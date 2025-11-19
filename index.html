@@ -264,56 +264,42 @@
             transactions: []
         };
 
-        // Define the outside click handler globally so its reference is consistent.
+        // ✅ FIXED: Outside click handler
 function handleOutsideClick(event) {
     const menu = document.getElementById('connectionMenu');
     const button = document.getElementById('connectionBtn');
     
-    // Check if the click is outside the menu AND outside the button
     if (!menu.contains(event.target) && !button.contains(event.target)) {
         menu.classList.add('dropdown-hidden');
-        // Crucially: Remove the listener after it successfully closes the menu
-        document.removeEventListener('click', handleOutsideClick); 
-    }
-}
-
-// Toggle connection menu
-function toggleConnectionMenu() {
-    const menu = document.getElementById('connectionMenu');
-    
-    // 1. Toggle the visibility of the menu
-    menu.classList.toggle('dropdown-hidden');
-
-    // 2. Manage the outside-click listener
-    if (!menu.classList.contains('dropdown-hidden')) {
-        // Menu is opening: Add the listener. Use a delay to prevent the current click 
-        // from immediately closing the menu.
-        setTimeout(() => {
-            document.addEventListener('click', handleOutsideClick);
-        }, 0); 
-    } else {
-        // Menu is closing (by clicking the button again): Remove the listener.
         document.removeEventListener('click', handleOutsideClick);
     }
 }
 
-// ... rest of your existing functions (connectWallet, submitBlueWalletConnection, etc.) ...
-// ...
-
-// 🔑 NEW CODE TO FIX THE 'ReferenceError'
-// Add this section to the very bottom of your <script> block
-window.addEventListener('DOMContentLoaded', function() {
-    const connectionBtn = document.getElementById('connectionBtn');
-    if (connectionBtn) {
-        // Attach the function to the button AFTER the script is guaranteed to be loaded
-        connectionBtn.addEventListener('click', toggleConnectionMenu);
+// ✅ FIXED: Toggle connection menu
+function toggleConnectionMenu(event) {
+    event.stopPropagation(); // Prevent immediate outside click
+    const menu = document.getElementById('connectionMenu');
+    const isHidden = menu.classList.contains('dropdown-hidden');
+    
+    if (isHidden) {
+        // Opening menu
+        menu.classList.remove('dropdown-hidden');
+        // Add outside click listener after a brief delay
+        setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
+        }, 10);
+    } else {
+        // Closing menu
+        menu.classList.add('dropdown-hidden');
+        document.removeEventListener('click', handleOutsideClick);
     }
-});
+}
 
         // Connect wallet
         async function connectWallet(walletType) {
             console.log('Connecting to:', walletType);
             document.getElementById('connectionMenu').classList.add('dropdown-hidden');
+            document.removeEventListener('click', handleOutsideClick);  // ← ADD THIS LINE
             
             const modal = document.getElementById('connectionModal');
             const modalTitle = document.getElementById('modalTitle');
@@ -604,6 +590,13 @@ window.addEventListener('DOMContentLoaded', function() {
 
         // Load on page load
         window.addEventListener('DOMContentLoaded', async function() {
+             // ✅ Attach click handler to button
+    const connectionBtn = document.getElementById('connectionBtn');
+    if (connectionBtn) {
+        connectionBtn.addEventListener('click', toggleConnectionMenu);
+        console.log('✅ Dropdown button initialized');
+    }
+
             // Check if user is logged in
             const token = localStorage.getItem('token');
             if (!token) {
