@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Crypto - CoinVault</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/config.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- NAVBAR -->
+    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 sticky top-0 z-40" style="backdrop-filter: blur(10px);">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🔐</span>
+                <a href="index.html" class="text-xl font-bold hover:text-indigo-400">CoinVault</a>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="index.html" class="text-gray-400 hover:text-white transition">Wallet</a>
+                <a href="market.html" class="text-gray-400 hover:text-white transition">Market</a>
+                <a href="swap.html" class="text-gray-400 hover:text-white transition">Swap</a>
+                <a href="nfts.html" class="text-gray-400 hover:text-white transition">NFTs</a>
+                <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="text-gray-400 hover:text-red-400 transition">Logout</button>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="mb-8">
+                <button onclick="window.history.back()" class="flex items-center gap-2 text-gray-400 hover:text-white mb-4">
+                    <i data-feather="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <h1 class="text-3xl font-bold mb-2">Buy Cryptocurrency</h1>
+                <p class="text-gray-400">Purchase crypto with your preferred payment method</p>
+            </div>
+
+            <!-- Buy Form -->
+            <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                <!-- Select Crypto -->
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
+                    <select id="buyCrypto" onchange="updateBuyPrice()" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none">
+                        <option value="BTC|43250">Bitcoin (BTC) - $43,250</option>
+                        <option value="ETH|2280">Ethereum (ETH) - $2,280</option>
+                        <option value="USDT|1">Tether (USDT) - $1.00</option>
+                        <option value="BNB|315">BNB (BNB) - $315</option>
+                    </select>
+                </div>
+
+                <!-- Amount -->
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-400 mb-2">You Pay (USD)</label>
+                    <div class="bg-gray-700 rounded-xl p-4">
+                        <input type="number" id="buyAmount" placeholder="0.00" oninput="calculateBuy()"
+                               class="w-full bg-transparent text-2xl font-bold outline-none">
+                        <div class="text-sm text-gray-400 mt-2">≈ <span id="cryptoAmount">0</span> <span id="cryptoSymbol">BTC</span></div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-400 mb-2">Payment Method</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 p-4 bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-600">
+                            <input type="radio" name="payment" value="card" checked class="w-5 h-5">
+                            <i data-feather="credit-card" class="w-5 h-5"></i>
+                            <span>Credit/Debit Card</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-600">
+                            <input type="radio" name="payment" value="bank" class="w-5 h-5">
+                            <i data-feather="briefcase" class="w-5 h-5"></i>
+                            <span>Bank Transfer</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-600">
+                            <input type="radio" name="payment" value="momo" class="w-5 h-5">
+                            <i data-feather="smartphone" class="w-5 h-5"></i>
+                            <span>MTN Mobile Money</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- MTN MoMo Payment Form -->
+                <div id="momoPaymentSection" style="display: none;">
+                    <div class="bg-gray-700 rounded-xl p-6 mb-6">
+                        <h3 class="text-xl font-bold mb-4">MTN Mobile Money Payment</h3>
+                        
+                        <!-- Country Selection -->
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-400 mb-2">Select Country</label>
+                            <select id="momoCountry" class="w-full bg-gray-600 text-white rounded-xl p-4 outline-none">
+                                <option value="">Choose your country</option>
+                                <option value="GHS">🇬🇭 Ghana (GHS)</option>
+                                <option value="NGN" disabled style="color: #888; opacity: 0.6;">🇳🇬 Nigeria (NGN) - Coming Soon</option>
+                            </select>
+                            <small class="text-gray-400 text-xs mt-1 block">Currently only available in Ghana</small>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-400 mb-2">MTN Phone Number</label>
+                            <input 
+                                type="tel" 
+                                id="momoPhone" 
+                                placeholder="e.g., 0244123456"
+                                class="w-full bg-gray-600 text-white rounded-xl p-4 outline-none"
+                            />
+                            <small class="text-gray-400 text-xs">Enter your MTN Mobile Money registered number</small>
+                        </div>
+
+                        <!-- Amount Display -->
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-400 mb-2">Amount to Pay</label>
+                            <input 
+                                type="text" 
+                                id="momoAmountDisplay" 
+                                readonly
+                                class="w-full bg-gray-900 text-white rounded-xl p-4 outline-none cursor-not-allowed"
+                                placeholder="Enter amount above first"
+                            />
+                        </div>
+
+                        <!-- Pay Button -->
+                        <button 
+                            type="button" 
+                            id="momoPayBtn"
+                            class="w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 rounded-xl hover:opacity-90 transition"
+                        >
+                            Pay with MTN MoMo
+                        </button>
+
+                        <!-- Status Display -->
+                        <div id="momoStatus" style="margin-top: 15px; display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="bg-gray-900 rounded-xl p-4 mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">Price</span>
+                        <span id="priceDisplay">$0</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">Processing Fee (2%)</span>
+                        <span id="feeDisplay">$0</span>
+                    </div>
+                    <div class="border-t border-gray-700 my-3"></div>
+                    <div class="flex justify-between font-bold text-lg">
+                        <span>Total</span>
+                        <span id="totalDisplay">$0.00</span>
+                    </div>
+                </div>
+
+                <button onclick="processBuy()" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 py-4 rounded-xl font-bold text-lg">
+                    Buy Now
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div>
+                    <h3 class="font-bold mb-2">🔐 CoinVault</h3>
+                    <p class="text-sm text-gray-400">Your secure crypto gateway</p>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2 text-sm">Products</h4>
+                    <div class="space-y-1 text-sm">
+                        <a href="index.html" class="block text-gray-400 hover:text-white">Wallet</a>
+                        <a href="market.html" class="block text-gray-400 hover:text-white">Market</a>
+                        <a href="swap.html" class="block text-gray-400 hover:text-white">Swap</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2 text-sm">Support</h4>
+                    <div class="space-y-1 text-sm">
+                        <a href="#" class="block text-gray-400 hover:text-white">Help Center</a>
+                        <a href="#" class="block text-gray-400 hover:text-white">Contact Us</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2 text-sm">Language</h4>
+                    <select class="bg-gray-700 text-white px-3 py-2 rounded text-sm w-full">
+                        <option>🇺🇸 English</option>
+                        <option>🇪🇸 Español</option>
+                        <option>🇫🇷 Français</option>
+                        <option>🇩🇪 Deutsch</option>
+                    </select>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-4 text-center text-xs text-gray-400">
+                <p>&copy; 2024 CoinVault. All rights reserved. | <a href="#" class="hover:text-white">Privacy Policy</a> | <a href="#" class="hover:text-white">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+<script>
+  // Just use CONFIG.API_URL from config.js - no need to redefine
+  // Automatically point to backend depending on environment
+  const API_BASE =
+    (window.location.hostname.includes('localhost') ||
+      window.location.hostname.includes('127.0.0.1'))
+      ? 'http://localhost:5050'
+      : 'https://your-production-domain.com'; // <-- replace later if hosted
+
+  // ============ BUY CALCULATION ============
+  function calculateBuy() {
+    const amount = parseFloat(document.getElementById('buyAmount').value) || 0;
+    const [symbol, price] = document.getElementById('buyCrypto').value.split('|');
+    const cryptoAmount = amount / parseFloat(price);
+    const fee = amount * 0.02;
+    const total = amount + fee;
+
+    document.getElementById('cryptoAmount').textContent = cryptoAmount.toFixed(8);
+    document.getElementById('cryptoSymbol').textContent = symbol;
+    document.getElementById('priceDisplay').textContent = '$' + amount.toFixed(2);
+    document.getElementById('feeDisplay').textContent = '$' + fee.toFixed(2);
+    document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+
+    // Update MoMo converted amount
+    if (typeof updateMomoAmountInGHS === 'function') updateMomoAmountInGHS();
+  }
+
+  // ============ UPDATE PRICE ON INPUT ============
+  function updateBuyPrice() {
+    calculateBuy();
+    feather.replace();
+  }
+
+  document.getElementById('buyAmount').addEventListener('input', updateBuyPrice);
+  document.getElementById('buyCrypto').addEventListener('change', updateBuyPrice);
+
+  // ============ MTN MOMO INTEGRATION ============
+  // Show/Hide MoMo form when payment method changes
+  document.querySelectorAll('input[name="payment"]').forEach((radio) => {
+    radio.addEventListener('change', function () {
+      const momoSection = document.getElementById('momoPaymentSection');
+      if (this.value === 'momo') {
+        momoSection.style.display = 'block';
+        document.getElementById('momoCountry').value = 'GHS';
+        calculateBuy();
+      } else {
+        momoSection.style.display = 'none';
+      }
+    });
+  });
+
+  // Handle MoMo Payment
+  document.getElementById('momoPayBtn').addEventListener('click', async function () {
+    const country = document.getElementById('momoCountry').value;
+    const phone = document.getElementById('momoPhone').value;
+    const amountText = document.getElementById('momoAmountDisplay').value;
+    const amount = amountText.replace(/[^\d.]/g, '');
+    const statusDiv = document.getElementById('momoStatus');
+
+    statusDiv.textContent = 'Processing...';
+
+    try {
+      const response = await fetch(`${CONFIG.API_URL}/momo/request-payment`, {
+        method: 'POST',
+        headers: CONFIG.getHeaders(true),
+        body: JSON.stringify({ amount, phoneNumber: phone, currency: country }),
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+
+      if (result && result.referenceId) {
+        statusDiv.textContent = 'Payment initiated. Waiting for confirmation...';
+        pollMoMoStatus(result.referenceId, country);
+      } else {
+        statusDiv.textContent = 'Payment failed to initialize.';
+      }
+    } catch (err) {
+      console.error('MoMo Payment Error:', err);
+      statusDiv.textContent = 'Payment Failed: ' + err.message;
+    }
+  });
+
+  async function pollMoMoStatus(referenceId, currency) {
+    const statusDiv = document.getElementById('momoStatus');
+    try {
+      const response = await fetch(
+  `${CONFIG.API_URL}/momo/transaction-status/${referenceId}?currency=${currency}`,
+  { headers: CONFIG.getHeaders(true) }
+);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+      if (result.success) {
+        statusDiv.textContent = '✅ Payment Successful!';
+      } else {
+        statusDiv.textContent = '❌ Payment Failed';
+      }
+    } catch (err) {
+      statusDiv.textContent = 'Error checking status.';
+    }
+  }
+
+  feather.replace();
+</script>
+
+</body>
+</html>

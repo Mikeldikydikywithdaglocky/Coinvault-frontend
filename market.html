@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market - CoinVault</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-900 text-white">
+<!-- COPY THIS NAVBAR TO: market.html, swap.html, nfts.html, buy.html, sell.html, send.html, receive.html -->
+<nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 sticky top-0 z-40" style="backdrop-filter: blur(10px);">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">🔐</span>
+            <a href="index.html" class="text-xl font-bold hover:text-indigo-400">CoinVault</a>
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="index.html" class="text-gray-400 hover:text-white transition">Wallet</a>
+            <a href="market.html" class="text-gray-400 hover:text-white transition">Market</a>
+            <a href="swap.html" class="text-gray-400 hover:text-white transition">Swap</a>
+            <a href="nfts.html" class="text-gray-400 hover:text-white transition">NFTs</a>
+            <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="text-gray-400 hover:text-red-400 transition">Logout</button>
+        </div>
+    </div>
+</nav>
+    
+    <main class="container mx-auto px-4 py-8">
+        <!-- Market Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Crypto Market</h1>
+            <p class="text-gray-400">Live cryptocurrency prices updated every 30 seconds</p>
+        </div>
+
+        <!-- Market Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gradient-to-r from-green-900 to-green-700 rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-200 text-sm">Market Cap</p>
+                        <h3 class="text-2xl font-bold" id="totalMarketCap">$0</h3>
+                    </div>
+                    <i data-feather="trending-up" class="w-10 h-10 text-green-300"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-200 text-sm">24h Volume</p>
+                        <h3 class="text-2xl font-bold" id="totalVolume">$0</h3>
+                    </div>
+                    <i data-feather="activity" class="w-10 h-10 text-blue-300"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-purple-900 to-purple-700 rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-200 text-sm">BTC Dominance</p>
+                        <h3 class="text-2xl font-bold" id="btcDominance">0%</h3>
+                    </div>
+                    <i data-feather="pie-chart" class="w-10 h-10 text-purple-300"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="bg-gray-800 rounded-xl p-4 mb-6 flex gap-4">
+            <div class="flex-1">
+                <input type="text" id="searchCrypto" placeholder="Search cryptocurrency..." 
+                       class="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <select id="sortBy" class="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none">
+                <option value="market_cap">Market Cap</option>
+                <option value="price">Price</option>
+                <option value="change">24h Change</option>
+                <option value="volume">Volume</option>
+            </select>
+        </div>
+
+        <!-- Crypto Table -->
+        <div class="bg-gray-800 rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-4 text-left">#</th>
+                            <th class="px-6 py-4 text-left">Name</th>
+                            <th class="px-6 py-4 text-right">Price</th>
+                            <th class="px-6 py-4 text-right">24h %</th>
+                            <th class="px-6 py-4 text-right">Market Cap</th>
+                            <th class="px-6 py-4 text-right">Volume (24h)</th>
+                            <th class="px-6 py-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cryptoTable">
+                        <!-- Loading -->
+                        <tr>
+                            <td colspan="7" class="text-center py-8">
+                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+                                <p class="mt-2 text-gray-400">Loading market data...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/market.js"></script>
+    <script>feather.replace();</script>
+
+<!-- COPY THIS FOOTER TO ALL PAGES -->
+<footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div>
+                <h3 class="font-bold mb-2">🔐 CoinVault</h3>
+                <p class="text-sm text-gray-400">Your secure crypto gateway</p>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2 text-sm">Products</h4>
+                <div class="space-y-1 text-sm">
+                    <a href="index.html" class="block text-gray-400 hover:text-white">Wallet</a>
+                    <a href="market.html" class="block text-gray-400 hover:text-white">Market</a>
+                    <a href="swap.html" class="block text-gray-400 hover:text-white">Swap</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2 text-sm">Support</h4>
+                <div class="space-y-1 text-sm">
+                    <a href="#" class="block text-gray-400 hover:text-white">Help Center</a>
+                    <a href="#" class="block text-gray-400 hover:text-white">Contact Us</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2 text-sm">Language</h4>
+                <select class="bg-gray-700 text-white px-3 py-2 rounded text-sm w-full">
+                    <option>🇺🇸 English</option>
+                    <option>🇪🇸 Español</option>
+                    <option>🇫🇷 Français</option>
+                    <option>🇩🇪 Deutsch</option>
+                </select>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-4 text-center text-xs text-gray-400">
+            <p>&copy; 2024 CoinVault. All rights reserved. | <a href="#" class="hover:text-white">Privacy Policy</a> | <a href="#" class="hover:text-white">Terms of Service</a></p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

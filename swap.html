@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swap - CoinVault</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="js/crypto-data.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+<!-- COPY THIS NAVBAR TO: market.html, swap.html, nfts.html, buy.html, sell.html, send.html, receive.html -->
+<nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 sticky top-0 z-40" style="backdrop-filter: blur(10px);">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">🔐</span>
+            <a href="index.html" class="text-xl font-bold hover:text-indigo-400">CoinVault</a>
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="index.html" class="text-gray-400 hover:text-white transition">Wallet</a>
+            <a href="market.html" class="text-gray-400 hover:text-white transition">Market</a>
+            <a href="swap.html" class="text-gray-400 hover:text-white transition">Swap</a>
+            <a href="nfts.html" class="text-gray-400 hover:text-white transition">NFTs</a>
+            <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="text-gray-400 hover:text-red-400 transition">Logout</button>
+        </div>
+    </div>
+</nav>
+    
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold mb-2">Swap Crypto</h1>
+                <p class="text-gray-400">Exchange your crypto instantly</p>
+            </div>
+
+            <!-- Swap Card -->
+            <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                <!-- From -->
+                <div class="bg-gray-700 rounded-xl p-4 mb-2">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm text-gray-400">From</label>
+                        <span class="text-sm text-gray-400">Balance: <span id="fromBalance">0</span></span>
+                    </div>
+                    <div class="flex gap-3">
+                        <input type="number" id="fromAmount" placeholder="0.0" 
+                               class="flex-1 bg-transparent text-2xl font-bold outline-none" 
+                               oninput="calculateSwap()">
+                        <button onclick="showTokenSelect('from')" class="flex items-center gap-2 bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg transition">
+                            <img id="fromTokenImg" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" class="w-6 h-6 rounded-full">
+                            <span id="fromToken" class="font-medium">BTC</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <button onclick="setMaxAmount()" class="mt-2 text-sm text-indigo-400 hover:text-indigo-300">MAX</button>
+                </div>
+
+                <!-- Swap Icon -->
+                <div class="flex justify-center -my-3 relative z-10">
+                    <button onclick="swapTokens()" class="bg-gray-800 border-4 border-gray-700 rounded-full p-2 hover:bg-gray-700 transition">
+                        <i data-feather="arrow-down" class="w-5 h-5 text-indigo-400"></i>
+                    </button>
+                </div>
+
+                <!-- To -->
+                <div class="bg-gray-700 rounded-xl p-4 mt-2">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm text-gray-400">To</label>
+                        <span class="text-sm text-gray-400">Balance: <span id="toBalance">0</span></span>
+                    </div>
+                    <div class="flex gap-3">
+                        <input type="number" id="toAmount" placeholder="0.0" 
+                               class="flex-1 bg-transparent text-2xl font-bold outline-none" readonly>
+                        <button onclick="showTokenSelect('to')" class="flex items-center gap-2 bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg transition">
+                            <img id="toTokenImg" src="https://cryptologos.cc/logos/ethereum-eth-logo.png" class="w-6 h-6 rounded-full">
+                            <span id="toToken" class="font-medium">ETH</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Swap Details -->
+                <div id="swapDetails" class="mt-4 p-4 bg-gray-900 rounded-xl hidden">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-400">Rate</span>
+                        <span id="swapRate">-</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-400">Fee (0.3%)</span>
+                        <span id="swapFee">-</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">You'll receive</span>
+                        <span id="youReceive" class="font-medium">-</span>
+                    </div>
+                </div>
+
+                <!-- Swap Button -->
+                <button id="swapBtn" onclick="executeSwap()" 
+                        class="w-full mt-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-4 rounded-xl font-bold text-lg transition disabled:opacity-50 disabled:cursor-not-allowed" 
+                        disabled>
+                    Enter amount
+                </button>
+            </div>
+
+            <!-- Recent Swaps -->
+            <div class="bg-gray-800 rounded-xl p-6">
+                <h3 class="text-lg font-bold mb-4">Recent Swaps</h3>
+                <div id="recentSwaps" class="space-y-3">
+                    <p class="text-center text-gray-400 py-4">No recent swaps</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Token Select Modal -->
+    <div id="tokenModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Select Token</h3>
+                <button onclick="closeTokenModal()" class="text-gray-400 hover:text-white">
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <input type="text" id="tokenSearch" placeholder="Search token..." 
+                   class="w-full bg-gray-700 px-4 py-2 rounded-lg mb-4 outline-none">
+            <div id="tokenList" class="space-y-2 max-h-96 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/swap.js"></script>
+    <script>feather.replace();</script>
+<!-- COPY THIS FOOTER TO ALL PAGES -->
+<footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div>
+                <h3 class="font-bold mb-2">🔐 CoinVault</h3>
+                <p class="text-sm text-gray-400">Your secure crypto gateway</p>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2 text-sm">Products</h4>
+                <div class="space-y-1 text-sm">
+                    <a href="index.html" class="block text-gray-400 hover:text-white">Wallet</a>
+                    <a href="market.html" class="block text-gray-400 hover:text-white">Market</a>
+                    <a href="swap.html" class="block text-gray-400 hover:text-white">Swap</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2 text-sm">Support</h4>
+                <div class="space-y-1 text-sm">
+                    <a href="#" class="block text-gray-400 hover:text-white">Help Center</a>
+                    <a href="#" class="block text-gray-400 hover:text-white">Contact Us</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2 text-sm">Language</h4>
+                <select class="bg-gray-700 text-white px-3 py-2 rounded text-sm w-full">
+                    <option>🇺🇸 English</option>
+                    <option>🇪🇸 Español</option>
+                    <option>🇫🇷 Français</option>
+                    <option>🇩🇪 Deutsch</option>
+                </select>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-4 text-center text-xs text-gray-400">
+            <p>&copy; 2024 CoinVault. All rights reserved. | <a href="#" class="hover:text-white">Privacy Policy</a> | <a href="#" class="hover:text-white">Terms of Service</a></p>
+        </div>
+    </div>
+</footer>
+</body>
+
+</html>
