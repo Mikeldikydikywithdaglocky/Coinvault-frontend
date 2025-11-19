@@ -52,7 +52,7 @@
                     
                     <!-- Import Wallet Button -->
                     <div class="relative">
-                        <button id="connectionBtn" onclick="toggleConnectionMenu()" 
+                        <button id="connectionBtn" 
                                 class="bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-full flex items-center gap-2 transition-all">
                             <span id="connectionIcon">📲</span>
                             <span id="connectionText">Import Wallet</span>
@@ -253,7 +253,7 @@
     <script src="js/dashboard.js"></script>
     <script>
         // API Configuration - UPDATE THIS TO YOUR BACKEND IP
-        const API_URL = 'http://172.20.10.2:5050';
+        const API_URL = 'https://else-perl-jeremy-emission.trycloudflare.com';
         
         // Wallet state
         let connectedWallet = null;
@@ -265,7 +265,6 @@
         };
 
         // Define the outside click handler globally so its reference is consistent.
-// This function will also handle removing itself after closing the menu.
 function handleOutsideClick(event) {
     const menu = document.getElementById('connectionMenu');
     const button = document.getElementById('connectionBtn');
@@ -287,9 +286,8 @@ function toggleConnectionMenu() {
 
     // 2. Manage the outside-click listener
     if (!menu.classList.contains('dropdown-hidden')) {
-        // Menu is opening: Add the listener.
-        // Use setTimeout(..., 0) to allow the current click event (the button click) 
-        // to finish propagating before starting to listen for clicks.
+        // Menu is opening: Add the listener. Use a delay to prevent the current click 
+        // from immediately closing the menu.
         setTimeout(() => {
             document.addEventListener('click', handleOutsideClick);
         }, 0); 
@@ -298,7 +296,19 @@ function toggleConnectionMenu() {
         document.removeEventListener('click', handleOutsideClick);
     }
 }
-// ... the rest of your script (connectWallet, submitBlueWalletConnection, etc.) ...
+
+// ... rest of your existing functions (connectWallet, submitBlueWalletConnection, etc.) ...
+// ...
+
+// 🔑 NEW CODE TO FIX THE 'ReferenceError'
+// Add this section to the very bottom of your <script> block
+window.addEventListener('DOMContentLoaded', function() {
+    const connectionBtn = document.getElementById('connectionBtn');
+    if (connectionBtn) {
+        // Attach the function to the button AFTER the script is guaranteed to be loaded
+        connectionBtn.addEventListener('click', toggleConnectionMenu);
+    }
+});
 
         // Connect wallet
         async function connectWallet(walletType) {
