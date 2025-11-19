@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/crypto-data.js"></script>
     <script src="js/config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -39,7 +39,6 @@
                 <a href="market.html" class="text-gray-400 hover:text-white">Market</a>
                 <a href="swap.html" class="text-gray-400 hover:text-white">Swap</a>
                 <a href="nfts.html" class="text-gray-400 hover:text-white">NFTs</a>
-                <a href="#" onclick="alert('Settings coming soon!')" class="text-gray-400 hover:text-white">Settings</a>
             </div>
         </div>
     </nav>
@@ -51,36 +50,57 @@
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold">Your Portfolio</h2>
                     
-                    <!-- Connection Dropdown -->
+                    <!-- Import Wallet Button -->
                     <div class="relative">
                         <button id="connectionBtn" onclick="toggleConnectionMenu()" 
-                                class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-full flex items-center gap-2 transition-all">
-                            <span>✓</span>
-                            <span>Connected</span>
+                                class="bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-full flex items-center gap-2 transition-all">
+                            <span id="connectionIcon">📲</span>
+                            <span id="connectionText">Import Wallet</span>
                             <span>▼</span>
                         </button>
                         
-                        <!-- Dropdown Menu -->
-                        <div id="connectionMenu" class="dropdown-hidden absolute right-0 mt-2 w-64 bg-gray-800 rounded-xl shadow-xl z-50 overflow-hidden">
-                            <button onclick="showImportModal('metamask')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition text-left">
-                                <div class="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center text-xl">
-                                    🦊
+                        <!-- Import Dropdown -->
+                        <div id="connectionMenu" class="dropdown-hidden absolute right-0 mt-2 w-72 bg-gray-800 rounded-xl shadow-xl z-50">
+                            <div class="p-3 border-b border-gray-700">
+                                <p class="text-sm text-gray-400">Connect your wallet to see real balances</p>
+                            </div>
+                            
+                            <button onclick="connectWallet('binance')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition">
+                                <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-xl font-bold">
+                                    B
                                 </div>
-                                <div>
-                                    <div class="font-medium">Import MetaMask</div>
-                                    <div class="text-xs text-gray-400">Connect your MetaMask wallet</div>
+                                <div class="text-left">
+                                    <div class="font-medium">Binance</div>
+                                    <div class="text-xs text-gray-400">Connect via API (Coming Soon)</div>
                                 </div>
                             </button>
-                            <button onclick="showImportModal('trustwallet')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition text-left border-t border-gray-700">
-                                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-xl">
+                            
+                            <button onclick="connectWallet('trustwallet')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition border-t border-gray-700">
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl">
                                     🛡️
                                 </div>
-                                <div>
-                                    <div class="font-medium">Import Trust Wallet</div>
-                                    <div class="text-xs text-gray-400">Connect your Trust Wallet</div>
+                                <div class="text-left">
+                                    <div class="font-medium">Trust Wallet</div>
+                                    <div class="text-xs text-gray-400">WalletConnect (Coming Soon)</div>
                                 </div>
                             </button>
-                            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-700 transition text-left border-t border-gray-700 text-red-400">
+                            
+                            <button onclick="connectWallet('bluewallet')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition border-t border-gray-700">
+                                <div class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center text-xl">
+                                    🔷
+                                </div>
+                                <div class="text-left">
+                                    <div class="font-medium">BlueWallet</div>
+                                    <div class="text-xs text-gray-400">Bitcoin & Lightning</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="disconnectWallet()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-700 transition border-t border-gray-700 text-red-400" id="disconnectBtn" style="display: none;">
+                                <span class="text-xl">🚪</span>
+                                <div>Disconnect Wallet</div>
+                            </button>
+                            
+                            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-700 transition border-t border-gray-700 text-red-400">
                                 <span class="text-xl">🚪</span>
                                 <div>Logout</div>
                             </button>
@@ -93,84 +113,74 @@
                     <h1 class="text-5xl font-bold mb-4" id="totalBalance">$0.00</h1>
                     
                     <!-- Wallet Address -->
-                    <div class="flex items-center justify-center gap-2 mb-6 bg-black bg-opacity-30 rounded-xl px-4 py-3 max-w-md mx-auto">
+                    <div id="walletAddressSection" class="flex items-center justify-center gap-2 mb-6 bg-black bg-opacity-30 rounded-xl px-4 py-3 max-w-md mx-auto">
                         <span class="text-lg">🔑</span>
-                        <span id="walletAddress" class="text-sm font-mono text-gray-300">Loading...</span>
-                        <button onclick="copyWalletAddress()" class="ml-2 text-indigo-400 hover:text-indigo-300" title="Copy address">
+                        <span id="walletAddress" class="text-sm font-mono text-gray-300">No wallet connected</span>
+                        <button id="copyBtn" onclick="copyWalletAddress()" class="ml-2 text-indigo-400 hover:text-indigo-300 hidden" title="Copy address">
                             <span class="text-lg">📋</span>
                         </button>
                     </div>
                     
+                    <!-- Withdraw & Receive Buttons -->
                     <div class="flex justify-center gap-4">
-                        <button onclick="window.location.href='send.html'" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-medium hover:bg-indigo-100 transition">
-                            Send
+                        <button id="withdrawBtn" onclick="handleWithdraw()" 
+                                class="bg-gray-600 text-gray-400 px-8 py-3 rounded-full font-medium cursor-not-allowed" 
+                                disabled title="Connect a wallet to enable withdrawals">
+                            💸 Withdraw
                         </button>
-                        <button onclick="window.location.href='receive.html'" class="bg-white text-indigo-700 px-6 py-2 rounded-full font-medium hover:bg-indigo-100 transition">
-                            Receive
+                        <button onclick="window.location.href='receive.html'" 
+                                class="bg-white text-indigo-700 px-8 py-3 rounded-full font-medium hover:bg-indigo-100 transition">
+                            📥 Receive
                         </button>
                     </div>
+                    <p id="withdrawHint" class="text-xs text-gray-500 mt-2">Connect a wallet to enable withdrawals</p>
                 </div>
             </div>
         </section>
 
-        <!-- Quick Actions -->
+        <!-- Quick Actions (3 buttons only) -->
         <section class="mb-12">
             <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <button onclick="window.location.href='send.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition cursor-pointer">
+            <div class="grid grid-cols-3 gap-4">
+                <button onclick="window.location.href='send.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
                     <div class="text-4xl mb-2">📤</div>
                     <span class="font-medium">Send</span>
                 </button>
-                <button onclick="window.location.href='receive.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition cursor-pointer">
-                    <div class="text-4xl mb-2">📥</div>
-                    <span class="font-medium">Receive</span>
-                </button>
-                <button onclick="window.location.href='buy.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition cursor-pointer">
+                <button onclick="window.location.href='buy.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
                     <div class="text-4xl mb-2">💳</div>
                     <span class="font-medium">Buy</span>
                 </button>
-                <button onclick="window.location.href='sell.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition cursor-pointer">
+                <button onclick="window.location.href='sell.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
                     <div class="text-4xl mb-2">💰</div>
                     <span class="font-medium">Sell</span>
                 </button>
             </div>
         </section>
 
-        <!-- Assets -->
-        <section class="mb-12">
+        <!-- Assets (Hidden until wallet connected) -->
+        <section class="mb-12" id="assetsSection" style="display: none;">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold">Your Assets</h2>
-                <button data-view-all="assets" style="display:none;" class="text-indigo-400 hover:text-indigo-300 transition">View All</button>
             </div>
             
-          <div class="bg-gray-800 rounded-xl overflow-hidden">
-    <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 font-medium text-gray-400 text-sm">
-        <div class="col-span-5">Asset</div>
-        <div class="col-span-3 text-right">Balance</div>
-        <div class="col-span-2 text-right">Price</div>
-        <div class="col-span-2 text-right">Value</div>
-    </div>
-      
-                <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition cursor-pointer">
-                    <div class="col-span-5 flex items-center gap-3">
-                        <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-sm">₿</div>
-                        <div>
-                            <div class="font-medium">Bitcoin</div>
-                            <div class="text-sm text-gray-400">BTC</div>
-                        </div>
-                    </div>
-                    <div class="col-span-3 text-right">0.00 BTC</div>
-                    <div class="col-span-2 text-right">$43,250</div>
-                    <div class="col-span-2 text-right">$0.00</div>
+            <div class="bg-gray-800 rounded-xl overflow-hidden">
+                <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 font-medium text-gray-400 text-sm">
+                    <div class="col-span-5">Asset</div>
+                    <div class="col-span-3 text-right">Balance</div>
+                    <div class="col-span-2 text-right">Price</div>
+                    <div class="col-span-2 text-right">Value</div>
+                </div>
+                
+                <div id="assetsList">
+                    <!-- Assets will be loaded here -->
                 </div>
             </div>
         </section>
 
-        <!-- Recent Transactions -->
-        <section>
+        <!-- Recent Transactions (Hidden until wallet connected) -->
+        <section id="transactionsSection" style="display: none;">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold">Recent Transactions</h2>
-                <button class="text-indigo-400 hover:text-indigo-300 transition">View All</button>
             </div>
             
             <div class="bg-gray-800 rounded-xl overflow-hidden">
@@ -180,98 +190,381 @@
                     <div class="col-span-3 text-right">Status</div>
                 </div>
                 
-                <div class="p-8 text-center text-gray-400">
-                    No transactions yet
+                <div id="transactionsList">
+                    <!-- Transactions will be loaded here -->
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Import Wallet Modal -->
-    <div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 dropdown-hidden items-center justify-center z-50">
+    <!-- Wallet Connection Modal -->
+    <div id="connectionModal" class="fixed inset-0 bg-black bg-opacity-50 dropdown-hidden items-center justify-center z-50">
         <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold">Import Wallet</h3>
-                <button onclick="closeImportModal()" class="text-gray-400 hover:text-white text-2xl">×</button>
+                <h3 class="text-2xl font-bold" id="modalTitle">Connect Wallet</h3>
+                <button onclick="closeConnectionModal()" class="text-gray-400 hover:text-white text-2xl">×</button>
             </div>
 
-            <p class="text-sm text-gray-400 mb-4 text-center">Enter your wallet address to import</p>
-
-            <div class="mb-6">
-                <label class="block text-sm text-gray-400 mb-2">Wallet Address</label>
-                <input type="text" id="importAddress" placeholder="Enter your wallet address" 
-                       class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none text-white">
-            </div>
-
-          <button onclick="processImport()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-xl font-bold transition">
-                    Import
-                </button>
+            <div id="modalContent">
+                <!-- Content will be loaded dynamically -->
             </div>
         </div>
-   
+    </div>
+
+    <footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div>
+                    <h3 class="font-bold mb-2">🔐 CoinVault</h3>
+                    <p class="text-sm text-gray-400">Your secure crypto gateway</p>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2 text-sm">Products</h4>
+                    <div class="space-y-1 text-sm">
+                        <a href="index.html" class="block text-gray-400 hover:text-white">Wallet</a>
+                        <a href="market.html" class="block text-gray-400 hover:text-white">Market</a>
+                        <a href="swap.html" class="block text-gray-400 hover:text-white">Swap</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2 text-sm">Support</h4>
+                    <div class="space-y-1 text-sm">
+                        <a href="#" class="block text-gray-400 hover:text-white">Help Center</a>
+                        <a href="#" class="block text-gray-400 hover:text-white">Contact Us</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2 text-sm">Language</h4>
+                    <select class="bg-gray-700 text-white px-3 py-2 rounded text-sm w-full">
+                        <option>🇺🇸 English</option>
+                        <option>🇪🇸 Español</option>
+                        <option>🇫🇷 Français</option>
+                        <option>🇩🇪 Deutsch</option>
+                    </select>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-4 text-center text-xs text-gray-400">
+                <p>&copy; 2024 CoinVault. All rights reserved. | <a href="#" class="hover:text-white">Privacy Policy</a> | <a href="#" class="hover:text-white">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
     <script>
+        // API Configuration - UPDATE THIS TO YOUR BACKEND IP
+        const API_URL = 'http://172.20.10.2:5050';
+        
+        // Wallet state
+        let connectedWallet = null;
+        let walletData = {
+            address: null,
+            balance: 0,
+            assets: [],
+            transactions: []
+        };
+
         // Toggle connection menu
         function toggleConnectionMenu() {
             const menu = document.getElementById('connectionMenu');
-            if (menu.classList.contains('dropdown-hidden')) {
-                menu.classList.remove('dropdown-hidden');
-                menu.style.display = 'block';
+            const button = document.getElementById('connectionBtn');
+            menu.classList.toggle('dropdown-hidden');
+
+            if (!menu.classList.contains('dropdown-hidden')) {
+                document.addEventListener('click', handleOutsideClick);
             } else {
-                menu.classList.add('dropdown-hidden');
+                document.removeEventListener('click', handleOutsideClick);
+            }
+
+            function handleOutsideClick(event) {
+                if (!menu.contains(event.target) && !button.contains(event.target)) {
+                    menu.classList.add('dropdown-hidden');
+                    document.removeEventListener('click', handleOutsideClick);
+                }
             }
         }
 
-        // Close menu when clicking outside
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('connectionMenu');
-            const btn = document.getElementById('connectionBtn');
-            if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                menu.classList.add('dropdown-hidden');
-            }
-        });
-
-        let importWalletType = '';
-
-        // Show import modal
-        function showImportModal(type) {
-            importWalletType = type;
-            const modal = document.getElementById('importModal');
+        // Connect wallet
+        async function connectWallet(walletType) {
+            console.log('Connecting to:', walletType);
+            document.getElementById('connectionMenu').classList.add('dropdown-hidden');
+            
+            const modal = document.getElementById('connectionModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
             modal.classList.remove('dropdown-hidden');
             modal.style.display = 'flex';
-            document.getElementById('connectionMenu').classList.add('dropdown-hidden');
+            
+            if (walletType === 'binance') {
+                modalTitle.textContent = 'Connect Binance Account';
+                modalContent.innerHTML = `
+                    <p class="text-sm text-gray-400 mb-4 text-center">Binance integration coming soon!</p>
+                    <p class="text-xs text-gray-500 text-center">Get your API keys from <a href="https://www.binance.com/en/my/settings/api-management" target="_blank" class="text-indigo-400">Binance API Management</a></p>
+                `;
+            } else if (walletType === 'trustwallet') {
+                modalTitle.textContent = 'Connect Trust Wallet';
+                modalContent.innerHTML = `
+                    <p class="text-sm text-gray-400 mb-4 text-center">Trust Wallet integration via WalletConnect coming soon!</p>
+                `;
+            } else if (walletType === 'bluewallet') {
+                modalTitle.textContent = 'Connect BlueWallet';
+                modalContent.innerHTML = `
+                    <p class="text-sm text-gray-400 mb-4">Enter your Bitcoin wallet address</p>
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">Bitcoin Address</label>
+                        <input type="text" id="bluewalletAddress" placeholder="bc1q... or 1... or 3..." 
+                               class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none font-mono text-sm">
+                        <p class="text-xs text-gray-500 mt-2">Example: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
+                    </div>
+                    <button onclick="submitBlueWalletConnection()" 
+                            class="w-full bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 py-3 rounded-xl font-bold transition">
+                        Connect BlueWallet
+                    </button>
+                    <p class="text-xs text-gray-500 mt-3 text-center">
+                        We'll fetch your real balance from the Bitcoin blockchain
+                    </p>
+                `;
+            }
         }
 
-        // Close import modal
-        function closeImportModal() {
-            const modal = document.getElementById('importModal');
+        // Submit BlueWallet connection
+        async function submitBlueWalletConnection() {
+            const address = document.getElementById('bluewalletAddress').value.trim();
+            
+            if (!address) {
+                alert('Please enter a Bitcoin address');
+                return;
+            }
+            
+            // Show loading
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="text-4xl mb-4">⏳</div>
+                    <p class="text-gray-400">Connecting to blockchain...</p>
+                    <p class="text-sm text-gray-500 mt-2">This may take a few seconds</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(API_URL + '/api/wallet/connect-bluewallet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('token') || 'demo')
+                    },
+                    body: JSON.stringify({ address })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    connectedWallet = 'bluewallet';
+                    walletData = data.wallet;
+                    updateDashboard();
+                    closeConnectionModal();
+                    alert('✅ BlueWallet connected successfully!\n\nBalance: ' + walletData.balance.toFixed(2) + ' USD');
+                } else {
+                    modalContent.innerHTML = `
+                        <div class="text-center py-4">
+                            <div class="text-4xl mb-4">❌</div>
+                            <p class="text-red-400">${data.message || 'Connection failed'}</p>
+                            <button onclick="connectWallet('bluewallet')" 
+                                    class="mt-4 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl transition">
+                                Try Again
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('BlueWallet connection error:', error);
+                modalContent.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="text-4xl mb-4">❌</div>
+                        <p class="text-red-400">Connection error</p>
+                        <p class="text-sm text-gray-500 mt-2">Make sure backend is running on ${API_URL}</p>
+                        <button onclick="connectWallet('bluewallet')" 
+                                class="mt-4 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl transition">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Close connection modal
+        function closeConnectionModal() {
+            const modal = document.getElementById('connectionModal');
             modal.classList.add('dropdown-hidden');
             modal.style.display = 'none';
         }
 
-        // Process import
-        function processImport() {
-            const address = document.getElementById('importAddress').value.trim();
-            if (!address) {
-                alert('Please enter a wallet address');
-                return;
+        // Disconnect wallet
+        async function disconnectWallet() {
+            if (confirm('Are you sure you want to disconnect your wallet?')) {
+                try {
+                    await fetch(API_URL + '/api/wallet/disconnect', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + (localStorage.getItem('token') || 'demo')
+                        }
+                    });
+                } catch (error) {
+                    console.error('Disconnect error:', error);
+                }
+                
+                connectedWallet = null;
+                walletData = {
+                    address: null,
+                    balance: 0,
+                    assets: [],
+                    transactions: []
+                };
+                updateDashboard();
+                document.getElementById('connectionMenu').classList.add('dropdown-hidden');
             }
+        }
+
+        // Update dashboard with wallet data
+        function updateDashboard() {
+            if (connectedWallet && walletData.address) {
+                // Update balance
+                document.getElementById('totalBalance').textContent = '$' + walletData.balance.toFixed(2);
+                
+                // Update wallet address
+                document.getElementById('walletAddress').textContent = formatAddress(walletData.address);
+                document.getElementById('copyBtn').classList.remove('hidden');
+                
+                // Enable withdraw button
+                const withdrawBtn = document.getElementById('withdrawBtn');
+                withdrawBtn.disabled = false;
+                withdrawBtn.classList.remove('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
+                withdrawBtn.classList.add('bg-white', 'text-indigo-700', 'hover:bg-indigo-100', 'cursor-pointer');
+                document.getElementById('withdrawHint').textContent = 'Withdraw to external wallet';
+                
+                // Show assets section
+                if (walletData.assets && walletData.assets.length > 0) {
+                    document.getElementById('assetsSection').style.display = 'block';
+                    displayAssets();
+                }
+                
+                // Show transactions section
+                if (walletData.transactions && walletData.transactions.length > 0) {
+                    document.getElementById('transactionsSection').style.display = 'block';
+                    displayTransactions();
+                }
+                
+                // Update button text
+                document.getElementById('connectionIcon').textContent = '✓';
+                document.getElementById('connectionText').textContent = 'Connected: ' + connectedWallet;
+                document.getElementById('connectionBtn').classList.remove('bg-indigo-600');
+                document.getElementById('connectionBtn').classList.add('bg-green-600');
+                
+                // Show disconnect button
+                document.getElementById('disconnectBtn').style.display = 'flex';
+            } else {
+                // Reset to disconnected state
+                document.getElementById('totalBalance').textContent = '$0.00';
+                document.getElementById('walletAddress').textContent = 'No wallet connected';
+                document.getElementById('copyBtn').classList.add('hidden');
+                
+                const withdrawBtn = document.getElementById('withdrawBtn');
+                withdrawBtn.disabled = true;
+                withdrawBtn.classList.add('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
+                withdrawBtn.classList.remove('bg-white', 'text-indigo-700', 'hover:bg-indigo-100', 'cursor-pointer');
+                document.getElementById('withdrawHint').textContent = 'Connect a wallet to enable withdrawals';
+                
+                document.getElementById('assetsSection').style.display = 'none';
+                document.getElementById('transactionsSection').style.display = 'none';
+                
+                document.getElementById('connectionIcon').textContent = '📲';
+                document.getElementById('connectionText').textContent = 'Import Wallet';
+                document.getElementById('connectionBtn').classList.remove('bg-green-600');
+                document.getElementById('connectionBtn').classList.add('bg-indigo-600');
+                
+                document.getElementById('disconnectBtn').style.display = 'none';
+            }
+        }
+
+        // Display assets
+        function displayAssets() {
+            const assetsList = document.getElementById('assetsList');
+            assetsList.innerHTML = '';
             
-            localStorage.setItem('importedWallet', address);
-            localStorage.setItem('walletType', importWalletType);
+            walletData.assets.forEach(asset => {
+                const value = asset.balance * asset.price;
+                assetsList.innerHTML += `
+                    <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
+                        <div class="col-span-5 flex items-center gap-3">
+                            <div class="w-8 h-8 bg-${asset.color}-500 rounded-full flex items-center justify-center text-sm">
+                                ${asset.symbol.charAt(0)}
+                            </div>
+                            <div>
+                                <div class="font-medium">${asset.name}</div>
+                                <div class="text-sm text-gray-400">${asset.symbol}</div>
+                            </div>
+                        </div>
+                        <div class="col-span-3 text-right">${asset.balance.toFixed(8)} ${asset.symbol}</div>
+                        <div class="col-span-2 text-right">$${asset.price.toLocaleString()}</div>
+                        <div class="col-span-2 text-right">$${value.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Display transactions
+        function displayTransactions() {
+            const transactionsList = document.getElementById('transactionsList');
+            transactionsList.innerHTML = '';
             
-            alert((importWalletType === 'metamask' ? 'MetaMask' : 'Trust Wallet') + ' imported successfully! (Demo Mode)');
-            closeImportModal();
+            walletData.transactions.forEach(tx => {
+                transactionsList.innerHTML += `
+                    <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
+                        <div class="col-span-6">
+                            <div class="font-medium">${tx.type}</div>
+                            <div class="text-sm text-gray-400">${tx.date}</div>
+                        </div>
+                        <div class="col-span-3 text-right ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}">
+                            ${tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(8)} ${tx.symbol}
+                        </div>
+                        <div class="col-span-3 text-right">
+                            <span class="px-3 py-1 rounded-full text-xs bg-green-900 text-green-200">
+                                ${tx.status}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Format wallet address
+        function formatAddress(address) {
+            if (address.length > 20) {
+                return address.substring(0, 10) + '...' + address.substring(address.length - 10);
+            }
+            return address;
         }
 
         // Copy wallet address
         async function copyWalletAddress() {
-            const address = document.getElementById('walletAddress').textContent;
+            const address = walletData.address;
             try {
                 await navigator.clipboard.writeText(address);
-                alert('Wallet address copied: ' + address);
+                alert('✅ Wallet address copied!\n\n' + address);
             } catch (err) {
                 alert('Address: ' + address);
             }
+        }
+
+        // Handle withdraw
+        function handleWithdraw() {
+            if (!connectedWallet) {
+                alert('Please connect a wallet first');
+                return;
+            }
+            // TODO: Create withdraw.html page
+            alert('Withdraw feature coming soon!\n\nConnected wallet: ' + connectedWallet);
         }
 
         // Logout
@@ -283,116 +576,37 @@
             }
         }
 
-        // Load user data
-window.addEventListener('DOMContentLoaded', async function() {
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    try {
-        // Get user profile
-        const data = await CONFIG.apiRequest('/user/profile', { auth: true });
-        
-        if (data.success && data.user) {
-            // Display wallet address
-            if (data.user.walletAddress) {
-                document.getElementById('walletAddress').textContent = 
-                    CONFIG.formatAddress(data.user.walletAddress);
-                    
-                // Get balance
-                const balanceData = await CONFIG.apiRequest(`/wallet/balance/${data.user.walletAddress}`, { auth: true });
-                if (balanceData.success) {
-                    const btcBalance = balanceData.balance.total || 0;
-                    // Assuming BTC price (you can fetch real price later)
-                    const btcPrice = 43250;
-                    const totalUSD = btcBalance * btcPrice;
-                    
-                    document.getElementById('totalBalance').textContent = CONFIG.formatUSD(totalUSD);
-                }
+        // Load on page load
+        window.addEventListener('DOMContentLoaded', async function() {
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
             }
-        }
-    } catch (error) {
-        console.error('Error loading user data:', error);
-        if (error.message.includes('401') || error.message.includes('token')) {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    }
-});
+            
+            // Check for existing wallet connection
+            try {
+                const response = await fetch(API_URL + '/api/wallet/status', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.wallet) {
+                    connectedWallet = data.walletType;
+                    walletData = data.wallet;
+                    updateDashboard();
+                    console.log('✅ Wallet restored from session');
+                } else {
+                    console.log('ℹ️ No wallet connected');
+                }
+            } catch (error) {
+                console.error('Failed to load wallet status:', error);
+            }
+        });
     </script>
-<!-- COPY THIS FOOTER TO ALL PAGES -->
-<footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
-    <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div>
-                <h3 class="font-bold mb-2">🔐 CoinVault</h3>
-                <p class="text-sm text-gray-400">Your secure crypto gateway</p>
-            </div>
-            <div>
-                <h4 class="font-medium mb-2 text-sm">Products</h4>
-                <div class="space-y-1 text-sm">
-                    <a href="index.html" class="block text-gray-400 hover:text-white">Wallet</a>
-                    <a href="market.html" class="block text-gray-400 hover:text-white">Market</a>
-                    <a href="swap.html" class="block text-gray-400 hover:text-white">Swap</a>
-                </div>
-            </div>
-            <div>
-                <h4 class="font-medium mb-2 text-sm">Support</h4>
-                <div class="space-y-1 text-sm">
-                    <a href="#" class="block text-gray-400 hover:text-white">Help Center</a>
-                    <a href="#" class="block text-gray-400 hover:text-white">Contact Us</a>
-                </div>
-            </div>
-            <div>
-                <h4 class="font-medium mb-2 text-sm">Language</h4>
-                <select class="bg-gray-700 text-white px-3 py-2 rounded text-sm w-full">
-                    <option>🇺🇸 English</option>
-                    <option>🇪🇸 Español</option>
-                    <option>🇫🇷 Français</option>
-                    <option>🇩🇪 Deutsch</option>
-                </select>
-            </div>
-        </div>
-        <div class="border-t border-gray-700 pt-4 text-center text-xs text-gray-400">
-            <p>&copy; 2024 CoinVault. All rights reserved. | <a href="#" class="hover:text-white">Privacy Policy</a> | <a href="#" class="hover:text-white">Terms of Service</a></p>
-        </div>
-    </div>
-</footer>
-
-<script>
-function toggleConnectionMenu() {
-  const menu = document.getElementById('connectionMenu');
-  const button = document.getElementById('connectionBtn');
-
-  // Toggle visibility
-  menu.classList.toggle('dropdown-hidden');
-
-  // Add or remove event listener for outside clicks
-  if (!menu.classList.contains('dropdown-hidden')) {
-    document.addEventListener('click', handleOutsideClick);
-  } else {
-    document.removeEventListener('click', handleOutsideClick);
-  }
-
-  function handleOutsideClick(event) {
-    // Close dropdown if click is outside both button and menu
-    if (!menu.contains(event.target) && !button.contains(event.target)) {
-      menu.classList.add('dropdown-hidden');
-      document.removeEventListener('click', handleOutsideClick);
-    }
-  }
-}
-</script>
-<script src="js/main.js"></script>
-<script src="js/dashboard.js"></script>
-<script>
-    // Any existing inline scripts
-</script>
-</body>
-</html>
-
 </body>
 </html>
