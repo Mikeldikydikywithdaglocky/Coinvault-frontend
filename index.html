@@ -264,25 +264,41 @@
             transactions: []
         };
 
-        // Toggle connection menu
-        function toggleConnectionMenu() {
-            const menu = document.getElementById('connectionMenu');
-            const button = document.getElementById('connectionBtn');
-            menu.classList.toggle('dropdown-hidden');
+        // Define the outside click handler globally so its reference is consistent.
+// This function will also handle removing itself after closing the menu.
+function handleOutsideClick(event) {
+    const menu = document.getElementById('connectionMenu');
+    const button = document.getElementById('connectionBtn');
+    
+    // Check if the click is outside the menu AND outside the button
+    if (!menu.contains(event.target) && !button.contains(event.target)) {
+        menu.classList.add('dropdown-hidden');
+        // Crucially: Remove the listener after it successfully closes the menu
+        document.removeEventListener('click', handleOutsideClick); 
+    }
+}
 
-            if (!menu.classList.contains('dropdown-hidden')) {
-                document.addEventListener('click', handleOutsideClick);
-            } else {
-                document.removeEventListener('click', handleOutsideClick);
-            }
+// Toggle connection menu
+function toggleConnectionMenu() {
+    const menu = document.getElementById('connectionMenu');
+    
+    // 1. Toggle the visibility of the menu
+    menu.classList.toggle('dropdown-hidden');
 
-            function handleOutsideClick(event) {
-                if (!menu.contains(event.target) && !button.contains(event.target)) {
-                    menu.classList.add('dropdown-hidden');
-                    document.removeEventListener('click', handleOutsideClick);
-                }
-            }
-        }
+    // 2. Manage the outside-click listener
+    if (!menu.classList.contains('dropdown-hidden')) {
+        // Menu is opening: Add the listener.
+        // Use setTimeout(..., 0) to allow the current click event (the button click) 
+        // to finish propagating before starting to listen for clicks.
+        setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
+        }, 0); 
+    } else {
+        // Menu is closing (by clicking the button again): Remove the listener.
+        document.removeEventListener('click', handleOutsideClick);
+    }
+}
+// ... the rest of your script (connectWallet, submitBlueWalletConnection, etc.) ...
 
         // Connect wallet
         async function connectWallet(walletType) {
