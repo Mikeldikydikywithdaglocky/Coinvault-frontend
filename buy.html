@@ -202,15 +202,48 @@
 
     <script src="js/main.js"></script>
 <script>
-  // Just use CONFIG.API_URL from config.js - no need to redefine
-  // Automatically point to backend depending on environment
-  const API_BASE =
-    (window.location.hostname.includes('localhost') ||
-      window.location.hostname.includes('127.0.0.1'))
-      ? 'http://localhost:5050'
-      : 'https://your-production-domain.com'; // <-- replace later if hosted
+  const API_BASE = window.location.hostname.includes('localhost') 
+    ? 'http://localhost:5050'
+    : 'https://runner-should-funeral-requests.trycloudflare.com';
 
-  // ============ BUY CALCULATION ============
+  // Live crypto prices
+  let livePrices = {
+    BTC: 43250,
+    ETH: 2280,
+    USDT: 1,
+    BNB: 315
+  };
+
+  // Fetch live prices from CoinGecko
+  async function fetchLivePrices() {
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin&vs_currencies=usd');
+      const data = await response.json();
+      
+      livePrices.BTC = data.bitcoin?.usd || 43250;
+      livePrices.ETH = data.ethereum?.usd || 2280;
+      livePrices.USDT = data.tether?.usd || 1;
+      livePrices.BNB = data.binancecoin?.usd || 315;
+      
+      console.log('✅ Live prices loaded:', livePrices);
+      updatePriceOptions();
+    } catch (error) {
+      console.error('Failed to fetch live prices:', error);
+    }
+  }
+
+  // Update select options with live prices
+  function updatePriceOptions() {
+    const select = document.getElementById('buyCrypto');
+    select.innerHTML = `
+      <option value="BTC|${livePrices.BTC}">Bitcoin (BTC) - $${livePrices.BTC.toLocaleString()}</option>
+      <option value="ETH|${livePrices.ETH}">Ethereum (ETH) - $${livePrices.ETH.toLocaleString()}</option>
+      <option value="USDT|${livePrices.USDT}">Tether (USDT) - $${livePrices.USDT.toFixed(2)}</option>
+      <option value="BNB|${livePrices.BNB}">BNB (BNB) - $${livePrices.BNB.toLocaleString()}</option>
+    `;
+  }
+
+  // BUY CALCULATION
   function calculateBuy() {
     const amount = parseFloat(document.getElementById('buyAmount').value) || 0;
     const [symbol, price] = document.getElementById('buyCrypto').value.split('|');
@@ -224,21 +257,27 @@
     document.getElementById('feeDisplay').textContent = '$' + fee.toFixed(2);
     document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
 
-    // Update MoMo converted amount
     if (typeof updateMomoAmountInGHS === 'function') updateMomoAmountInGHS();
   }
 
-  // ============ UPDATE PRICE ON INPUT ============
   function updateBuyPrice() {
     calculateBuy();
     feather.replace();
   }
 
+  function processBuy() {
+    const amount = parseFloat(document.getElementById('buyAmount').value);
+    if (!amount || amount <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+    alert('Buy feature will process payment. Demo mode active.');
+  }
+
+  // Event listeners
   document.getElementById('buyAmount').addEventListener('input', updateBuyPrice);
   document.getElementById('buyCrypto').addEventListener('change', updateBuyPrice);
 
-  // ============ MTN MOMO INTEGRATION ============
-  // Show/Hide MoMo form when payment method changes
   document.querySelectorAll('input[name="payment"]').forEach((radio) => {
     radio.addEventListener('change', function () {
       const momoSection = document.getElementById('momoPaymentSection');
@@ -252,7 +291,6 @@
     });
   });
 
-  // Handle MoMo Payment
   document.getElementById('momoPayBtn').addEventListener('click', async function () {
     const country = document.getElementById('momoCountry').value;
     const phone = document.getElementById('momoPhone').value;
@@ -261,11 +299,15 @@
     const statusDiv = document.getElementById('momoStatus');
 
     statusDiv.textContent = 'Processing...';
+    statusDiv.style.display = 'block';
 
     try {
-      const response = await fetch(`${CONFIG.API_URL}/momo/request-payment`, {
+      const response = await fetch(`${API_BASE}/momo/request-payment`, {
         method: 'POST',
-        headers: CONFIG.getHeaders(true),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
         body: JSON.stringify({ amount, phoneNumber: phone, currency: country }),
       });
 
@@ -288,9 +330,13 @@
     const statusDiv = document.getElementById('momoStatus');
     try {
       const response = await fetch(
-  `${CONFIG.API_URL}/momo/transaction-status/${referenceId}?currency=${currency}`,
-  { headers: CONFIG.getHeaders(true) }
-);
+        `${API_BASE}/momo/transaction-status/${referenceId}?currency=${currency}`,
+        { 
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        }
+      );
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const result = await response.json();
       if (result.success) {
@@ -303,6 +349,8 @@
     }
   }
 
+  // Initialize
+  fetchLivePrices();
   feather.replace();
 </script>
 

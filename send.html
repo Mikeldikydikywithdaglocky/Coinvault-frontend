@@ -221,5 +221,58 @@
         </div>
     </div>
 </footer>
+
+  <script>
+// Load wallet data from localStorage
+function loadWalletData() {
+    const walletDataStr = localStorage.getItem('connectedWallet');
+    if (!walletDataStr) {
+        console.log('No wallet connected');
+        return null;
+    }
+    
+    try {
+        const walletInfo = JSON.parse(walletDataStr);
+        console.log('✅ Loaded wallet:', walletInfo);
+        return walletInfo;
+    } catch (error) {
+        console.error('Failed to parse wallet data:', error);
+        return null;
+    }
+}
+
+// Update balance display
+function updateWalletBalance() {
+    const walletInfo = loadWalletData();
+    if (!walletInfo || !walletInfo.data) {
+        console.log('No wallet data available');
+        return;
+    }
+    
+    const walletData = walletInfo.data;
+    
+    // Update BTC balance if wallet has BTC
+    if (walletData.assets && walletData.assets.length > 0) {
+        const btcAsset = walletData.assets.find(a => a.symbol === 'BTC');
+        if (btcAsset) {
+            // Update the balance in the crypto selector
+            const btcOption = document.querySelector('#sellCrypto option[value*="BTC"]');
+            if (btcOption) {
+                btcOption.textContent = `Bitcoin (BTC) - Balance: ${btcAsset.balance.toFixed(8)}`;
+            }
+            
+            // Update the displayed balance
+            const balanceSpan = document.getElementById('cryptoBalance');
+            if (balanceSpan) {
+                balanceSpan.textContent = btcAsset.balance.toFixed(8);
+            }
+        }
+    }
+}
+
+// Load on page ready
+document.addEventListener('DOMContentLoaded', updateWalletBalance);
+</script>
+
 </body>
 </html>
