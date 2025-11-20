@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoinVault - Your Secure Crypto Wallet</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/crypto-data.js"></script>
-    <script src="js/config.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -128,7 +126,7 @@
                                 disabled title="Connect a wallet to enable withdrawals">
                             💸 Withdraw
                         </button>
-                        <button onclick="window.location.href='receive.html'" 
+                        <button onclick="alert('Receive page coming soon!')" 
                                 class="bg-white text-indigo-700 px-8 py-3 rounded-full font-medium hover:bg-indigo-100 transition">
                             📥 Receive
                         </button>
@@ -142,15 +140,15 @@
         <section class="mb-12">
             <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
             <div class="grid grid-cols-3 gap-4">
-                <button onclick="window.location.href='send.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
+                <button onclick="alert('Send page coming soon!')" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
                     <div class="text-4xl mb-2">📤</div>
                     <span class="font-medium">Send</span>
                 </button>
-                <button onclick="window.location.href='buy.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
+                <button onclick="alert('Buy page coming soon!')" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
                     <div class="text-4xl mb-2">💳</div>
                     <span class="font-medium">Buy</span>
                 </button>
-                <button onclick="window.location.href='sell.html'" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
+                <button onclick="alert('Sell page coming soon!')" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
                     <div class="text-4xl mb-2">💰</div>
                     <span class="font-medium">Sell</span>
                 </button>
@@ -222,8 +220,8 @@
                     <h4 class="font-medium mb-2 text-sm">Products</h4>
                     <div class="space-y-1 text-sm">
                         <a href="index.html" class="block text-gray-400 hover:text-white">Wallet</a>
-                        <a href="market.html" class="block text-gray-400 hover:text-white">Market</a>
-                        <a href="swap.html" class="block text-gray-400 hover:text-white">Swap</a>
+                        <a href="#" class="block text-gray-400 hover:text-white">Market</a>
+                        <a href="#" class="block text-gray-400 hover:text-white">Swap</a>
                     </div>
                 </div>
                 <div>
@@ -249,11 +247,10 @@
         </div>
     </footer>
 
-    <script src="js/wallet-dropdown.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/dashboard.js"></script>
     <script>
-        // API Configuration - UPDATE THIS TO YOUR BACKEND IP
+        console.log('🚀 CoinVault Loading...');
+        
+        // API Configuration
         const API_URL = 'https://nightlife-onion-transmitted-transform.trycloudflare.com';
         
         // Wallet state
@@ -265,20 +262,77 @@
             transactions: []
         };
 
-        
+        // Track dropdown state
+        let dropdownListenerAttached = false;
+
+        // Handle clicks outside the dropdown
+        function handleOutsideClick(event) {
+            const menu = document.getElementById('connectionMenu');
+            const button = document.getElementById('connectionBtn');
+            
+            if (menu && button && !menu.contains(event.target) && !button.contains(event.target)) {
+                menu.classList.add('dropdown-hidden');
+                document.removeEventListener('click', handleOutsideClick);
+                dropdownListenerAttached = false;
+                console.log('🔽 Dropdown closed');
+            }
+        }
+
+        // Toggle connection menu
+        function toggleConnectionMenu(event) {
+            event.stopPropagation();
+            
+            const menu = document.getElementById('connectionMenu');
+            if (!menu) {
+                console.error('❌ Menu not found');
+                return;
+            }
+            
+            const isHidden = menu.classList.contains('dropdown-hidden');
+            
+            if (isHidden) {
+                menu.classList.remove('dropdown-hidden');
+                console.log('🔼 Dropdown opened');
+                
+                if (!dropdownListenerAttached) {
+                    setTimeout(() => {
+                        document.addEventListener('click', handleOutsideClick);
+                        dropdownListenerAttached = true;
+                    }, 10);
+                }
+            } else {
+                menu.classList.add('dropdown-hidden');
+                console.log('🔽 Dropdown closed');
+                
+                if (dropdownListenerAttached) {
+                    document.removeEventListener('click', handleOutsideClick);
+                    dropdownListenerAttached = false;
+                }
+            }
+        }
 
         // Connect wallet
         async function connectWallet(walletType) {
             console.log('Connecting to:', walletType);
-            document.getElementById('connectionMenu').classList.add('dropdown-hidden');
-            document.removeEventListener('click', handleOutsideClick);  // ← ADD THIS LINE
+            
+            const menu = document.getElementById('connectionMenu');
+            if (menu) {
+                menu.classList.add('dropdown-hidden');
+            }
+            
+            if (dropdownListenerAttached) {
+                document.removeEventListener('click', handleOutsideClick);
+                dropdownListenerAttached = false;
+            }
             
             const modal = document.getElementById('connectionModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalContent = document.getElementById('modalContent');
             
-            modal.classList.remove('dropdown-hidden');
-            modal.style.display = 'flex';
+            if (modal) {
+                modal.classList.remove('dropdown-hidden');
+                modal.style.display = 'flex';
+            }
             
             if (walletType === 'binance') {
                 modalTitle.textContent = 'Connect Binance Account';
@@ -321,7 +375,6 @@
                 return;
             }
             
-            // Show loading
             const modalContent = document.getElementById('modalContent');
             modalContent.innerHTML = `
                 <div class="text-center py-8">
@@ -348,7 +401,7 @@
                     walletData = data.wallet;
                     updateDashboard();
                     closeConnectionModal();
-                    alert('✅ BlueWallet connected successfully!\n\nBalance: ' + walletData.balance.toFixed(2) + ' USD');
+                    alert('✅ BlueWallet connected successfully!\n\nBalance: $' + walletData.balance.toFixed(2));
                 } else {
                     modalContent.innerHTML = `
                         <div class="text-center py-4">
@@ -362,12 +415,12 @@
                     `;
                 }
             } catch (error) {
-                console.error('BlueWallet connection error:', error);
+                console.error('Connection error:', error);
                 modalContent.innerHTML = `
                     <div class="text-center py-4">
                         <div class="text-4xl mb-4">❌</div>
                         <p class="text-red-400">Connection error</p>
-                        <p class="text-sm text-gray-500 mt-2">Make sure backend is running on ${API_URL}</p>
+                        <p class="text-sm text-gray-500 mt-2">Backend connection failed</p>
                         <button onclick="connectWallet('bluewallet')" 
                                 class="mt-4 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl transition">
                             Try Again
@@ -380,24 +433,15 @@
         // Close connection modal
         function closeConnectionModal() {
             const modal = document.getElementById('connectionModal');
-            modal.classList.add('dropdown-hidden');
-            modal.style.display = 'none';
+            if (modal) {
+                modal.classList.add('dropdown-hidden');
+                modal.style.display = 'none';
+            }
         }
 
         // Disconnect wallet
         async function disconnectWallet() {
             if (confirm('Are you sure you want to disconnect your wallet?')) {
-                try {
-                    await fetch(API_URL + '/api/wallet/disconnect', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + (localStorage.getItem('token') || 'demo')
-                        }
-                    });
-                } catch (error) {
-                    console.error('Disconnect error:', error);
-                }
-                
                 connectedWallet = null;
                 walletData = {
                     address: null,
@@ -406,49 +450,32 @@
                     transactions: []
                 };
                 updateDashboard();
-                document.getElementById('connectionMenu').classList.add('dropdown-hidden');
+                
+                const menu = document.getElementById('connectionMenu');
+                if (menu) {
+                    menu.classList.add('dropdown-hidden');
+                }
             }
         }
 
-        // Update dashboard with wallet data
+        // Update dashboard
         function updateDashboard() {
             if (connectedWallet && walletData.address) {
-                // Update balance
                 document.getElementById('totalBalance').textContent = '$' + walletData.balance.toFixed(2);
-                
-                // Update wallet address
                 document.getElementById('walletAddress').textContent = formatAddress(walletData.address);
                 document.getElementById('copyBtn').classList.remove('hidden');
                 
-                // Enable withdraw button
                 const withdrawBtn = document.getElementById('withdrawBtn');
                 withdrawBtn.disabled = false;
                 withdrawBtn.classList.remove('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
                 withdrawBtn.classList.add('bg-white', 'text-indigo-700', 'hover:bg-indigo-100', 'cursor-pointer');
-                document.getElementById('withdrawHint').textContent = 'Withdraw to external wallet';
                 
-                // Show assets section
-                if (walletData.assets && walletData.assets.length > 0) {
-                    document.getElementById('assetsSection').style.display = 'block';
-                    displayAssets();
-                }
-                
-                // Show transactions section
-                if (walletData.transactions && walletData.transactions.length > 0) {
-                    document.getElementById('transactionsSection').style.display = 'block';
-                    displayTransactions();
-                }
-                
-                // Update button text
                 document.getElementById('connectionIcon').textContent = '✓';
                 document.getElementById('connectionText').textContent = 'Connected: ' + connectedWallet;
                 document.getElementById('connectionBtn').classList.remove('bg-indigo-600');
                 document.getElementById('connectionBtn').classList.add('bg-green-600');
-                
-                // Show disconnect button
                 document.getElementById('disconnectBtn').style.display = 'flex';
             } else {
-                // Reset to disconnected state
                 document.getElementById('totalBalance').textContent = '$0.00';
                 document.getElementById('walletAddress').textContent = 'No wallet connected';
                 document.getElementById('copyBtn').classList.add('hidden');
@@ -456,73 +483,17 @@
                 const withdrawBtn = document.getElementById('withdrawBtn');
                 withdrawBtn.disabled = true;
                 withdrawBtn.classList.add('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
-                withdrawBtn.classList.remove('bg-white', 'text-indigo-700', 'hover:bg-indigo-100', 'cursor-pointer');
-                document.getElementById('withdrawHint').textContent = 'Connect a wallet to enable withdrawals';
-                
-                document.getElementById('assetsSection').style.display = 'none';
-                document.getElementById('transactionsSection').style.display = 'none';
+                withdrawBtn.classList.remove('bg-white', 'text-indigo-700', 'hover:bg-indigo-100');
                 
                 document.getElementById('connectionIcon').textContent = '📲';
                 document.getElementById('connectionText').textContent = 'Import Wallet';
                 document.getElementById('connectionBtn').classList.remove('bg-green-600');
                 document.getElementById('connectionBtn').classList.add('bg-indigo-600');
-                
                 document.getElementById('disconnectBtn').style.display = 'none';
             }
         }
 
-        // Display assets
-        function displayAssets() {
-            const assetsList = document.getElementById('assetsList');
-            assetsList.innerHTML = '';
-            
-            walletData.assets.forEach(asset => {
-                const value = asset.balance * asset.price;
-                assetsList.innerHTML += `
-                    <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
-                        <div class="col-span-5 flex items-center gap-3">
-                            <div class="w-8 h-8 bg-${asset.color}-500 rounded-full flex items-center justify-center text-sm">
-                                ${asset.symbol.charAt(0)}
-                            </div>
-                            <div>
-                                <div class="font-medium">${asset.name}</div>
-                                <div class="text-sm text-gray-400">${asset.symbol}</div>
-                            </div>
-                        </div>
-                        <div class="col-span-3 text-right">${asset.balance.toFixed(8)} ${asset.symbol}</div>
-                        <div class="col-span-2 text-right">$${asset.price.toLocaleString()}</div>
-                        <div class="col-span-2 text-right">$${value.toFixed(2)}</div>
-                    </div>
-                `;
-            });
-        }
-
-        // Display transactions
-        function displayTransactions() {
-            const transactionsList = document.getElementById('transactionsList');
-            transactionsList.innerHTML = '';
-            
-            walletData.transactions.forEach(tx => {
-                transactionsList.innerHTML += `
-                    <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
-                        <div class="col-span-6">
-                            <div class="font-medium">${tx.type}</div>
-                            <div class="text-sm text-gray-400">${tx.date}</div>
-                        </div>
-                        <div class="col-span-3 text-right ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}">
-                            ${tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(8)} ${tx.symbol}
-                        </div>
-                        <div class="col-span-3 text-right">
-                            <span class="px-3 py-1 rounded-full text-xs bg-green-900 text-green-200">
-                                ${tx.status}
-                            </span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // Format wallet address
+        // Format address
         function formatAddress(address) {
             if (address.length > 20) {
                 return address.substring(0, 10) + '...' + address.substring(address.length - 10);
@@ -532,12 +503,11 @@
 
         // Copy wallet address
         async function copyWalletAddress() {
-            const address = walletData.address;
             try {
-                await navigator.clipboard.writeText(address);
-                alert('✅ Wallet address copied!\n\n' + address);
+                await navigator.clipboard.writeText(walletData.address);
+                alert('✅ Address copied!');
             } catch (err) {
-                alert('Address: ' + address);
+                alert('Address: ' + walletData.address);
             }
         }
 
@@ -547,67 +517,28 @@
                 alert('Please connect a wallet first');
                 return;
             }
-            // TODO: Create withdraw.html page
-            alert('Withdraw feature coming soon!\n\nConnected wallet: ' + connectedWallet);
+            alert('Withdraw feature coming soon!');
         }
 
         // Logout
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                localStorage.clear();
                 window.location.href = 'login.html';
             }
         }
 
-        // ✅ Initialize EVERYTHING when page loads
-        window.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 CoinVault Dashboard Initializing...');
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM Ready');
             
-            // 1. Initialize dropdown button FIRST
             const connectionBtn = document.getElementById('connectionBtn');
             if (connectionBtn) {
                 connectionBtn.addEventListener('click', toggleConnectionMenu);
-                console.log('✅ Dropdown button initialized');
+                console.log('✅ Dropdown initialized');
             } else {
-                console.error('❌ Connection button not found');
+                console.error('❌ Button not found');
             }
-            
-            // 2. Check authentication (OPTIONAL for demo mode)
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.warn('⚠️ No token found - running in DEMO mode');
-                // For production, uncomment this to require login:
-                // window.location.href = 'login.html';
-                // return;
-            }
-            
-            // 3. Load wallet connection status if logged in
-            if (token) {
-                try {
-                    const response = await fetch(API_URL + '/api/wallet/status', {
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        }
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success && data.wallet) {
-                        connectedWallet = data.walletType;
-                        walletData = data.wallet;
-                        updateDashboard();
-                        console.log('✅ Wallet restored from session');
-                    } else {
-                        console.log('ℹ️ No wallet connected');
-                    }
-                } catch (error) {
-                    console.error('❌ Failed to load wallet status:', error);
-                    // Don't break the app, just log the error
-                }
-            }
-            
-            console.log('✅ Dashboard initialization complete');
         });
     </script>
 </body>
