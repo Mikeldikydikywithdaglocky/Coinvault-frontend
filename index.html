@@ -121,16 +121,16 @@
                     
                     <!-- Withdraw & Receive Buttons -->
                     <div class="flex justify-center gap-4">
-                        <button id="withdrawBtn" onclick="handleWithdraw()" 
-                                class="bg-gray-600 text-gray-400 px-8 py-3 rounded-full font-medium cursor-not-allowed" 
-                                disabled title="Connect a wallet to enable withdrawals">
-                            💸 Withdraw
-                        </button>
-                        <button onclick="alert('Receive page coming soon!')" 
-                                class="bg-white text-indigo-700 px-8 py-3 rounded-full font-medium hover:bg-indigo-100 transition">
-                            📥 Receive
-                        </button>
-                    </div>
+    <button id="withdrawBtn" onclick="handleWithdraw()" 
+            class="bg-gray-600 text-gray-400 px-8 py-3 rounded-full font-medium cursor-not-allowed" 
+            disabled title="Connect a wallet to enable withdrawals">
+        💸 Withdraw
+    </button>
+    <a href="receive.html" 
+            class="bg-white text-indigo-700 px-8 py-3 rounded-full font-medium hover:bg-indigo-100 transition inline-block">
+        📥 Receive
+    </a>
+</div>
                     <p id="withdrawHint" class="text-xs text-gray-500 mt-2">Connect a wallet to enable withdrawals</p>
                 </div>
             </div>
@@ -251,7 +251,7 @@
         console.log('🚀 CoinVault Loading...');
         
         // API Configuration
-        const API_URL = 'https://exp-webster-legends-handling.trycloudflare.com';
+        const API_URL = 'https://since-silver-purse-fate.trycloudflare.com';
         
         // Wallet state
         let connectedWallet = null;
