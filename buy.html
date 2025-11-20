@@ -214,23 +214,76 @@
     BNB: 315
   };
 
-  // Fetch live prices from CoinGecko
-  async function fetchLivePrices() {
-    try {
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin&vs_currencies=usd');
-      const data = await response.json();
-      
-      livePrices.BTC = data.bitcoin?.usd || 43250;
-      livePrices.ETH = data.ethereum?.usd || 2280;
-      livePrices.USDT = data.tether?.usd || 1;
-      livePrices.BNB = data.binancecoin?.usd || 315;
-      
-      console.log('✅ Live prices loaded:', livePrices);
-      updatePriceOptions();
-    } catch (error) {
-      console.error('Failed to fetch live prices:', error);
+ // Fetch live prices from multiple APIs with fallback
+async function fetchLivePrices() {
+    const apis = [
+        {
+            name: 'Coinbase',
+            url: 'https://api.coinbase.com/v2/exchange-rates?currency=USD',
+            parse: (data) => {
+                const rates = data.data.rates;
+                return {
+                    BTC: 1 / parseFloat(rates.BTC),
+                    ETH: 1 / parseFloat(rates.ETH),
+                    USDT: 1 / parseFloat(rates.USDT || 1),
+                    BNB: 1 / parseFloat(rates.BNB || 315)
+                };
+            }
+        },
+        {
+            name: 'CryptoCompare',
+            url: 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,USDT,BNB&tsyms=USD',
+            parse: (data) => ({
+                BTC: data.BTC?.USD || 43250,
+                ETH: data.ETH?.USD || 2280,
+                USDT: data.USDT?.USD || 1,
+                BNB: data.BNB?.USD || 315
+            })
+        },
+        {
+            name: 'Binance',
+            url: 'https://api.binance.com/api/v3/ticker/price',
+            parse: (data) => {
+                const btc = data.find(t => t.symbol === 'BTCUSDT');
+                const eth = data.find(t => t.symbol === 'ETHUSDT');
+                const bnb = data.find(t => t.symbol === 'BNBUSDT');
+                return {
+                    BTC: parseFloat(btc?.price || 43250),
+                    ETH: parseFloat(eth?.price || 2280),
+                    USDT: 1,
+                    BNB: parseFloat(bnb?.price || 315)
+                };
+            }
+        }
+    ];
+
+    for (const api of apis) {
+        try {
+            console.log(`🔄 Trying ${api.name}...`);
+            const response = await fetch(api.url);
+            
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const data = await response.json();
+            const prices = api.parse(data);
+            
+            livePrices.BTC = prices.BTC;
+            livePrices.ETH = prices.ETH;
+            livePrices.USDT = prices.USDT;
+            livePrices.BNB = prices.BNB;
+            
+            console.log('✅ Live prices loaded:', livePrices);
+            updatePriceOptions();
+            return; // Success!
+            
+        } catch (error) {
+            console.warn(`❌ ${api.name} failed:`, error.message);
+        }
     }
-  }
+    
+    console.log('⚠️ All APIs failed. Using fallback prices');
+    updatePriceOptions(); // Use default prices already set
+}
 
   // Update select options with live prices
   function updatePriceOptions() {

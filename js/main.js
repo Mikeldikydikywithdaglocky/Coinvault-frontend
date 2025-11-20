@@ -47,24 +47,85 @@ document.addEventListener('DOMContentLoaded', function() {
 let liveCryptoPrices = {};
 let usdToGhsRate = 0;
 
-// Fetch crypto prices from CoinGecko
+// Fetch crypto prices with multiple fallback APIs
 async function fetchCryptoPrices() {
-    try {
-        const response = await fetch(
-            'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin&vs_currencies=usd'
-        );
-        const data = await response.json();
-        liveCryptoPrices = {
-            BTC: data.bitcoin.usd,
-            ETH: data.ethereum.usd,
-            USDT: data.tether.usd,
-            BNB: data.binancecoin.usd
-        };
-        updateCryptoDropdown();
-    } catch (error) {
-        console.error("Error fetching CoinGecko prices:", error);
-        showToast("Failed to fetch live crypto prices", "error");
+    // Define multiple APIs to try in order
+    const apis = [
+        {
+            name: 'Coinbase',
+            url: 'https://api.coinbase.com/v2/exchange-rates?currency=USD',
+            parse: (data) => {
+                const rates = data.data.rates;
+                return {
+                    BTC: 1 / parseFloat(rates.BTC),
+                    ETH: 1 / parseFloat(rates.ETH),
+                    USDT: 1 / parseFloat(rates.USDT || rates.DAI || 1), // Fallback if USDT missing
+                    BNB: 1 / parseFloat(rates.BNB || 315) // Fallback if BNB missing
+                };
+            }
+        },
+        {
+            name: 'CryptoCompare',
+            url: 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,USDT,BNB&tsyms=USD',
+            parse: (data) => ({
+                BTC: data.BTC?.USD || 43250,
+                ETH: data.ETH?.USD || 2280,
+                USDT: data.USDT?.USD || 1,
+                BNB: data.BNB?.USD || 315
+            })
+        },
+        {
+            name: 'Binance',
+            url: 'https://api.binance.com/api/v3/ticker/price',
+            parse: (data) => {
+                const btc = data.find(t => t.symbol === 'BTCUSDT');
+                const eth = data.find(t => t.symbol === 'ETHUSDT');
+                const bnb = data.find(t => t.symbol === 'BNBUSDT');
+                return {
+                    BTC: parseFloat(btc?.price || 43250),
+                    ETH: parseFloat(eth?.price || 2280),
+                    USDT: 1,
+                    BNB: parseFloat(bnb?.price || 315)
+                };
+            }
+        }
+    ];
+
+    // Try each API until one works
+    for (const api of apis) {
+        try {
+            console.log(`🔄 Trying ${api.name} API...`);
+            
+            const response = await fetch(api.url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            liveCryptoPrices = api.parse(data);
+            
+            console.log(`✅ ${api.name} API SUCCESS:`, liveCryptoPrices);
+            updateCryptoDropdown();
+            showToast(`Live prices from ${api.name}`, "success");
+            return; // Success! Stop trying other APIs
+            
+        } catch (error) {
+            console.warn(`❌ ${api.name} failed:`, error.message);
+            // Continue to next API
+        }
     }
+    
+    // If ALL APIs fail, use fallback prices
+    console.error("⚠️ All crypto APIs failed. Using fallback prices.");
+    liveCryptoPrices = {
+        BTC: 43250,
+        ETH: 2280,
+        USDT: 1,
+        BNB: 315
+    };
+    updateCryptoDropdown();
+    showToast("Using cached crypto prices", "error");
 }
 
 // ✅ FREE UNLIMITED USD → GHS using exchangerate.host (NO API KEY!)
@@ -127,10 +188,41 @@ window.calculateBuy = function() {
     updateMomoAmountInGHS();
 };
 
-// Fetch live data every 60 seconds
-setInterval(fetchCryptoPrices, 60000);
-setInterval(fetchUsdToGhsRate, 60000);
+// ============ SMART RATE LIMITING ============
+
+// Check if we need to fetch USD->GHS rate (once per 24 hours)
+function shouldFetchUsdGhsRate() {
+    const lastFetch = localStorage.getItem('lastUsdGhsFetch');
+    if (!lastFetch) return true;
+    
+    const now = Date.now();
+    const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours
+    
+    return (now - parseInt(lastFetch)) > oneDayInMs;
+}
+
+// Fetch USD->GHS with 24-hour cache
+async function fetchUsdToGhsRateCached() {
+    // Check if we have a cached rate
+    const cachedRate = localStorage.getItem('usdToGhsRate');
+    
+    if (cachedRate && !shouldFetchUsdGhsRate()) {
+        usdToGhsRate = parseFloat(cachedRate);
+        console.log("✅ Using cached USD → GHS rate:", usdToGhsRate);
+        return;
+    }
+    
+    // Fetch new rate
+    await fetchUsdToGhsRate();
+    
+    // Save to cache
+    localStorage.setItem('usdToGhsRate', usdToGhsRate.toString());
+    localStorage.setItem('lastUsdGhsFetch', Date.now().toString());
+}
+
+// Fetch crypto prices every 2 minutes (not every 60 seconds)
+setInterval(fetchCryptoPrices, 120000); // 2 minutes
 
 // Initial load
 fetchCryptoPrices();
-fetchUsdToGhsRate();
+fetchUsdToGhsRateCached(); // Use cached version
