@@ -249,6 +249,7 @@
         </div>
     </footer>
 
+    <script src="js/wallet-dropdown.js"></script>
     <script src="js/main.js"></script>
     <script src="js/dashboard.js"></script>
     <script>
@@ -264,36 +265,7 @@
             transactions: []
         };
 
-        // ✅ FIXED: Outside click handler
-function handleOutsideClick(event) {
-    const menu = document.getElementById('connectionMenu');
-    const button = document.getElementById('connectionBtn');
-    
-    if (!menu.contains(event.target) && !button.contains(event.target)) {
-        menu.classList.add('dropdown-hidden');
-        document.removeEventListener('click', handleOutsideClick);
-    }
-}
-
-// ✅ FIXED: Toggle connection menu
-function toggleConnectionMenu(event) {
-    event.stopPropagation(); // Prevent immediate outside click
-    const menu = document.getElementById('connectionMenu');
-    const isHidden = menu.classList.contains('dropdown-hidden');
-    
-    if (isHidden) {
-        // Opening menu
-        menu.classList.remove('dropdown-hidden');
-        // Add outside click listener after a brief delay
-        setTimeout(() => {
-            document.addEventListener('click', handleOutsideClick);
-        }, 10);
-    } else {
-        // Closing menu
-        menu.classList.add('dropdown-hidden');
-        document.removeEventListener('click', handleOutsideClick);
-    }
-}
+        
 
         // Connect wallet
         async function connectWallet(walletType) {
@@ -588,43 +560,54 @@ function toggleConnectionMenu(event) {
             }
         }
 
-        // Load on page load
+        // ✅ Initialize EVERYTHING when page loads
         window.addEventListener('DOMContentLoaded', async function() {
-             // ✅ Attach click handler to button
-    const connectionBtn = document.getElementById('connectionBtn');
-    if (connectionBtn) {
-        connectionBtn.addEventListener('click', toggleConnectionMenu);
-        console.log('✅ Dropdown button initialized');
-    }
-
-            // Check if user is logged in
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
+            console.log('🚀 CoinVault Dashboard Initializing...');
+            
+            // 1. Initialize dropdown button FIRST
+            const connectionBtn = document.getElementById('connectionBtn');
+            if (connectionBtn) {
+                connectionBtn.addEventListener('click', toggleConnectionMenu);
+                console.log('✅ Dropdown button initialized');
+            } else {
+                console.error('❌ Connection button not found');
             }
             
-            // Check for existing wallet connection
-            try {
-                const response = await fetch(API_URL + '/api/wallet/status', {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success && data.wallet) {
-                    connectedWallet = data.walletType;
-                    walletData = data.wallet;
-                    updateDashboard();
-                    console.log('✅ Wallet restored from session');
-                } else {
-                    console.log('ℹ️ No wallet connected');
-                }
-            } catch (error) {
-                console.error('Failed to load wallet status:', error);
+            // 2. Check authentication (OPTIONAL for demo mode)
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.warn('⚠️ No token found - running in DEMO mode');
+                // For production, uncomment this to require login:
+                // window.location.href = 'login.html';
+                // return;
             }
+            
+            // 3. Load wallet connection status if logged in
+            if (token) {
+                try {
+                    const response = await fetch(API_URL + '/api/wallet/status', {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.wallet) {
+                        connectedWallet = data.walletType;
+                        walletData = data.wallet;
+                        updateDashboard();
+                        console.log('✅ Wallet restored from session');
+                    } else {
+                        console.log('ℹ️ No wallet connected');
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to load wallet status:', error);
+                    // Don't break the app, just log the error
+                }
+            }
+            
+            console.log('✅ Dashboard initialization complete');
         });
     </script>
 </body>
