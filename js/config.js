@@ -4,7 +4,7 @@
 const CONFIG = {
   // API Base URL - automatically uses ngrok URL
   // js/config.js - line 3
-API_URL: 'https://runner-should-funeral-requests.trycloudflare.com/api',
+API_URL: 'https://exp-webster-legends-handling.trycloudflare.com/api',
   
   // Network Configuration
   NETWORK: 'bitcoin', // 'bitcoin' or 'testnet'
