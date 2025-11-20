@@ -67,15 +67,14 @@ async function fetchCryptoPrices() {
     }
 }
 
-// ✅ Working USD → GHS using ExchangeRate-API
+// ✅ FREE UNLIMITED USD → GHS using exchangerate.host (NO API KEY!)
 async function fetchUsdToGhsRate() {
     try {
-        // Use your own key from https://www.exchangerate-api.com/ (free signup)
-        const response = await fetch('https://v6.exchangerate-api.com/v6/0cc9322f2c029905cbeaa56d/latest/USD');
+        const response = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=GHS');
         const data = await response.json();
 
-        if (data && data.conversion_rates && data.conversion_rates.GHS) {
-            usdToGhsRate = data.conversion_rates.GHS;
+        if (data && data.rates && data.rates.GHS) {
+            usdToGhsRate = data.rates.GHS;
             console.log("✅ Live USD → GHS rate:", usdToGhsRate);
             showToast(`Live rate loaded: ₵${usdToGhsRate.toFixed(2)} per $1`, "success");
         } else {
