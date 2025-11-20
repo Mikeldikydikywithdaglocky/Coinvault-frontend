@@ -1,20 +1,7 @@
-// Use web3Client for all operations
-async function loadRealBalance() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.walletAddress) {
-        const balance = await web3Client.getBalance(user.walletAddress);
-        document.getElementById('totalBalance').textContent = '$' + (balance * 43250).toFixed(2); // Rough ETH price
-    }
-}
 
-// Call this after loadUserData()
-document.addEventListener('DOMContentLoaded', () => {
-    loadUserData();
-    loadRealBalance();
-});
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://else-perl-jeremy-emission.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
@@ -208,11 +195,21 @@ async function loadTransactions() {
     }
 }
 
-// Initialize dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    checkDashboardAuth();
-    loadUserData();
+// Initialize dashboard - ONLY if not already initialized
+if (!window.dashboardInitialized) {
+    window.dashboardInitialized = true;
     
-    // Refresh prices every 60 seconds
-    setInterval(loadUserAssets, 60000);
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📊 Dashboard.js loading...');
+        
+        // Don't redirect if no token - let index.html handle it
+        const token = localStorage.getItem('token');
+        if (token) {
+            loadUserData();
+            // Refresh prices every 60 seconds
+            setInterval(loadUserAssets, 60000);
+        } else {
+            console.log('⚠️ No token - skipping dashboard data load');
+        }
+    });
+}
