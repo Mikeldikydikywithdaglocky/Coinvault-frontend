@@ -137,23 +137,23 @@
         </section>
 
         <!-- Quick Actions (3 buttons only) -->
-        <section class="mb-12">
-            <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
-            <div class="grid grid-cols-3 gap-4">
-                <button onclick="alert('Send page coming soon!')" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
-                    <div class="text-4xl mb-2">📤</div>
-                    <span class="font-medium">Send</span>
-                </button>
-                <button onclick="alert('Buy page coming soon!')" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
-                    <div class="text-4xl mb-2">💳</div>
-                    <span class="font-medium">Buy</span>
-                </button>
-                <button onclick="alert('Sell page coming soon!')" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition">
-                    <div class="text-4xl mb-2">💰</div>
-                    <span class="font-medium">Sell</span>
-                </button>
-            </div>
-        </section>
+<section class="mb-12">
+    <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
+    <div class="grid grid-cols-3 gap-4">
+        <a href="send.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer">
+            <div class="text-4xl mb-2">📤</div>
+            <span class="font-medium">Send</span>
+        </a>
+        <a href="buy.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer">
+            <div class="text-4xl mb-2">💳</div>
+            <span class="font-medium">Buy</span>
+        </a>
+        <a href="sell.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer">
+            <div class="text-4xl mb-2">💰</div>
+            <span class="font-medium">Sell</span>
+        </a>
+    </div>
+</section>
 
         <!-- Assets (Hidden until wallet connected) -->
         <section class="mb-12" id="assetsSection" style="display: none;">
