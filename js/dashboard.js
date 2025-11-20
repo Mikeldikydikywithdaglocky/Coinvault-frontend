@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://nightlife-onion-transmitted-transform.trycloudflare.com/api';
+const API_URL = 'https://driven-protected-encourage-clothing.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
