@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://since-silver-purse-fate.trycloudflare.com/api';
+const API_URL = 'https://provided-differences-became-repair.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
