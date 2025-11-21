@@ -152,28 +152,120 @@ function loadWalletData() {
     }
 }
 
-// Update balance display
-function updateSellBalances() {
+// Get balance for a specific crypto symbol
+function getBalance(symbol) {
     const walletInfo = loadWalletData();
-    if (!walletInfo || !walletInfo.data) return;
-    
-    const walletData = walletInfo.data;
-    
-    if (walletData.assets && walletData.assets.length > 0) {
-        const btcAsset = walletData.assets.find(a => a.symbol === 'BTC');
-        if (btcAsset) {
-            const sellCrypto = document.getElementById('sellCrypto');
-            if (sellCrypto) {
-                // Update the first option with real balance
-                sellCrypto.options[0].value = `BTC|${btcAsset.price}|${btcAsset.balance}`;
-                sellCrypto.options[0].textContent = `Bitcoin (BTC) - Balance: ${btcAsset.balance.toFixed(8)}`;
-            }
-        }
+    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
+        return 0;
     }
+    
+    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
+    return asset ? asset.balance : 0;
+}
+
+// Get price for a specific crypto symbol
+function getPrice(symbol) {
+    const walletInfo = loadWalletData();
+    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
+        // Fallback prices
+        const fallbackPrices = {
+            'BTC': 43250,
+            'ETH': 2280,
+            'USDT': 1,
+            'BNB': 315
+        };
+        return fallbackPrices[symbol] || 0;
+    }
+    
+    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
+    return asset ? asset.price : 0;
+}
+
+// Update sell dropdown with real balances
+function updateSellBalances() {
+    const btcBalance = getBalance('BTC');
+    const ethBalance = getBalance('ETH');
+    const usdtBalance = getBalance('USDT');
+    const bnbBalance = getBalance('BNB');
+    
+    const btcPrice = getPrice('BTC');
+    const ethPrice = getPrice('ETH');
+    const usdtPrice = getPrice('USDT');
+    const bnbPrice = getPrice('BNB');
+    
+    const sellCrypto = document.getElementById('sellCrypto');
+    if (sellCrypto) {
+        sellCrypto.innerHTML = `
+            <option value="BTC|${btcPrice}|${btcBalance}">Bitcoin (BTC) - Balance: ${btcBalance.toFixed(8)}</option>
+            <option value="ETH|${ethPrice}|${ethBalance}">Ethereum (ETH) - Balance: ${ethBalance.toFixed(8)}</option>
+            <option value="USDT|${usdtPrice}|${usdtBalance}">Tether (USDT) - Balance: ${usdtBalance.toFixed(2)}</option>
+            <option value="BNB|${bnbPrice}|${bnbBalance}">BNB (BNB) - Balance: ${bnbBalance.toFixed(8)}</option>
+        `;
+    }
+    
+    console.log('✅ Sell page balances updated:', {
+        BTC: btcBalance,
+        ETH: ethBalance,
+        USDT: usdtBalance,
+        BNB: bnbBalance
+    });
+}
+
+function updateSellPrice() { 
+    calculateSell(); 
+    feather.replace(); 
+}
+
+function calculateSell() {
+    const amount = parseFloat(document.getElementById('sellAmount').value) || 0;
+    const [symbol, price, balance] = document.getElementById('sellCrypto').value.split('|');
+    const salePrice = amount * parseFloat(price);
+    const fee = salePrice * 0.015;
+    const receive = salePrice - fee;
+    
+    document.getElementById('sellSymbol').textContent = symbol;
+    document.getElementById('usdValue').textContent = salePrice.toFixed(2);
+    document.getElementById('salePriceDisplay').textContent = '$' + salePrice.toFixed(2);
+    document.getElementById('sellFeeDisplay').textContent = '$' + fee.toFixed(2);
+    document.getElementById('receiveDisplay').textContent = '$' + receive.toFixed(2);
+}
+
+function setMaxSell() {
+    const [symbol, price, balance] = document.getElementById('sellCrypto').value.split('|');
+    const maxBalance = parseFloat(balance);
+    
+    if (maxBalance <= 0) {
+        alert('You have no ' + symbol + ' to sell. Please connect a wallet with balance.');
+        return;
+    }
+    
+    document.getElementById('sellAmount').value = maxBalance.toFixed(8);
+    calculateSell();
+}
+
+function processSell() {
+    const amount = parseFloat(document.getElementById('sellAmount').value);
+    const [symbol, price, balance] = document.getElementById('sellCrypto').value.split('|');
+    const maxBalance = parseFloat(balance);
+    
+    if (!amount || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    if (amount > maxBalance) {
+        alert('Insufficient balance. You have ' + maxBalance.toFixed(8) + ' ' + symbol);
+        return;
+    }
+    
+    alert('Sell feature will process to your payout method. Demo mode active.');
 }
 
 // Load on page ready
-document.addEventListener('DOMContentLoaded', updateSellBalances);
+document.addEventListener('DOMContentLoaded', function() {
+    updateSellBalances();
+    feather.replace();
+});
 </script>
 
        feather.replace();

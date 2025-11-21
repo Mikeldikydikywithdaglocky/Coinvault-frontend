@@ -241,38 +241,99 @@ function loadWalletData() {
     }
 }
 
-// Update balance display
-function updateWalletBalance() {
+// Get balance for specific crypto
+function getBalance(symbol) {
     const walletInfo = loadWalletData();
-    if (!walletInfo || !walletInfo.data) {
-        console.log('No wallet data available');
-        return;
+    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
+        return 0;
     }
     
-    const walletData = walletInfo.data;
-    
-    // Update BTC balance if wallet has BTC
-    if (walletData.assets && walletData.assets.length > 0) {
-        const btcAsset = walletData.assets.find(a => a.symbol === 'BTC');
-        if (btcAsset) {
-            // Update the balance in the crypto selector
-            const btcOption = document.querySelector('#sellCrypto option[value*="BTC"]');
-            if (btcOption) {
-                btcOption.textContent = `Bitcoin (BTC) - Balance: ${btcAsset.balance.toFixed(8)}`;
-            }
-            
-            // Update the displayed balance
-            const balanceSpan = document.getElementById('cryptoBalance');
-            if (balanceSpan) {
-                balanceSpan.textContent = btcAsset.balance.toFixed(8);
-            }
-        }
-    }
+    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
+    return asset ? asset.balance : 0;
 }
 
-// Load on page ready
-document.addEventListener('DOMContentLoaded', updateWalletBalance);
+// Get price for specific crypto
+function getPrice(symbol) {
+    const walletInfo = loadWalletData();
+    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
+        const fallbackPrices = {
+            'BTC': 43250,
+            'ETH': 2280,
+            'USDT': 1,
+            'BNB': 315
+        };
+        return fallbackPrices[symbol] || 0;
+    }
+    
+    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
+    return asset ? asset.price : 0;
+}
+
+// Override the cryptos array from send.js with real balances
+window.addEventListener('DOMContentLoaded', function() {
+    // Update the cryptos array with real wallet balances
+    if (typeof cryptos !== 'undefined') {
+        cryptos[0].balance = getBalance('BTC');
+        cryptos[0].price = getPrice('BTC');
+        
+        cryptos[1].balance = getBalance('ETH');
+        cryptos[1].price = getPrice('ETH');
+        
+        cryptos[2].balance = getBalance('USDT');
+        cryptos[2].price = getPrice('USDT');
+        
+        cryptos[3].balance = getBalance('BNB');
+        cryptos[3].price = getPrice('BNB');
+        
+        // Update the selected crypto (which is BTC by default)
+        if (typeof selectedCrypto !== 'undefined') {
+            selectedCrypto.balance = getBalance('BTC');
+            selectedCrypto.price = getPrice('BTC');
+        }
+        
+        console.log('✅ Send page: Updated crypto balances:', cryptos);
+        
+        // Update the displayed balance
+        const balanceSpan = document.getElementById('cryptoBalance');
+        if (balanceSpan) {
+            balanceSpan.textContent = getBalance('BTC').toFixed(8);
+        }
+        
+        // Re-render the crypto list with updated balances
+        if (typeof renderCryptoList === 'function') {
+            renderCryptoList();
+        }
+    }
+});
 </script>
+```
+
+---
+
+# ✅ **What This Does:**
+
+## **Sell Page:**
+- Shows **real BTC balance** from your wallet
+- Shows **0.00000000** for ETH, USDT, BNB (since BlueWallet only has Bitcoin)
+- **MAX button works** - fills in your actual BTC balance
+- Warns you if you try to sell more than you have
+
+## **Send Page:**
+- Shows **real BTC balance** in the dropdown
+- Shows **0.00000000** for other cryptos
+- Updates the balance display correctly
+
+---
+
+# 🧪 **Test It:**
+
+1. **Connect your BlueWallet** with BTC
+2. **Go to Sell page** - should show:
+```
+   Bitcoin (BTC) - Balance: 0.00357698
+   Ethereum (ETH) - Balance: 0.00000000
+   Tether (USDT) - Balance: 0.00
+   BNB (BNB) - Balance: 0.00000000
 
 </body>
 </html>
