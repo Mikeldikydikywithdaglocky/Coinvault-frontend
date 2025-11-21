@@ -466,11 +466,24 @@
                 }
             }
         }
+        
+         // Format balance with commas and proper decimals
+        function formatBalanceWithCommas(amount) {
+            if (!amount || isNaN(amount)) return '0.00';
+            
+            // Use toLocaleString for comma formatting
+            return amount.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+   
 
         // Update dashboard
         function updateDashboard() {
             if (connectedWallet && walletData.address) {
-                document.getElementById('totalBalance').textContent = '$' + walletData.balance.toFixed(2);
+                document.getElementById('totalBalance').textContent = '$' + formatBalanceWithCommas(walletData.balance);
                 document.getElementById('walletAddress').textContent = formatAddress(walletData.address);
                 document.getElementById('copyBtn').classList.remove('hidden');
                 
