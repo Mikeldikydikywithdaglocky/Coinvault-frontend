@@ -110,35 +110,6 @@
     <custom-footer></custom-footer>
     <script src="js/main.js"></script>
     <script>
-        function updateSellPrice() { calculateSell(); feather.replace(); }
-        function calculateSell() {
-            const amount = parseFloat(document.getElementById('sellAmount').value) || 0;
-            const [symbol, price, balance] = document.getElementById('sellCrypto').value.split('|');
-            const salePrice = amount * parseFloat(price);
-            const fee = salePrice * 0.015;
-            const receive = salePrice - fee;
-            
-            document.getElementById('sellSymbol').textContent = symbol;
-            document.getElementById('usdValue').textContent = salePrice.toFixed(2);
-            document.getElementById('salePriceDisplay').textContent = '$' + salePrice.toFixed(2);
-            document.getElementById('sellFeeDisplay').textContent = '$' + fee.toFixed(2);
-            document.getElementById('receiveDisplay').textContent = '$' + receive.toFixed(2);
-        }
-        function setMaxSell() {
-            const [symbol, price, balance] = document.getElementById('sellCrypto').value.split('|');
-            document.getElementById('sellAmount').value = balance;
-            calculateSell();
-        }
-        function processSell() {
-            const amount = parseFloat(document.getElementById('sellAmount').value);
-            if (!amount || amount <= 0) {
-                alert('Please enter a valid amount');
-                return;
-            }
-            alert('Sell feature will process to your payout method. Demo mode active.');
-        }
-      
-        <script>
 // Load wallet data from localStorage
 function loadWalletData() {
     const walletDataStr = localStorage.getItem('connectedWallet');
@@ -169,10 +140,10 @@ function getPrice(symbol) {
     if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
         // Fallback prices
         const fallbackPrices = {
-            'BTC': 43250,
-            'ETH': 2280,
+            'BTC': 87000,
+            'ETH': 2800,
             'USDT': 1,
-            'BNB': 315
+            'BNB': 330
         };
         return fallbackPrices[symbol] || 0;
     }
@@ -266,9 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSellBalances();
     feather.replace();
 });
-</script>
 
-       feather.replace();
     </script>
 <!-- COPY THIS FOOTER TO ALL PAGES -->
 <footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
