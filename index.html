@@ -497,7 +497,85 @@
                 document.getElementById('connectionBtn').classList.remove('bg-indigo-600');
                 document.getElementById('connectionBtn').classList.add('bg-green-600');
                 document.getElementById('disconnectBtn').style.display = 'flex';
+                
+                // Show and populate Assets section
+                if (walletData.assets && walletData.assets.length > 0) {
+                    document.getElementById('assetsSection').style.display = 'block';
+                    const assetsList = document.getElementById('assetsList');
+                    assetsList.innerHTML = walletData.assets.map(asset => `
+                        <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
+                            <div class="col-span-5 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl" style="background-color: ${asset.color || '#4F46E5'}">
+                                    ${asset.symbol === 'BTC' ? '₿' : asset.symbol.charAt(0)}
+                                </div>
+                                <div>
+                                    <div class="font-medium">${asset.name}</div>
+                                    <div class="text-sm text-gray-400">${asset.symbol}</div>
+                                </div>
+                            </div>
+                            <div class="col-span-3 text-right">
+                                <div class="font-medium">${asset.balance.toFixed(8)}</div>
+                                <div class="text-sm text-gray-400">${asset.symbol}</div>
+                            </div>
+                            <div class="col-span-2 text-right">
+                                <div class="font-medium">$${formatBalanceWithCommas(asset.price)}</div>
+                            </div>
+                            <div class="col-span-2 text-right">
+                                <div class="font-medium text-green-400">$${formatBalanceWithCommas(asset.balance * asset.price)}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                // Show and populate Transactions section
+                if (walletData.transactions && walletData.transactions.length > 0) {
+                    document.getElementById('transactionsSection').style.display = 'block';
+                    const transactionsList = document.getElementById('transactionsList');
+                    transactionsList.innerHTML = walletData.transactions.map(tx => `
+                        <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
+                            <div class="col-span-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center ${
+                                    tx.type === 'Received' ? 'bg-green-600' : 'bg-red-600'
+                                }">
+                                    ${tx.type === 'Received' ? '↓' : '↑'}
+                                </div>
+                                <div>
+                                    <div class="font-medium">${tx.type}</div>
+                                    <div class="text-sm text-gray-400">${tx.date}</div>
+                                </div>
+                            </div>
+                            <div class="col-span-3 text-right">
+                                <div class="font-medium ${tx.type === 'Received' ? 'text-green-400' : 'text-red-400'}">
+                                    ${tx.type === 'Received' ? '+' : '-'}${tx.amount.toFixed(8)} ${tx.symbol}
+                                </div>
+                            </div>
+                            <div class="col-span-3 text-right">
+                                <span class="px-3 py-1 rounded-full text-xs ${
+                                    tx.status === 'Completed' 
+                                        ? 'bg-green-900 text-green-400' 
+                                        : 'bg-yellow-900 text-yellow-400'
+                                }">
+                                    ${tx.status}
+                                </span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    // Show section but with empty state
+                    document.getElementById('transactionsSection').style.display = 'block';
+                    document.getElementById('transactionsList').innerHTML = `
+                        <div class="p-8 text-center text-gray-400">
+                            <div class="text-4xl mb-2">📭</div>
+                            <p>No transactions yet</p>
+                        </div>
+                    `;
+                }
+                
             } else {
+                // Hide sections when disconnected
+                document.getElementById('assetsSection').style.display = 'none';
+                document.getElementById('transactionsSection').style.display = 'none';
+                
                 document.getElementById('totalBalance').textContent = '$0.00';
                 document.getElementById('walletAddress').textContent = 'No wallet connected';
                 document.getElementById('copyBtn').classList.add('hidden');
@@ -514,6 +592,43 @@
                 document.getElementById('disconnectBtn').style.display = 'none';
             }
         }
+```
+
+---
+
+## 🎨 **What This Does:**
+
+### **Assets Section:**
+- ✅ Shows your **Bitcoin balance**
+- ✅ Displays **BTC symbol** with orange background
+- ✅ Shows **price per BTC**
+- ✅ Shows **total value in USD**
+
+### **Transactions Section:**
+- ✅ Shows **recent transactions** from blockchain
+- ✅ **Green ↓** for received transactions
+- ✅ **Red ↑** for sent transactions
+- ✅ Shows **date, amount, and status**
+- ✅ If no transactions: shows "No transactions yet"
+
+---
+
+## 📊 **Example Output:**
+
+### **Your Assets:**
+```
+Asset               Balance        Price      Value
+₿ Bitcoin (BTC)    9260.01664050  $84,161.00  $779,403,395.92
+```
+
+### **Recent Transactions:**
+```
+Transaction         Amount                    Status
+↓ Received         +0.00100000 BTC           Completed
+11/20/2024
+
+↑ Sent             -0.00050000 BTC           Completed
+11/19/2024
 
         // Format address
         function formatAddress(address) {
