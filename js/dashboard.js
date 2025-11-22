@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://montgomery-folk-valves-confidential.trycloudflare.com/api';
+const API_URL = 'https://collectables-lawsuit-intervention-dollars.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
