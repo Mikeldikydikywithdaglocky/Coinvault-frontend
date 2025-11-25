@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://gates-compute-susan-clay.trycloudflare.com/api';
+const API_URL = 'https://contributions-substantial-ipaq-expressions.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
