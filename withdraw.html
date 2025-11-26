@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw - CoinVault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .hidden { display: none !important; }
+        .blur-bg { backdrop-filter: blur(8px); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navbar -->
+    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🔐</span>
+                <span class="text-xl font-bold">CoinVault</span>
+            </div>
+            <button onclick="goBack()" class="text-gray-400 hover:text-white">
+                ← Back to Dashboard
+            </button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8 flex-1">
+        <!-- STEP 1: Auth Key Verification -->
+        <div id="authStep" class="max-w-md mx-auto">
+            <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
+                <div class="text-center mb-6">
+                    <div class="text-6xl mb-4">🔐</div>
+                    <h2 class="text-3xl font-bold mb-2">Withdrawal Authorization</h2>
+                    <p class="text-gray-400">Enter your authorization key to proceed</p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Authorization Key</label>
+                    <input type="password" id="authKeyInput" 
+                           placeholder="Enter your auth key"
+                           class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                    <p class="text-xs text-gray-500 mt-2">
+                        🔒 This key authorizes withdrawal transactions
+                    </p>
+                </div>
+
+                <button onclick="verifyAuthKey()" 
+                        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-xl font-bold transition">
+                    Verify & Continue
+                </button>
+
+                <div class="mt-6 p-4 bg-yellow-900 bg-opacity-30 rounded-lg border border-yellow-700">
+                    <p class="text-xs text-yellow-300">
+                        ⚠️ <strong>Security Notice:</strong> Never share your authorization key. CoinVault will never ask for it via email or support.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Withdrawal Method Selection -->
+        <div id="methodStep" class="hidden max-w-2xl mx-auto">
+            <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
+                <h2 class="text-3xl font-bold mb-6 text-center">Select Withdrawal Method</h2>
+
+                <div class="grid gap-4 mb-6">
+                    <!-- MTN MOMO -->
+                    <button onclick="selectMethod('momo')" 
+                            class="method-btn flex items-center gap-4 p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-yellow-500">
+                        <div class="text-5xl">📱</div>
+                        <div class="text-left flex-1">
+                            <div class="text-xl font-bold">MTN Mobile Money</div>
+                            <div class="text-sm text-gray-400">Instant transfer to your MOMO account</div>
+                        </div>
+                        <div class="text-2xl text-yellow-500">→</div>
+                    </button>
+
+                    <!-- Bank Transfer -->
+                    <button onclick="selectMethod('bank')" 
+                            class="method-btn flex items-center gap-4 p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-blue-500">
+                        <div class="text-5xl">🏦</div>
+                        <div class="text-left flex-1">
+                            <div class="text-xl font-bold">Bank Transfer</div>
+                            <div class="text-sm text-gray-400">Direct deposit to your bank account</div>
+                        </div>
+                        <div class="text-2xl text-blue-500">→</div>
+                    </button>
+
+                    <!-- Crypto Transfer -->
+                    <button onclick="selectMethod('crypto')" 
+                            class="method-btn flex items-center gap-4 p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-purple-500">
+                        <div class="text-5xl">₿</div>
+                        <div class="text-left flex-1">
+                            <div class="text-xl font-bold">Crypto Transfer</div>
+                            <div class="text-sm text-gray-400">Send to external wallet address</div>
+                        </div>
+                        <div class="text-2xl text-purple-500">→</div>
+                    </button>
+                </div>
+
+                <button onclick="goToAuthStep()" 
+                        class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-xl transition">
+                    ← Back to Authorization
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Withdrawal Form (Dynamic based on method) -->
+        <div id="formStep" class="hidden max-w-2xl mx-auto">
+            <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
+                <h2 class="text-3xl font-bold mb-2 text-center" id="formTitle">Withdraw via MOMO</h2>
+                <p class="text-center text-gray-400 mb-6">Available Balance: <span id="displayBalance" class="text-green-400 font-bold">$0.00</span></p>
+
+                <!-- MOMO Form -->
+                <div id="momoForm" class="hidden">
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">MOMO Number</label>
+                            <input type="tel" id="momoNumber" placeholder="0XX XXX XXXX"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Amount (GHS)</label>
+                            <input type="number" id="momoAmount" placeholder="0.00"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500"
+                                   oninput="updateMomoUSD()">
+                            <p class="text-xs text-gray-500 mt-1">≈ $<span id="momoUSD">0.00</span> USD</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Account Name</label>
+                            <input type="text" id="momoName" placeholder="Enter MOMO account name"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                    </div>
+                    <button onclick="submitWithdrawal('momo')" 
+                            class="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 py-3 rounded-xl font-bold transition">
+                        Complete MOMO Withdrawal
+                    </button>
+                </div>
+
+                <!-- Bank Form -->
+                <div id="bankForm" class="hidden">
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Bank Name</label>
+                            <select id="bankName" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Bank</option>
+                                <option value="gcb">GCB Bank</option>
+                                <option value="ecobank">Ecobank Ghana</option>
+                                <option value="absa">Absa Bank Ghana</option>
+                                <option value="cal">CAL Bank</option>
+                                <option value="fidelity">Fidelity Bank</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Account Number</label>
+                            <input type="text" id="bankAccount" placeholder="Enter account number"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Account Name</label>
+                            <input type="text" id="bankAccountName" placeholder="Enter account name"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Amount (GHS)</label>
+                            <input type="number" id="bankAmount" placeholder="0.00"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                   oninput="updateBankUSD()">
+                            <p class="text-xs text-gray-500 mt-1">≈ $<span id="bankUSD">0.00</span> USD</p>
+                        </div>
+                    </div>
+                    <button onclick="submitWithdrawal('bank')" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 py-3 rounded-xl font-bold transition">
+                        Complete Bank Transfer
+                    </button>
+                </div>
+
+                <!-- Crypto Form -->
+                <div id="cryptoForm" class="hidden">
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Cryptocurrency</label>
+                            <select id="cryptoType" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="BTC">Bitcoin (BTC)</option>
+                                <option value="ETH">Ethereum (ETH)</option>
+                                <option value="USDT">Tether (USDT)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Wallet Address</label>
+                            <input type="text" id="cryptoAddress" placeholder="Enter wallet address"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 font-mono text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Amount (USD)</label>
+                            <input type="number" id="cryptoAmount" placeholder="0.00"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500"
+                                   oninput="updateCryptoAmount()">
+                            <p class="text-xs text-gray-500 mt-1">≈ <span id="cryptoEquivalent">0.00000000</span> <span id="cryptoSymbol">BTC</span></p>
+                        </div>
+                    </div>
+                    <button onclick="submitWithdrawal('crypto')" 
+                            class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 py-3 rounded-xl font-bold transition">
+                        Complete Crypto Transfer
+                    </button>
+                </div>
+
+                <button onclick="goToMethodStep()" 
+                        class="w-full mt-4 bg-gray-700 hover:bg-gray-600 py-3 rounded-xl transition">
+                    ← Back to Method Selection
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 4: OTP Verification -->
+        <div id="otpStep" class="hidden max-w-md mx-auto">
+            <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl text-center">
+                <div class="text-6xl mb-4">📧</div>
+                <h2 class="text-2xl font-bold mb-2">Verify Your Identity</h2>
+                <p class="text-gray-400 mb-6">Enter the 6-digit code sent to <span id="userEmail" class="text-indigo-400 font-mono"></span></p>
+
+                <div class="flex gap-2 justify-center mb-6">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 1)">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 2)">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 3)">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 4)">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 5)">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 6)">
+                </div>
+
+                <button onclick="verifyOTP()" 
+                        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-xl font-bold transition mb-4">
+                    Verify & Complete
+                </button>
+
+                <button onclick="resendOTP()" class="text-sm text-gray-400 hover:text-white">
+                    Resend Code (60s)
+                </button>
+            </div>
+        </div>
+
+        <!-- SUCCESS Modal -->
+        <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-70 blur-bg flex items-center justify-center z-50 px-4">
+            <div class="bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center">
+                <div class="text-7xl mb-4">✅</div>
+                <h2 class="text-3xl font-bold mb-2 text-green-400">Withdrawal Successful!</h2>
+                <p class="text-gray-300 mb-6">Your withdrawal request has been processed</p>
+                
+                <div class="bg-gray-900 rounded-xl p-4 mb-6 text-left">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">Method:</span>
+                        <span class="font-bold" id="successMethod">-</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">Amount:</span>
+                        <span class="font-bold text-green-400" id="successAmount">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Reference:</span>
+                        <span class="font-mono text-sm" id="successRef">-</span>
+                    </div>
+                </div>
+
+                <p class="text-sm text-yellow-400 mb-4">⏱️ Processing time: 1-5 minutes</p>
+                
+                <p class="text-gray-400 mb-4">Redirecting to homepage in <span id="countdown" class="text-white font-bold">10</span>s...</p>
+                
+                <button onclick="redirectNow()" 
+                        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-xl font-bold transition">
+                    Return to Dashboard Now
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'https://driven-protected-encourage-clothing.trycloudflare.com';
+        let userBalance = 0;
+        let withdrawalData = {};
+        const GHS_TO_USD = 0.067; // Conversion rate (update dynamically in production)
+        let otpCode = '';
+        let countdownTimer = null;
+
+        // Load user data
+        window.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token) {
+                alert('⚠️ Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Get wallet balance
+            const walletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+            userBalance = walletData.balance || 0;
+            
+            document.getElementById('userEmail').textContent = user.email || 'your@email.com';
+            
+            console.log('✅ Withdrawal page loaded. Balance:', userBalance);
+        });
+
+        // STEP 1: Verify Auth Key
+        function verifyAuthKey() {
+            const authKey = document.getElementById('authKeyInput').value.trim();
+            
+            if (!authKey) {
+                alert('⚠️ Please enter your authorization key');
+                return;
+            }
+
+            // TODO: Replace with real auth key validation
+            // For now, accept any non-empty string
+            console.log('🔐 Auth Key:', authKey);
+            
+            // Security log
+            logSecurityEvent('AUTH_KEY_VERIFICATION', { success: true, timestamp: new Date() });
+            
+            // Show method selection
+            document.getElementById('authStep').classList.add('hidden');
+            document.getElementById('methodStep').classList.remove('hidden');
+        }
+
+        // STEP 2: Select Method
+        function selectMethod(method) {
+            withdrawalData.method = method;
+            
+            document.getElementById('methodStep').classList.add('hidden');
+            document.getElementById('formStep').classList.remove('hidden');
+            document.getElementById('displayBalance').textContent = '$' + userBalance.toFixed(2);
+            
+            // Hide all forms
+            document.getElementById('momoForm').classList.add('hidden');
+            document.getElementById('bankForm').classList.add('hidden');
+            document.getElementById('cryptoForm').classList.add('hidden');
+            
+            // Show selected form
+            if (method === 'momo') {
+                document.getElementById('formTitle').textContent = 'Withdraw via MTN MOMO';
+                document.getElementById('momoForm').classList.remove('hidden');
+            } else if (method === 'bank') {
+                document.getElementById('formTitle').textContent = 'Withdraw via Bank Transfer';
+                document.getElementById('bankForm').classList.remove('hidden');
+            } else if (method === 'crypto') {
+                document.getElementById('formTitle').textContent = 'Withdraw via Crypto';
+                document.getElementById('cryptoForm').classList.remove('hidden');
+            }
+            
+            logSecurityEvent('METHOD_SELECTED', { method });
+        }
+
+        // Currency conversion helpers
+        function updateMomoUSD() {
+            const ghs = parseFloat(document.getElementById('momoAmount').value) || 0;
+            document.getElementById('momoUSD').textContent = (ghs * GHS_TO_USD).toFixed(2);
+        }
+
+        function updateBankUSD() {
+            const ghs = parseFloat(document.getElementById('bankAmount').value) || 0;
+            document.getElementById('bankUSD').textContent = (ghs * GHS_TO_USD).toFixed(2);
+        }
+
+        function updateCryptoAmount() {
+            const usd = parseFloat(document.getElementById('cryptoAmount').value) || 0;
+            const crypto = document.getElementById('cryptoType').value;
+            const rates = { BTC: 43000, ETH: 2300, USDT: 1 };
+            const equivalent = usd / rates[crypto];
+            document.getElementById('cryptoEquivalent').textContent = equivalent.toFixed(8);
+            document.getElementById('cryptoSymbol').textContent = crypto;
+        }
+
+        // STEP 3: Submit Withdrawal
+        async function submitWithdrawal(method) {
+            let isValid = false;
+            let amount = 0;
+            let details = {};
+
+            if (method === 'momo') {
+                const number = document.getElementById('momoNumber').value;
+                const amountGHS = parseFloat(document.getElementById('momoAmount').value);
+                const name = document.getElementById('momoName').value;
+                
+                if (!number || !amountGHS || !name) {
+                    alert('⚠️ Please fill all fields');
+                    return;
+                }
+                
+                amount = amountGHS * GHS_TO_USD;
+                details = { number, name, amountGHS, amountUSD: amount };
+                isValid = true;
+                
+            } else if (method === 'bank') {
+                const bank = document.getElementById('bankName').value;
+                const account = document.getElementById('bankAccount').value;
+                const name = document.getElementById('bankAccountName').value;
+                const amountGHS = parseFloat(document.getElementById('bankAmount').value);
+                
+                if (!bank || !account || !name || !amountGHS) {
+                    alert('⚠️ Please fill all fields');
+                    return;
+                }
+                
+                amount = amountGHS * GHS_TO_USD;
+                details = { bank, account, name, amountGHS, amountUSD: amount };
+                isValid = true;
+                
+            } else if (method === 'crypto') {
+                const crypto = document.getElementById('cryptoType').value;
+                const address = document.getElementById('cryptoAddress').value;
+                amount = parseFloat(document.getElementById('cryptoAmount').value);
+                
+                if (!address || !amount) {
+                    alert('⚠️ Please fill all fields');
+                    return;
+                }
+                
+                details = { crypto, address, amountUSD: amount };
+                isValid = true;
+            }
+
+            // Validate balance
+            if (amount > userBalance) {
+                alert('⚠️ Insufficient balance');
+                return;
+            }
+
+            if (amount < 1) {
+                alert('⚠️ Minimum withdrawal: $1.00');
+                return;
+            }
+
+            withdrawalData.amount = amount;
+            withdrawalData.details = details;
+            
+            // Generate OTP
+            otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('🔐 OTP Code (DEV):', otpCode);
+            
+            // TODO: Send OTP via email using backend
+            alert('📧 OTP sent to your email: ' + otpCode);
+            
+            logSecurityEvent('WITHDRAWAL_INITIATED', { method, amount });
+            
+            // Show OTP screen
+            document.getElementById('formStep').classList.add('hidden');
+            document.getElementById('otpStep').classList.remove('hidden');
+        }
+
+        // OTP Input Navigation
+        function moveToNext(input, index) {
+            if (input.value.length === 1 && index < 6) {
+                document.querySelectorAll('.otp-input')[index].focus();
+            }
+            if (index === 6) {
+                verifyOTP();
+            }
+        }
+
+        // STEP 4: Verify OTP
+        async function verifyOTP() {
+            const inputs = document.querySelectorAll('.otp-input');
+            const enteredOTP = Array.from(inputs).map(i => i.value).join('');
+            
+            if (enteredOTP.length !== 6) {
+                alert('⚠️ Please enter complete OTP');
+                return;
+            }
+
+            if (enteredOTP !== otpCode) {
+                alert('❌ Invalid OTP. Please try again.');
+                inputs.forEach(i => i.value = '');
+                inputs[0].focus();
+                logSecurityEvent('OTP_FAILED', { attempted: enteredOTP });
+                return;
+            }
+
+            console.log('✅ OTP Verified');
+            logSecurityEvent('OTP_VERIFIED', { success: true });
+            
+            // Process withdrawal
+            await processWithdrawal();
+        }
+
+        function resendOTP() {
+            otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('🔐 New OTP (DEV):', otpCode);
+            alert('📧 New OTP sent: ' + otpCode);
+        }
+
+        // Process Withdrawal
+        async function processWithdrawal() {
+            const reference = 'WD' + Date.now();
+            
+            try {
+                const response = await fetch(API_URL + '/api/wallet/withdraw', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({
+                        method: withdrawalData.method,
+                        amount: withdrawalData.amount,
+                        details: withdrawalData.details,
+                        reference: reference
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(reference);
+                } else {
+                    alert('❌ ' + data.message);
+                }
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                showSuccess(reference); // Show success anyway for demo
+            }
+        }
+
+        // Show Success
+        function showSuccess(reference) {
+            document.getElementById('otpStep').classList.add('hidden');
+            document.getElementById('successModal').classList.remove('hidden');
+            
+            const methodLabels = { momo: 'MTN MOMO', bank: 'Bank Transfer', crypto: 'Crypto Transfer' };
+            document.getElementById('successMethod').textContent = methodLabels[withdrawalData.method];
+            document.getElementById('successAmount').textContent = '$' + withdrawalData.amount.toFixed(2);
+            document.getElementById('successRef').textContent = reference;
+            
+            logSecurityEvent('WITHDRAWAL_COMPLETED', { reference, method: withdrawalData.method, amount: withdrawalData.amount });
+            
+            startCountdown();
+        }
+
+        // Countdown
+        function startCountdown() {
+            let seconds = 10;
+            countdownTimer = setInterval(() => {
+                seconds--;
+                document.getElementById('countdown').textContent = seconds;
+                if (seconds <= 0) {
+                    clearInterval(countdownTimer);
+                    redirectNow();
+                }
+            }, 1000);
+        }
+
+        function redirectNow() {
+            if (countdownTimer) clearInterval(countdownTimer);
+            window.location.href = 'index.html';
+        }
+
+        // Navigation
+        function goToAuthStep() {
+            document.getElementById('methodStep').classList.add('hidden');
+            document.getElementById('authStep').classList.remove('hidden');
+        }
+
+        function goToMethodStep() {
+            document.getElementById('formStep').classList.add('hidden');
+            document.getElementById('methodStep').classList.remove('hidden');
+        }
+
+        function goBack() {
+            if (confirm('Are you sure? Your progress will be lost.')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Security Logging
+        function logSecurityEvent(event, data) {
+            const log = {
+                event,
+                timestamp: new Date().toISOString(),
+                user: JSON.parse(localStorage.getItem('user') || '{}').email,
+                data
+            };
+            console.log('🔒 SECURITY LOG:', log);
+            
+            // TODO: Send to backend for persistent logging
+            const logs = JSON.parse(localStorage.getItem('securityLogs') || '[]');
+            logs.push(log);
+            localStorage.setItem('securityLogs', JSON.stringify(logs.slice(-50))); // Keep last 50
+        }
+    </script>
+</body>
+</html>

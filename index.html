@@ -614,13 +614,18 @@
         }
 
         // Handle withdraw
-        function handleWithdraw() {
-            if (!connectedWallet) {
-                alert('Please connect a wallet first');
-                return;
-            }
-            alert('Withdraw feature coming soon!');
-        }
+function handleWithdraw() {
+    if (!connectedWallet) {
+        alert('⚠️ Please connect a wallet first');
+        return;
+    }
+    
+    // Store wallet data for withdrawal page
+    localStorage.setItem('walletData', JSON.stringify(walletData));
+    
+    // Navigate to withdrawal page
+    window.location.href = 'withdraw.html';
+}
 
         // Logout
         function logout() {
