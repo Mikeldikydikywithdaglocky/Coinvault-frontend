@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://contributions-substantial-ipaq-expressions.trycloudflare.com/api';
+const API_URL = 'https://folk-receipt-bonds-index.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {

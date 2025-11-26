@@ -4,7 +4,7 @@
 const CONFIG = {
   // API Base URL - automatically uses ngrok URL
   // js/config.js - line 3
-API_URL: 'https://contributions-substantial-ipaq-expressions.trycloudflare.com/api',
+API_URL: 'https://folk-receipt-bonds-index.trycloudflare.com/api',
   
   // Network Configuration
   NETWORK: 'bitcoin', // 'bitcoin' or 'testnet'
