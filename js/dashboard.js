@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://supplies-recognize-yes-plug.trycloudflare.com/api';
+const API_URL = 'https://coinvault-api.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
