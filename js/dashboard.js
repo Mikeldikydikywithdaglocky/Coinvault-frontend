@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://coinvault-api.trycloudflare.com/api';
+const API_URL = 'https://notes-wishes-alike-universe.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
