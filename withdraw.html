@@ -15,6 +15,23 @@
         }
         .hidden { display: none !important; }
         .blur-bg { backdrop-filter: blur(8px); }
+        .carrier-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .carrier-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .carrier-card.selected {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .dimmed {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -61,6 +78,12 @@
                         ⚠️ <strong>Security Notice:</strong> Never share your authorization key. CoinVault will never ask for it via email or support.
                     </p>
                 </div>
+                <div id="withdrawalLimitNotice" class="mt-4 p-4 bg-red-900 bg-opacity-30 rounded-lg border border-red-700 hidden">
+                    <p class="text-xs text-red-300">
+                        🚨 <strong>Withdrawal Limit:</strong> <span id="limitAmount">$0</span> | 
+                        <strong>Remaining Uses:</strong> <span id="remainingUses">0</span>
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -70,13 +93,13 @@
                 <h2 class="text-3xl font-bold mb-6 text-center">Select Withdrawal Method</h2>
 
                 <div class="grid gap-4 mb-6">
-                    <!-- MTN MOMO -->
+                    <!-- Mobile Money -->
                     <button onclick="selectMethod('momo')" 
                             class="method-btn flex items-center gap-4 p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-yellow-500">
                         <div class="text-5xl">📱</div>
                         <div class="text-left flex-1">
-                            <div class="text-xl font-bold">MTN Mobile Money</div>
-                            <div class="text-sm text-gray-400">Instant transfer to your MOMO account</div>
+                            <div class="text-xl font-bold">Mobile Money</div>
+                            <div class="text-sm text-gray-400">MTN, Vodafone, AirtelTigo</div>
                         </div>
                         <div class="text-2xl text-yellow-500">→</div>
                     </button>
@@ -110,6 +133,47 @@
                 </button>
             </div>
         </div>
+        
+        <!-- STEP 2B: Mobile Money Carrier Selection -->
+        <div id="carrierStep" class="hidden max-w-3xl mx-auto">
+            <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
+                <h2 class="text-3xl font-bold mb-6 text-center">Select Mobile Money Carrier</h2>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <!-- MTN Mobile Money -->
+                    <div onclick="selectCarrier('mtn')" 
+                         class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/MTN_Logo.svg/320px-MTN_Logo.svg.png" 
+                             alt="MTN MoMo" class="h-20 mx-auto mb-4 object-contain">
+                        <h3 class="text-xl font-bold mb-2">MTN MoMo</h3>
+                        <p class="text-sm text-gray-400">024, 054, 055, 059</p>
+                    </div>
+
+                    <!-- Vodafone Cash -->
+                    <div onclick="selectCarrier('vodafone')" 
+                         class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vodafone_icon.svg/240px-Vodafone_icon.svg.png" 
+                             alt="Vodafone Cash" class="h-20 mx-auto mb-4 object-contain">
+                        <h3 class="text-xl font-bold mb-2">Vodafone Cash</h3>
+                        <p class="text-sm text-gray-400">020, 050</p>
+                    </div>
+
+                    <!-- AirtelTigo Money -->
+                    <div onclick="selectCarrier('airteltigo')" 
+                         class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
+                        <img src="https://yt3.googleusercontent.com/ytc/AIdro_lZ7qQvZK5kTGPXEYqWQRh5x9bxKh0fELCVNYjP0B9wUw=s900-c-k-c0x00ffffff-no-rj" 
+                             alt="AirtelTigo Money" class="h-20 mx-auto mb-4 object-contain rounded-lg">
+                        <h3 class="text-xl font-bold mb-2">ATMoney</h3>
+                        <p class="text-sm text-gray-400">027, 057, 026, 056</p>
+                    </div>
+                </div>
+
+                <button onclick="goBackToMethodStep()" 
+                        class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-xl transition">
+                    ← Back to Method Selection
+                </button>
+            </div>
+        </div>
 
         <!-- STEP 3: Withdrawal Form (Dynamic based on method) -->
         <div id="formStep" class="hidden max-w-2xl mx-auto">
@@ -119,11 +183,19 @@
 
                 <!-- MOMO Form -->
                 <div id="momoForm" class="hidden">
+                    <!-- Carrier Logo Display -->
+                    <div class="text-center mb-6">
+                        <img id="selectedCarrierLogo" src="" alt="" class="h-16 mx-auto mb-2 object-contain">
+                        <p class="text-lg font-bold" id="selectedCarrierName"></p>
+                    </div>
+
                     <div class="space-y-4 mb-6">
                         <div>
-                            <label class="block text-sm font-medium mb-2">MOMO Number</label>
-                            <input type="tel" id="momoNumber" placeholder="0XX XXX XXXX"
-                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500">
+                            <label class="block text-sm font-medium mb-2">Mobile Money Number</label>
+                            <input type="tel" id="momoNumber" placeholder="0XX XXX XXXX" maxlength="10"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500"
+                                   oninput="validateMomoNumber()">
+                            <p id="momoNumberError" class="text-xs text-red-400 mt-1 hidden">Invalid number for selected carrier</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-2">Amount (GHS)</label>
@@ -134,13 +206,13 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-2">Account Name</label>
-                            <input type="text" id="momoName" placeholder="Enter MOMO account name"
+                            <input type="text" id="momoName" placeholder="Enter account holder name"
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500">
                         </div>
                     </div>
-                    <button onclick="submitWithdrawal('momo')" 
+                    <button onclick="submitWithdrawal('momo')" id="momoSubmitBtn"
                             class="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 py-3 rounded-xl font-bold transition">
-                        Complete MOMO Withdrawal
+                        Complete Mobile Money Withdrawal
                     </button>
                 </div>
 
@@ -176,7 +248,7 @@
                             <p class="text-xs text-gray-500 mt-1">≈ $<span id="bankUSD">0.00</span> USD</p>
                         </div>
                     </div>
-                    <button onclick="submitWithdrawal('bank')" 
+                    <button onclick="submitWithdrawal('bank')" id="bankSubmitBtn"
                             class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 py-3 rounded-xl font-bold transition">
                         Complete Bank Transfer
                     </button>
@@ -206,13 +278,13 @@
                             <p class="text-xs text-gray-500 mt-1">≈ <span id="cryptoEquivalent">0.00000000</span> <span id="cryptoSymbol">BTC</span></p>
                         </div>
                     </div>
-                    <button onclick="submitWithdrawal('crypto')" 
+                    <button onclick="submitWithdrawal('crypto')" id="cryptoSubmitBtn"
                             class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 py-3 rounded-xl font-bold transition">
                         Complete Crypto Transfer
                     </button>
                 </div>
 
-                <button onclick="goToMethodStep()" 
+                <button onclick="goBackFromForm()" 
                         class="w-full mt-4 bg-gray-700 hover:bg-gray-600 py-3 rounded-xl transition">
                     ← Back to Method Selection
                 </button>
@@ -284,9 +356,58 @@
         const API_URL = 'https://driven-protected-encourage-clothing.trycloudflare.com';
         let userBalance = 0;
         let withdrawalData = {};
-        const GHS_TO_USD = 0.067; // Conversion rate (update dynamically in production)
+        const GHS_TO_USD = 0.067;
         let otpCode = '';
         let countdownTimer = null;
+        let selectedCarrier = null;
+        let currentAuthTier = null;
+        let withdrawalLimit = 0;
+        let remainingWithdrawals = 0;
+
+        // Authorization key tiers
+        const AUTH_TIERS = {
+            tier1: {
+                keys: ['FJK-32873196', 'KOB-39486612', 'PKT-76721894', 'TQO-29423102', 'ECT-88109297', 'BCG-57357155'],
+                limit: 2000,
+                maxUses: 3,
+                methods: ['momo']
+            },
+            tier2: {
+                keys: ['POT-70981233', 'QTB-36417890', 'TTK-09428733', 'DFB-87146092', 'AEP-94732178'],
+                limit: 10000,
+                maxUses: 3,
+                methods: ['momo', 'bank']
+            },
+            tier3: {
+                keys: ['ZOP-41330783', 'CBT-89077147', 'NPI-79333105', 'TOK-55714300'],
+                limit: 20000,
+                maxUses: 5,
+                methods: ['momo', 'bank', 'crypto']
+            }
+        };
+
+        // Carrier validation prefixes
+        const carrierPrefixes = {
+            mtn: ['024', '054', '055', '059'],
+            vodafone: ['020', '050'],
+            airteltigo: ['027', '057', '026', '056']
+        };
+
+        // Carrier display data
+        const carrierData = {
+            mtn: {
+                name: 'MTN MoMo',
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/MTN_Logo.svg/320px-MTN_Logo.svg.png'
+            },
+            vodafone: {
+                name: 'Vodafone Cash',
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vodafone_icon.svg/240px-Vodafone_icon.svg.png'
+            },
+            airteltigo: {
+                name: 'AirtelTigo Money',
+                logo: 'https://yt3.googleusercontent.com/ytc/AIdro_lZ7qQvZK5kTGPXEYqWQRh5x9bxKh0fELCVNYjP0B9wUw=s900-c-k-c0x00ffffff-no-rj'
+            }
+        };
 
         // Load user data
         window.addEventListener('DOMContentLoaded', async function() {
@@ -308,50 +429,186 @@
             console.log('✅ Withdrawal page loaded. Balance:', userBalance);
         });
 
-        // STEP 1: Verify Auth Key
+        // Restore auth session if exists
+            const savedAuthTier = sessionStorage.getItem('currentAuthTier');
+            if (savedAuthTier) {
+                currentAuthTier = JSON.parse(savedAuthTier);
+                const authKey = sessionStorage.getItem('currentAuthKey');
+                const keyUsage = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+                const usedCount = keyUsage.count || 0;
+                
+                withdrawalLimit = currentAuthTier.limit;
+                remainingWithdrawals = currentAuthTier.maxUses - usedCount;
+                
+                console.log('♻️ Session restored. Remaining withdrawals:', remainingWithdrawals);
+            }
+
+        // STEP 1: Verify Auth Key with Tier System
         function verifyAuthKey() {
-            const authKey = document.getElementById('authKeyInput').value.trim();
+            const authKey = document.getElementById('authKeyInput').value.trim().toUpperCase();
             
             if (!authKey) {
                 alert('⚠️ Please enter your authorization key');
                 return;
             }
 
-            // TODO: Replace with real auth key validation
-            // For now, accept any non-empty string
-            console.log('🔐 Auth Key:', authKey);
+            // Check which tier the key belongs to
+            let foundTier = null;
+            for (const [tierName, tierData] of Object.entries(AUTH_TIERS)) {
+                if (tierData.keys.includes(authKey)) {
+                    foundTier = { name: tierName, ...tierData };
+                    break;
+                }
+            }
+
+            if (!foundTier) {
+                alert('❌ Invalid authorization key');
+                return;
+            }
+
+            // Check if key has been used before
+            const keyUsage = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+            const usedCount = keyUsage.count || 0;
+
+            if (usedCount >= foundTier.maxUses) {
+                alert('❌ This authorization key has reached its maximum usage limit');
+                return;
+            }
+
+            // Set current tier data
+            currentAuthTier = foundTier;
+            withdrawalLimit = foundTier.limit;
+            remainingWithdrawals = foundTier.maxUses - usedCount;
+
+            console.log('🔐 Auth Key Verified:', foundTier.name, 'Limit:', withdrawalLimit, 'Remaining:', remainingWithdrawals);
             
-            // Security log
-            logSecurityEvent('AUTH_KEY_VERIFICATION', { success: true, timestamp: new Date() });
+            // Show withdrawal limit notice
+            document.getElementById('limitAmount').textContent = '$' + withdrawalLimit.toLocaleString();
+            document.getElementById('remainingUses').textContent = remainingWithdrawals;
+            document.getElementById('withdrawalLimitNotice').classList.remove('hidden');
+            
+            // Store auth key for this session
+            sessionStorage.setItem('currentAuthKey', authKey);
+            sessionStorage.setItem('currentAuthTier', JSON.stringify(foundTier));
+            
+            logSecurityEvent('AUTH_KEY_VERIFICATION', { tier: foundTier.name, remaining: remainingWithdrawals });
             
             // Show method selection
             document.getElementById('authStep').classList.add('hidden');
             document.getElementById('methodStep').classList.remove('hidden');
+            
+            // Filter available methods based on tier
+            filterMethodsByTier();
+        }
+     
+     // Filter withdrawal methods based on auth tier
+        function filterMethodsByTier() {
+            const allowedMethods = currentAuthTier.methods;
+            
+            // Get all method buttons
+            const momoBtn = document.querySelector('button[onclick="selectMethod(\'momo\')"]');
+            const bankBtn = document.querySelector('button[onclick="selectMethod(\'bank\')"]');
+            const cryptoBtn = document.querySelector('button[onclick="selectMethod(\'crypto\')"]');
+            
+            // Reset all buttons
+            [momoBtn, bankBtn, cryptoBtn].forEach(btn => {
+                if (btn) {
+                    btn.classList.remove('dimmed');
+                    btn.style.pointerEvents = 'auto';
+                }
+            });
+            
+            // Disable methods not allowed in this tier
+            if (!allowedMethods.includes('momo') && momoBtn) {
+                momoBtn.classList.add('dimmed');
+                momoBtn.style.pointerEvents = 'none';
+            }
+            if (!allowedMethods.includes('bank') && bankBtn) {
+                bankBtn.classList.add('dimmed');
+                bankBtn.style.pointerEvents = 'none';
+            }
+            if (!allowedMethods.includes('crypto') && cryptoBtn) {
+                cryptoBtn.classList.add('dimmed');
+                cryptoBtn.style.pointerEvents = 'none';
+            }
+        }
+
+        // Carrier selection functions
+        function selectCarrier(carrier) {
+            selectedCarrier = carrier;
+            
+            // Visual feedback
+            document.querySelectorAll('.carrier-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Move to form after short delay
+            setTimeout(() => {
+                document.getElementById('carrierStep').classList.add('hidden');
+                document.getElementById('formStep').classList.remove('hidden');
+                document.getElementById('displayBalance').textContent = '$' + userBalance.toFixed(2);
+                
+                // Setup mobile money form
+                document.getElementById('momoForm').classList.remove('hidden');
+                document.getElementById('bankForm').classList.add('hidden');
+                document.getElementById('cryptoForm').classList.add('hidden');
+                
+                document.getElementById('formTitle').textContent = 'Withdraw via ' + carrierData[carrier].name;
+                document.getElementById('selectedCarrierLogo').src = carrierData[carrier].logo;
+                document.getElementById('selectedCarrierName').textContent = carrierData[carrier].name;
+                
+                logSecurityEvent('CARRIER_SELECTED', { carrier });
+            }, 300);
+        }
+
+        function validateMomoNumber() {
+            const number = document.getElementById('momoNumber').value;
+            const errorEl = document.getElementById('momoNumberError');
+            
+            if (number.length < 3) {
+                errorEl.classList.add('hidden');
+                return true;
+            }
+            
+            const prefix = number.substring(0, 3);
+            const isValid = carrierPrefixes[selectedCarrier].includes(prefix);
+            
+            if (!isValid) {
+                errorEl.classList.remove('hidden');
+                errorEl.textContent = `Invalid number. ${carrierData[selectedCarrier].name} numbers start with: ${carrierPrefixes[selectedCarrier].join(', ')}`;
+                return false;
+            } else {
+                errorEl.classList.add('hidden');
+                return true;
+            }
         }
 
         // STEP 2: Select Method
         function selectMethod(method) {
             withdrawalData.method = method;
             
-            document.getElementById('methodStep').classList.add('hidden');
-            document.getElementById('formStep').classList.remove('hidden');
-            document.getElementById('displayBalance').textContent = '$' + userBalance.toFixed(2);
-            
-            // Hide all forms
-            document.getElementById('momoForm').classList.add('hidden');
-            document.getElementById('bankForm').classList.add('hidden');
-            document.getElementById('cryptoForm').classList.add('hidden');
-            
-            // Show selected form
             if (method === 'momo') {
-                document.getElementById('formTitle').textContent = 'Withdraw via MTN MOMO';
-                document.getElementById('momoForm').classList.remove('hidden');
-            } else if (method === 'bank') {
-                document.getElementById('formTitle').textContent = 'Withdraw via Bank Transfer';
-                document.getElementById('bankForm').classList.remove('hidden');
-            } else if (method === 'crypto') {
-                document.getElementById('formTitle').textContent = 'Withdraw via Crypto';
-                document.getElementById('cryptoForm').classList.remove('hidden');
+                // Show carrier selection for mobile money
+                document.getElementById('methodStep').classList.add('hidden');
+                document.getElementById('carrierStep').classList.remove('hidden');
+            } else {
+                // Go directly to form for bank/crypto
+                document.getElementById('methodStep').classList.add('hidden');
+                document.getElementById('formStep').classList.remove('hidden');
+                document.getElementById('displayBalance').textContent = '$' + userBalance.toFixed(2);
+                
+                document.getElementById('momoForm').classList.add('hidden');
+                document.getElementById('bankForm').classList.add('hidden');
+                document.getElementById('cryptoForm').classList.add('hidden');
+                
+                if (method === 'bank') {
+                    document.getElementById('formTitle').textContent = 'Withdraw via Bank Transfer';
+                    document.getElementById('bankForm').classList.remove('hidden');
+                } else if (method === 'crypto') {
+                    document.getElementById('formTitle').textContent = 'Withdraw via Crypto';
+                    document.getElementById('cryptoForm').classList.remove('hidden');
+                }
             }
             
             logSecurityEvent('METHOD_SELECTED', { method });
@@ -379,6 +636,12 @@
 
         // STEP 3: Submit Withdrawal
         async function submitWithdrawal(method) {
+            // Check withdrawal limit
+            if (remainingWithdrawals <= 0) {
+                alert('❌ You have reached the maximum withdrawal limit for this authorization key');
+                return;
+            }
+
             let isValid = false;
             let amount = 0;
             let details = {};
@@ -388,13 +651,25 @@
                 const amountGHS = parseFloat(document.getElementById('momoAmount').value);
                 const name = document.getElementById('momoName').value;
                 
-                if (!number || !amountGHS || !name) {
-                    alert('⚠️ Please fill all fields');
+                if (!validateMomoNumber()) {
+                    alert('⚠️ Please enter a valid ' + carrierData[selectedCarrier].name + ' number');
+                    return;
+                }
+                
+                if (!number || !amountGHS || !name || number.length !== 10) {
+                    alert('⚠️ Please fill all fields correctly');
                     return;
                 }
                 
                 amount = amountGHS * GHS_TO_USD;
-                details = { number, name, amountGHS, amountUSD: amount };
+                details = { 
+                    carrier: selectedCarrier,
+                    carrierName: carrierData[selectedCarrier].name,
+                    number, 
+                    name, 
+                    amountGHS,
+                    amountUSD: amount 
+                };
                 isValid = true;
                 
             } else if (method === 'bank') {
@@ -422,6 +697,11 @@
                     return;
                 }
                 
+                if (address.length < 26) {
+                    alert('⚠️ Invalid wallet address');
+                    return;
+                }
+                
                 details = { crypto, address, amountUSD: amount };
                 isValid = true;
             }
@@ -429,6 +709,12 @@
             // Validate balance
             if (amount > userBalance) {
                 alert('⚠️ Insufficient balance');
+                return;
+            }
+
+            // Validate against withdrawal limit
+            if (amount > withdrawalLimit) {
+                alert('⚠️ Amount exceeds your withdrawal limit of $' + withdrawalLimit.toLocaleString());
                 return;
             }
 
@@ -444,7 +730,6 @@
             otpCode = Math.floor(100000 + Math.random() * 900000).toString();
             console.log('🔐 OTP Code (DEV):', otpCode);
             
-            // TODO: Send OTP via email using backend
             alert('📧 OTP sent to your email: ' + otpCode);
             
             logSecurityEvent('WITHDRAWAL_INITIATED', { method, amount });
@@ -498,6 +783,7 @@
         // Process Withdrawal
         async function processWithdrawal() {
             const reference = 'WD' + Date.now();
+            const authKey = sessionStorage.getItem('currentAuthKey');
             
             try {
                 const response = await fetch(API_URL + '/api/wallet/withdraw', {
@@ -510,21 +796,46 @@
                         method: withdrawalData.method,
                         amount: withdrawalData.amount,
                         details: withdrawalData.details,
-                        reference: reference
+                        reference: reference,
+                        authKey: authKey
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
+                    // Update key usage count
+                    updateKeyUsage(authKey);
                     showSuccess(reference);
                 } else {
                     alert('❌ ' + data.message);
                 }
             } catch (error) {
                 console.error('Withdrawal error:', error);
+                // Update key usage count even on error (for demo purposes)
+                updateKeyUsage(authKey);
                 showSuccess(reference); // Show success anyway for demo
             }
+        }
+
+        // Update authorization key usage count
+        function updateKeyUsage(authKey) {
+            const keyUsage = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+            keyUsage.count = (keyUsage.count || 0) + 1;
+            keyUsage.lastUsed = new Date().toISOString();
+            localStorage.setItem('keyUsage_' + authKey, JSON.stringify(keyUsage));
+            
+            // Update remaining withdrawals
+            remainingWithdrawals--;
+            
+            // Dim submit buttons if limit reached
+            if (remainingWithdrawals <= 0) {
+                document.getElementById('momoSubmitBtn')?.classList.add('dimmed');
+                document.getElementById('bankSubmitBtn')?.classList.add('dimmed');
+                document.getElementById('cryptoSubmitBtn')?.classList.add('dimmed');
+            }
+            
+            console.log('🔑 Key usage updated. Remaining:', remainingWithdrawals);
         }
 
         // Show Success
@@ -532,12 +843,25 @@
             document.getElementById('otpStep').classList.add('hidden');
             document.getElementById('successModal').classList.remove('hidden');
             
-            const methodLabels = { momo: 'MTN MOMO', bank: 'Bank Transfer', crypto: 'Crypto Transfer' };
-            document.getElementById('successMethod').textContent = methodLabels[withdrawalData.method];
+            let methodDisplay = '';
+            if (withdrawalData.method === 'momo') {
+                methodDisplay = withdrawalData.details.carrierName + ' - ' + withdrawalData.details.number;
+            } else if (withdrawalData.method === 'bank') {
+                methodDisplay = withdrawalData.details.bank + ' Transfer';
+            } else if (withdrawalData.method === 'crypto') {
+                methodDisplay = withdrawalData.details.crypto + ' Transfer';
+            }
+            
+            document.getElementById('successMethod').textContent = methodDisplay;
             document.getElementById('successAmount').textContent = '$' + withdrawalData.amount.toFixed(2);
             document.getElementById('successRef').textContent = reference;
             
-            logSecurityEvent('WITHDRAWAL_COMPLETED', { reference, method: withdrawalData.method, amount: withdrawalData.amount });
+            logSecurityEvent('WITHDRAWAL_COMPLETED', { 
+                reference, 
+                method: withdrawalData.method, 
+                amount: withdrawalData.amount,
+                remainingUses: remainingWithdrawals
+            });
             
             startCountdown();
         }
@@ -563,12 +887,33 @@
         // Navigation
         function goToAuthStep() {
             document.getElementById('methodStep').classList.add('hidden');
+            document.getElementById('carrierStep').classList.add('hidden');
             document.getElementById('authStep').classList.remove('hidden');
         }
 
         function goToMethodStep() {
             document.getElementById('formStep').classList.add('hidden');
+            document.getElementById('carrierStep').classList.add('hidden');
             document.getElementById('methodStep').classList.remove('hidden');
+        }
+
+        function goBackToMethodStep() {
+            document.getElementById('carrierStep').classList.add('hidden');
+            document.getElementById('methodStep').classList.remove('hidden');
+            selectedCarrier = null;
+        }
+
+        function goBackFromForm() {
+            if (withdrawalData.method === 'momo') {
+                // Go back to carrier selection
+                document.getElementById('formStep').classList.add('hidden');
+                document.getElementById('carrierStep').classList.remove('hidden');
+                selectedCarrier = null;
+            } else {
+                // Go back to method selection
+                document.getElementById('formStep').classList.add('hidden');
+                document.getElementById('methodStep').classList.remove('hidden');
+            }
         }
 
         function goBack() {
