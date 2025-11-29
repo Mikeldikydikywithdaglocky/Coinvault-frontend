@@ -478,10 +478,92 @@
             });
         }
 
-   
+        // Show balance update notification
+        function showBalanceUpdateNotification(newBalance) {
+            // Check if notification already exists
+            let notification = document.getElementById('balanceUpdateNotification');
+            
+            if (!notification) {
+                // Create notification element
+                notification = document.createElement('div');
+                notification.id = 'balanceUpdateNotification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    padding: 16px 24px;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    font-weight: 600;
+                    animation: slideIn 0.3s ease-out;
+                `;
+                document.body.appendChild(notification);
+                
+                // Add animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(400px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideOut {
+                        from {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(400px);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 24px;">💰</span>
+                    <div>
+                        <div style="font-size: 14px; opacity: 0.9;">Balance Updated</div>
+                        <div style="font-size: 18px; font-weight: 700;">$${newBalance.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Auto-hide after 4 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // Update dashboard
 
         // Update dashboard
         function updateDashboard() {
+            // Refresh wallet data from localStorage in case it was updated
+            const savedWalletData = localStorage.getItem('walletData');
+            if (savedWalletData) {
+                const parsedData = JSON.parse(savedWalletData);
+                if (parsedData.balance !== undefined) {
+                    walletData.balance = parsedData.balance;
+                }
+            }
+            
             if (connectedWallet && walletData.address) {
                 document.getElementById('totalBalance').textContent = '$' + formatBalanceWithCommas(walletData.balance);
                 document.getElementById('walletAddress').textContent = formatAddress(walletData.address);
@@ -668,6 +750,14 @@ async function loadSavedWallet() {
             }));
             
             updateDashboard();
+            
+            // Check if balance was recently updated
+            const lastUpdate = localStorage.getItem('lastBalanceUpdate');
+            const now = Date.now();
+            if (lastUpdate && (now - parseInt(lastUpdate)) < 60000) { // Within last minute
+                console.log('💰 Recent balance update detected');
+                showBalanceUpdateNotification(walletData.balance);
+            }
         } else {
             console.log('ℹ️ No saved wallet found');
         }
@@ -690,6 +780,49 @@ window.addEventListener('DOMContentLoaded', function() {
     
     // Load saved wallet automatically
     loadSavedWallet();
+    
+    // Listen for balance changes from other tabs/pages
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'walletData' || e.key === 'connectedWallet') {
+            console.log('💰 Balance change detected from another tab/page');
+            
+            // Reload wallet data
+            const newWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+            if (newWalletData.balance !== undefined) {
+                walletData.balance = newWalletData.balance;
+                updateDashboard();
+                
+                // Show notification
+                showBalanceUpdateNotification(newWalletData.balance);
+            }
+        }
+    });
+    
+     // Periodic balance check every 30 seconds (optional)
+    setInterval(function() {
+        if (connectedWallet) {
+            const savedWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+            if (savedWalletData.balance !== undefined && savedWalletData.balance !== walletData.balance) {
+                console.log('🔄 Periodic check: Balance changed');
+                walletData.balance = savedWalletData.balance;
+                updateDashboard();
+            }
+        }
+    }, 30000); // Check every 30 seconds
+});
+
+    // Also check when user returns to the tab
+    window.addEventListener('focus', function() {
+        console.log('👁️ Tab focused - checking for balance updates');
+        
+        const savedWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+        if (savedWalletData.balance !== undefined && savedWalletData.balance !== walletData.balance) {
+            console.log('💰 Balance changed while away:', walletData.balance, '→', savedWalletData.balance);
+            walletData.balance = savedWalletData.balance;
+            updateDashboard();
+            showBalanceUpdateNotification(savedWalletData.balance);
+        }
+    });
 });
     </script>
 </body>

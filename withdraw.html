@@ -173,7 +173,10 @@
         <div id="formStep" class="hidden max-w-2xl mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
                 <h2 class="text-3xl font-bold mb-2 text-center" id="formTitle">Withdraw via Mobile Money</h2>
-                <p class="text-center text-gray-400 mb-2">Available Balance: <span id="displayBalance" class="text-green-400 font-bold">$0.00</span></p>
+                <div class="text-center mb-2">
+                    <p class="text-gray-400 text-sm">Available Balance</p>
+                    <p class="text-3xl font-bold text-green-400" id="displayBalance">$0.00</p>
+                </div>
                 
                 <!-- Withdrawal Limit Notice (shown on form page) -->
                 <div id="formLimitNotice" class="mb-6 p-4 bg-red-900 bg-opacity-30 rounded-lg border border-red-700">
@@ -340,7 +343,11 @@
                     </div>
                     <div class="flex justify-between mb-2">
                         <span class="text-gray-400">Amount:</span>
-                        <span class="font-bold text-green-400" id="successAmount">-</span>
+                        <span class="font-bold text-red-400" id="successAmount">-</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">New Balance:</span>
+                        <span class="font-bold text-green-400" id="successNewBalance">$0.00</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-400">Reference:</span>
@@ -350,6 +357,7 @@
 
                 <p class="text-sm text-yellow-400 mb-4">⏱️ Processing time: 1-5 minutes</p>
                 
+                <p class="text-sm text-green-400 mb-2">✅ Your dashboard balance has been updated</p>
                 <p class="text-gray-400 mb-4">Redirecting to homepage in <span id="countdown" class="text-white font-bold">10</span>s...</p>
                 
                 <button onclick="redirectNow()" 
@@ -1117,6 +1125,10 @@
                 if (data.success) {
                     // Update key usage count
                     updateKeyUsage(authKey);
+                    
+                    // Update wallet balance
+                    updateWalletBalance(withdrawalData.amount);
+                    
                     showSuccess(reference);
                 } else {
                     alert('❌ ' + data.message);
@@ -1125,9 +1137,12 @@
                 console.error('Withdrawal error:', error);
                 // Update key usage count even on error (for demo purposes)
                 updateKeyUsage(authKey);
+                
+                // Update wallet balance (demo mode)
+                updateWalletBalance(withdrawalData.amount);
+                
                 showSuccess(reference); // Show success anyway for demo
             }
-        }
 
         // Update authorization key usage count
         function updateKeyUsage(authKey) {
@@ -1152,10 +1167,61 @@
                        'Remaining amount: $' + withdrawalLimit.toFixed(2));
         }
 
+            // Update wallet balance after withdrawal
+        function updateWalletBalance(withdrawnAmount) {
+            try {
+                // Get current wallet data from localStorage
+                let walletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+                
+                if (!walletData.balance) {
+                    console.warn('⚠️ No wallet balance found in localStorage');
+                    walletData.balance = 0;
+                }
+                
+                // Subtract withdrawn amount
+                const oldBalance = walletData.balance;
+                walletData.balance = Math.max(0, walletData.balance - withdrawnAmount);
+                const newBalance = walletData.balance;
+                
+                // Save updated balance
+                localStorage.setItem('walletData', JSON.stringify(walletData));
+                
+                console.log('💰 Balance Updated:');
+                console.log('   Old Balance: $' + oldBalance.toFixed(2));
+                console.log('   Withdrawn: $' + withdrawnAmount.toFixed(2));
+                console.log('   New Balance: $' + newBalance.toFixed(2));
+                
+                // Also update connected wallet data if it exists
+                const connectedWallet = JSON.parse(localStorage.getItem('connectedWallet') || 'null');
+                if (connectedWallet && connectedWallet.data) {
+                    connectedWallet.data.balance = newBalance;
+                    localStorage.setItem('connectedWallet', JSON.stringify(connectedWallet));
+                    console.log('✅ Connected wallet balance also updated');
+                }
+                
+                // Update the global userBalance variable
+                userBalance = newBalance;
+                
+                // Mark timestamp of balance update
+                localStorage.setItem('lastBalanceUpdate', Date.now().toString());
+                
+                return newBalance;
+                                
+
+            } catch (error) {
+                console.error('❌ Error updating wallet balance:', error);
+                return null;
+            }
+        }
+
         // Show Success
         function showSuccess(reference) {
             document.getElementById('otpStep').classList.add('hidden');
             document.getElementById('successModal').classList.remove('hidden');
+            
+            // Get updated balance
+            const walletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+            const newBalance = walletData.balance || 0;
             
             let methodDisplay = '';
             if (withdrawalData.method === 'momo') {
@@ -1167,7 +1233,11 @@
             }
             
             document.getElementById('successMethod').textContent = methodDisplay;
-            document.getElementById('successAmount').textContent = '$' + withdrawalData.amount.toFixed(2);
+            document.getElementById('successAmount').textContent = '-$' + withdrawalData.amount.toFixed(2);
+            document.getElementById('successNewBalance').textContent = '$' + newBalance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
             document.getElementById('successRef').textContent = reference;
             
             logSecurityEvent('WITHDRAWAL_COMPLETED', { 
