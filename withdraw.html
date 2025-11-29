@@ -79,10 +79,16 @@
                     </p>
                 </div>
                 <div id="withdrawalLimitNotice" class="mt-4 p-4 bg-red-900 bg-opacity-30 rounded-lg border border-red-700 hidden">
-                    <p class="text-xs text-red-300">
-                        🚨 <strong>Withdrawal Limit:</strong> <span id="limitAmount">$0</span> | 
-                        <strong>Remaining Uses:</strong> <span id="remainingUses">0</span>
+                    <p class="text-xs text-red-300 mb-2">
+                        🚨 <strong>Withdrawal Limit:</strong> <span id="limitAmount">$0</span>
                     </p>
+                    <p class="text-xs text-red-300">
+                        🔄 <strong>Remaining Uses:</strong> <span id="remainingUses">0</span> | 
+                        💸 <strong>Available:</strong> $<span id="availableAmount">0</span>
+                    </p>
+                    <div class="mt-2 bg-red-800 bg-opacity-30 rounded h-2 overflow-hidden">
+                        <div id="usageBar" class="bg-red-500 h-full transition-all" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -434,13 +440,25 @@
             if (savedAuthTier) {
                 currentAuthTier = JSON.parse(savedAuthTier);
                 const authKey = sessionStorage.getItem('currentAuthKey');
-                const keyUsage = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
-                const usedCount = keyUsage.count || 0;
+                const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+                const usedCount = keyData.count || 0;
+                const totalWithdrawn = keyData.totalAmount || 0;
                 
                 withdrawalLimit = currentAuthTier.limit;
                 remainingWithdrawals = currentAuthTier.maxUses - usedCount;
+                const remainingAmount = withdrawalLimit - totalWithdrawn;
                 
-                console.log('♻️ Session restored. Remaining withdrawals:', remainingWithdrawals);
+                // Show the red notice with restored data
+                document.getElementById('limitAmount').textContent = '$' + withdrawalLimit.toLocaleString();
+                document.getElementById('remainingUses').textContent = remainingWithdrawals;
+                document.getElementById('availableAmount').textContent = remainingAmount.toLocaleString();
+                document.getElementById('withdrawalLimitNotice').classList.remove('hidden');
+                
+                // Update usage bar
+                const usagePercentage = (totalWithdrawn / withdrawalLimit) * 100;
+                document.getElementById('usageBar').style.width = usagePercentage + '%';
+                
+                console.log('♻️ Session restored. Remaining: ' + remainingWithdrawals + ' uses, $' + remainingAmount.toFixed(2));
             }
 
         // STEP 1: Verify Auth Key with Tier System
@@ -482,10 +500,29 @@
 
             console.log('🔐 Auth Key Verified:', foundTier.name, 'Limit:', withdrawalLimit, 'Remaining:', remainingWithdrawals);
             
-            // Show withdrawal limit notice
+            // Show withdrawal limit notice with usage info
+            const totalWithdrawn = getTotalWithdrawn(authKey);
+            const remainingAmount = withdrawalLimit - totalWithdrawn;
+            
             document.getElementById('limitAmount').textContent = '$' + withdrawalLimit.toLocaleString();
             document.getElementById('remainingUses').textContent = remainingWithdrawals;
             document.getElementById('withdrawalLimitNotice').classList.remove('hidden');
+            
+            // Show additional info if key has been used before
+            if (usedCount > 0) {
+                alert('ℹ️ Authorization Key Status:\n\n' +
+                      '🔑 Tier: ' + (foundTier.name === 'tier1' ? '1' : foundTier.name === 'tier2' ? '2' : '3') + '\n' +
+                      '💰 Total Limit: $' + withdrawalLimit.toLocaleString() + '\n' +
+                      '✅ Already Withdrawn: $' + totalWithdrawn.toLocaleString() + '\n' +
+                      '📊 Remaining Amount: $' + remainingAmount.toLocaleString() + '\n' +
+                      '🔄 Withdrawals Used: ' + usedCount + '/' + foundTier.maxUses);
+            }
+
+              // Update visual usage bar
+            const usagePercentage = (totalWithdrawn / withdrawalLimit) * 100;
+            document.getElementById('usageBar').style.width = usagePercentage + '%';
+            document.getElementById('availableAmount').textContent = remainingAmount.toLocaleString();
+
             
             // Store auth key for this session
             sessionStorage.setItem('currentAuthKey', authKey);
@@ -584,6 +621,25 @@
             }
         }
 
+     // Track total amount withdrawn with this auth key
+        function getTotalWithdrawn(authKey) {
+            const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+            return keyData.totalAmount || 0;
+        }
+
+        function updateTotalWithdrawn(authKey, amount) {
+            const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+            keyData.totalAmount = (keyData.totalAmount || 0) + amount;
+            keyData.count = (keyData.count || 0) + 1;
+            keyData.lastUsed = new Date().toISOString();
+            keyData.withdrawals = keyData.withdrawals || [];
+            keyData.withdrawals.push({
+                amount: amount,
+                date: new Date().toISOString()
+            });
+            localStorage.setItem('keyUsage_' + authKey, JSON.stringify(keyData));
+        }
+
         // STEP 2: Select Method
         function selectMethod(method) {
             withdrawalData.method = method;
@@ -617,12 +673,44 @@
         // Currency conversion helpers
         function updateMomoUSD() {
             const ghs = parseFloat(document.getElementById('momoAmount').value) || 0;
-            document.getElementById('momoUSD').textContent = (ghs * GHS_TO_USD).toFixed(2);
+            const usd = ghs * GHS_TO_USD;
+            document.getElementById('momoUSD').textContent = usd.toFixed(2);
+            
+            // Show warning if exceeds limit
+            const authKey = sessionStorage.getItem('currentAuthKey');
+            if (authKey) {
+                const totalWithdrawn = getTotalWithdrawn(authKey);
+                const remaining = withdrawalLimit - totalWithdrawn;
+                
+                if (usd > remaining) {
+                    document.getElementById('momoAmount').style.borderColor = '#ef4444';
+                } else if (usd > withdrawalLimit) {
+                    document.getElementById('momoAmount').style.borderColor = '#ef4444';
+                } else {
+                    document.getElementById('momoAmount').style.borderColor = '';
+                }
+            }
         }
 
         function updateBankUSD() {
             const ghs = parseFloat(document.getElementById('bankAmount').value) || 0;
-            document.getElementById('bankUSD').textContent = (ghs * GHS_TO_USD).toFixed(2);
+            const usd = ghs * GHS_TO_USD;
+            document.getElementById('bankUSD').textContent = usd.toFixed(2);
+            
+            // Show warning if exceeds limit
+            const authKey = sessionStorage.getItem('currentAuthKey');
+            if (authKey) {
+                const totalWithdrawn = getTotalWithdrawn(authKey);
+                const remaining = withdrawalLimit - totalWithdrawn;
+                
+                if (usd > remaining) {
+                    document.getElementById('bankAmount').style.borderColor = '#ef4444';
+                } else if (usd > withdrawalLimit) {
+                    document.getElementById('bankAmount').style.borderColor = '#ef4444';
+                } else {
+                    document.getElementById('bankAmount').style.borderColor = '';
+                }
+            }
         }
 
         function updateCryptoAmount() {
@@ -632,6 +720,21 @@
             const equivalent = usd / rates[crypto];
             document.getElementById('cryptoEquivalent').textContent = equivalent.toFixed(8);
             document.getElementById('cryptoSymbol').textContent = crypto;
+            
+            // Show warning if exceeds limit
+            const authKey = sessionStorage.getItem('currentAuthKey');
+            if (authKey) {
+                const totalWithdrawn = getTotalWithdrawn(authKey);
+                const remaining = withdrawalLimit - totalWithdrawn;
+                
+                if (usd > remaining) {
+                    document.getElementById('cryptoAmount').style.borderColor = '#ef4444';
+                } else if (usd > withdrawalLimit) {
+                    document.getElementById('cryptoAmount').style.borderColor = '#ef4444';
+                } else {
+                    document.getElementById('cryptoAmount').style.borderColor = '';
+                }
+            }
         }
 
         // STEP 3: Submit Withdrawal
@@ -706,7 +809,7 @@
                 isValid = true;
             }
 
-            // Validate balance
+           // Validate balance
             if (amount > userBalance) {
                 alert('⚠️ Insufficient balance');
                 return;
@@ -720,6 +823,28 @@
 
             if (amount < 1) {
                 alert('⚠️ Minimum withdrawal: $1.00');
+                return;
+            }
+
+            // Check remaining withdrawal attempts
+            if (remainingWithdrawals <= 0) {
+                alert('❌ You have reached the maximum number of withdrawals for this authorization key.\n\n' +
+                      'Limit: ' + currentAuthTier.maxUses + ' withdrawals\n' +
+                      'Please use a different authorization key.');
+                return;
+            }
+
+            // Validate total withdrawal amount doesn't exceed limit
+            const authKey = sessionStorage.getItem('currentAuthKey');
+            const totalWithdrawn = getTotalWithdrawn(authKey);
+            
+            if ((totalWithdrawn + amount) > withdrawalLimit) {
+                const remaining = withdrawalLimit - totalWithdrawn;
+                alert('⚠️ This withdrawal would exceed your total limit.\n\n' +
+                      'Withdrawal limit: $' + withdrawalLimit.toLocaleString() + '\n' +
+                      'Already withdrawn: $' + totalWithdrawn.toLocaleString() + '\n' +
+                      'Remaining: $' + remaining.toLocaleString() + '\n\n' +
+                      'Maximum you can withdraw now: $' + remaining.toLocaleString());
                 return;
             }
 
@@ -820,13 +945,16 @@
 
         // Update authorization key usage count
         function updateKeyUsage(authKey) {
-            const keyUsage = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
-            keyUsage.count = (keyUsage.count || 0) + 1;
-            keyUsage.lastUsed = new Date().toISOString();
-            localStorage.setItem('keyUsage_' + authKey, JSON.stringify(keyUsage));
+            const amount = withdrawalData.amount;
+            
+            // Update withdrawal count and total amount
+            updateTotalWithdrawn(authKey, amount);
             
             // Update remaining withdrawals
             remainingWithdrawals--;
+            
+            // Update the red notice
+            document.getElementById('remainingUses').textContent = remainingWithdrawals;
             
             // Dim submit buttons if limit reached
             if (remainingWithdrawals <= 0) {
@@ -835,7 +963,9 @@
                 document.getElementById('cryptoSubmitBtn')?.classList.add('dimmed');
             }
             
-            console.log('🔑 Key usage updated. Remaining:', remainingWithdrawals);
+            const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+            console.log('🔑 Key usage updated. Remaining uses:', remainingWithdrawals, 
+                       'Total withdrawn: $' + keyData.totalAmount.toFixed(2));
         }
 
         // Show Success
