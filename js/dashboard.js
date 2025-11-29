@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://costumes-exists-perceived-nuclear.trycloudflare.com/api';
+const API_URL = 'https://src-gps-tones-interesting.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
