@@ -78,18 +78,6 @@
                         ⚠️ <strong>Security Notice:</strong> Never share your authorization key. CoinVault will never ask for it via email or support.
                     </p>
                 </div>
-                <div id="withdrawalLimitNotice" class="mt-4 p-4 bg-red-900 bg-opacity-30 rounded-lg border border-red-700 hidden">
-                    <p class="text-xs text-red-300 mb-2">
-                        🚨 <strong>Withdrawal Limit:</strong> <span id="limitAmount">$0</span>
-                    </p>
-                    <p class="text-xs text-red-300">
-                        🔄 <strong>Remaining Uses:</strong> <span id="remainingUses">0</span> | 
-                        💸 <strong>Available:</strong> $<span id="availableAmount">0</span>
-                    </p>
-                    <div class="mt-2 bg-red-800 bg-opacity-30 rounded h-2 overflow-hidden">
-                        <div id="usageBar" class="bg-red-500 h-full transition-all" style="width: 0%"></div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -184,8 +172,22 @@
         <!-- STEP 3: Withdrawal Form (Dynamic based on method) -->
         <div id="formStep" class="hidden max-w-2xl mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
-                <h2 class="text-3xl font-bold mb-2 text-center" id="formTitle">Withdraw via MOMO</h2>
-                <p class="text-center text-gray-400 mb-6">Available Balance: <span id="displayBalance" class="text-green-400 font-bold">$0.00</span></p>
+                <h2 class="text-3xl font-bold mb-2 text-center" id="formTitle">Withdraw via Mobile Money</h2>
+                <p class="text-center text-gray-400 mb-2">Available Balance: <span id="displayBalance" class="text-green-400 font-bold">$0.00</span></p>
+                
+                <!-- Withdrawal Limit Notice (shown on form page) -->
+                <div id="formLimitNotice" class="mb-6 p-4 bg-red-900 bg-opacity-30 rounded-lg border border-red-700">
+                    <p class="text-xs text-red-300 mb-2 text-center">
+                        🚨 <strong>Withdrawal Limit:</strong> <span id="formLimitAmount">$0</span>
+                    </p>
+                    <p class="text-xs text-red-300 text-center">
+                        🔄 <strong>Remaining Uses:</strong> <span id="formRemainingUses">0</span> | 
+                        💸 <strong>Available:</strong> $<span id="formAvailableAmount">0</span>
+                    </p>
+                    <div class="mt-2 bg-red-800 bg-opacity-30 rounded h-2 overflow-hidden">
+                        <div id="formUsageBar" class="bg-red-500 h-full transition-all" style="width: 0%"></div>
+                    </div>
+                </div>
 
                 <!-- MOMO Form -->
                 <div id="momoForm" class="hidden">
@@ -436,29 +438,24 @@
         });
 
         // Restore auth session if exists
-            const savedAuthTier = sessionStorage.getItem('currentAuthTier');
+            const savedAuthTier = sessionStorage.getItem('currentAuthKey');
             if (savedAuthTier) {
-                currentAuthTier = JSON.parse(savedAuthTier);
                 const authKey = sessionStorage.getItem('currentAuthKey');
-                const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
-                const usedCount = keyData.count || 0;
-                const totalWithdrawn = keyData.totalAmount || 0;
+                const savedTierData = sessionStorage.getItem('currentAuthTier');
                 
-                withdrawalLimit = currentAuthTier.limit;
-                remainingWithdrawals = currentAuthTier.maxUses - usedCount;
-                const remainingAmount = withdrawalLimit - totalWithdrawn;
-                
-                // Show the red notice with restored data
-                document.getElementById('limitAmount').textContent = '$' + withdrawalLimit.toLocaleString();
-                document.getElementById('remainingUses').textContent = remainingWithdrawals;
-                document.getElementById('availableAmount').textContent = remainingAmount.toLocaleString();
-                document.getElementById('withdrawalLimitNotice').classList.remove('hidden');
-                
-                // Update usage bar
-                const usagePercentage = (totalWithdrawn / withdrawalLimit) * 100;
-                document.getElementById('usageBar').style.width = usagePercentage + '%';
-                
-                console.log('♻️ Session restored. Remaining: ' + remainingWithdrawals + ' uses, $' + remainingAmount.toFixed(2));
+                if (authKey && savedTierData) {
+                    currentAuthTier = JSON.parse(savedTierData);
+                    const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
+                    const usedCount = keyData.count || 0;
+                    const totalWithdrawn = keyData.totalAmount || 0;
+                    
+                    withdrawalLimit = currentAuthTier.limit;
+                    remainingWithdrawals = currentAuthTier.maxUses - usedCount;
+                    
+                    console.log('♻️ Session restored. Tier: ' + currentAuthTier.name + 
+                               ', Remaining: ' + remainingWithdrawals + ' uses, ' +
+                               'Available: $' + (withdrawalLimit - totalWithdrawn).toFixed(2));
+                }
             }
 
         // STEP 1: Verify Auth Key with Tier System
@@ -500,28 +497,8 @@
 
             console.log('🔐 Auth Key Verified:', foundTier.name, 'Limit:', withdrawalLimit, 'Remaining:', remainingWithdrawals);
             
-            // Show withdrawal limit notice with usage info
-            const totalWithdrawn = getTotalWithdrawn(authKey);
-            const remainingAmount = withdrawalLimit - totalWithdrawn;
-            
-            document.getElementById('limitAmount').textContent = '$' + withdrawalLimit.toLocaleString();
-            document.getElementById('remainingUses').textContent = remainingWithdrawals;
-            document.getElementById('withdrawalLimitNotice').classList.remove('hidden');
-            
-            // Show additional info if key has been used before
-            if (usedCount > 0) {
-                alert('ℹ️ Authorization Key Status:\n\n' +
-                      '🔑 Tier: ' + (foundTier.name === 'tier1' ? '1' : foundTier.name === 'tier2' ? '2' : '3') + '\n' +
-                      '💰 Total Limit: $' + withdrawalLimit.toLocaleString() + '\n' +
-                      '✅ Already Withdrawn: $' + totalWithdrawn.toLocaleString() + '\n' +
-                      '📊 Remaining Amount: $' + remainingAmount.toLocaleString() + '\n' +
-                      '🔄 Withdrawals Used: ' + usedCount + '/' + foundTier.maxUses);
-            }
-
-              // Update visual usage bar
-            const usagePercentage = (totalWithdrawn / withdrawalLimit) * 100;
-            document.getElementById('usageBar').style.width = usagePercentage + '%';
-            document.getElementById('availableAmount').textContent = remainingAmount.toLocaleString();
+           // Don't show limit info on auth page - will be shown on form page
+            console.log('✅ Auth verified. Limit: $' + withdrawalLimit.toLocaleString() + ', Uses: ' + remainingWithdrawals);
 
             
             // Store auth key for this session
@@ -596,6 +573,11 @@
                 document.getElementById('selectedCarrierName').textContent = carrierData[carrier].name;
                 
                 logSecurityEvent('CARRIER_SELECTED', { carrier });
+                
+                // Update limit display on form
+                setTimeout(() => {
+                    updateFormLimitDisplay();
+                }, 100);
             }, 300);
         }
 
@@ -619,6 +601,24 @@
                 errorEl.classList.add('hidden');
                 return true;
             }
+        }
+
+           // Update withdrawal limit display on form page
+        function updateFormLimitDisplay() {
+            const authKey = sessionStorage.getItem('currentAuthKey');
+            if (!authKey || !currentAuthTier) return;
+            
+            const totalWithdrawn = getTotalWithdrawn(authKey);
+            const remainingAmount = withdrawalLimit - totalWithdrawn;
+            const usagePercentage = (totalWithdrawn / withdrawalLimit) * 100;
+            
+            // Update all form limit elements
+            document.getElementById('formLimitAmount').textContent = '$' + withdrawalLimit.toLocaleString();
+            document.getElementById('formRemainingUses').textContent = remainingWithdrawals;
+            document.getElementById('formAvailableAmount').textContent = remainingAmount.toLocaleString();
+            document.getElementById('formUsageBar').style.width = usagePercentage + '%';
+            
+            console.log('📊 Form limit display updated. Available: $' + remainingAmount.toFixed(2));
         }
 
      // Track total amount withdrawn with this auth key
@@ -668,6 +668,11 @@
             }
             
             logSecurityEvent('METHOD_SELECTED', { method });
+            
+            // Update limit display on form
+            setTimeout(() => {
+                updateFormLimitDisplay();
+            }, 100);
         }
 
         // Currency conversion helpers
@@ -952,10 +957,7 @@
             
             // Update remaining withdrawals
             remainingWithdrawals--;
-            
-            // Update the red notice
-            document.getElementById('remainingUses').textContent = remainingWithdrawals;
-            
+          
             // Dim submit buttons if limit reached
             if (remainingWithdrawals <= 0) {
                 document.getElementById('momoSubmitBtn')?.classList.add('dimmed');
