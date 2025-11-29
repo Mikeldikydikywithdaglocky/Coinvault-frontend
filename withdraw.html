@@ -417,6 +417,170 @@
             }
         };
 
+            // Device fingerprinting for auth key tracking
+        function getDeviceFingerprint() {
+            // Create a unique device ID based on browser characteristics
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('device-fingerprint', 2, 2);
+            const canvasData = canvas.toDataURL();
+            
+            const fingerprint = {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                platform: navigator.platform,
+                screenResolution: `${screen.width}x${screen.height}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                canvas: canvasData.substring(0, 50), // Use part of canvas fingerprint
+                colorDepth: screen.colorDepth,
+                deviceMemory: navigator.deviceMemory || 'unknown',
+                hardwareConcurrency: navigator.hardwareConcurrency || 'unknown'
+            };
+            
+            // Create hash from fingerprint
+            const fingerprintString = JSON.stringify(fingerprint);
+            let hash = 0;
+            for (let i = 0; i < fingerprintString.length; i++) {
+                const char = fingerprintString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            return 'device_' + Math.abs(hash).toString(36);
+        }
+
+        // Get or create device ID
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('device_id');
+            if (!deviceId) {
+                deviceId = getDeviceFingerprint();
+                localStorage.setItem('device_id', deviceId);
+                console.log('🆔 New device ID created:', deviceId);
+            }
+            return deviceId;
+        }
+
+    // Check if auth key is exhausted on this specific device
+        function isKeyLockedOnDevice(authKey) {
+            const deviceId = getDeviceId();
+            const lockKey = deviceId + '_' + authKey; // Unique combination
+            const lockData = JSON.parse(localStorage.getItem('authKeyLocks') || '{}');
+            
+            if (lockData[lockKey]) {
+                const keyLock = lockData[lockKey];
+                
+                // Check if this key is exhausted on THIS device
+                if (keyLock.usesRemaining <= 0) {
+                    return {
+                        locked: true,
+                        reason: 'uses_exhausted',
+                        message: '❌ This authorization key has been fully used.\n\n' +
+                               '📊 Withdrawals Made: ' + keyLock.totalUses + '/' + keyLock.maxUses + '\n' +
+                               '💰 Total Withdrawn: $' + keyLock.totalWithdrawn.toLocaleString() + '/' + 
+                               '$' + keyLock.totalLimit.toLocaleString() + '\n\n' +
+                               '✅ You can use a different authorization key, or\n' +
+                               '✅ Use this same key on a different device.'
+                    };
+                }
+                
+                if (keyLock.amountRemaining <= 0) {
+                    return {
+                        locked: true,
+                        reason: 'amount_exhausted',
+                        message: '❌ This authorization key has reached its withdrawal limit.\n\n' +
+                               '💰 Limit: $' + keyLock.totalLimit.toLocaleString() + '\n' +
+                               '💸 Withdrawn: $' + keyLock.totalWithdrawn.toLocaleString() + '\n\n' +
+                               '✅ You can use a different authorization key, or\n' +
+                               '✅ Use this same key on a different device.'
+                    };
+                }
+            }
+            
+            return { locked: false };
+        }
+
+        // Lock auth key to this device (device + key combination)
+        function lockKeyToDevice(authKey, tierData) {
+            const deviceId = getDeviceId();
+            const lockKey = deviceId + '_' + authKey; // Unique device + key combo
+            const lockData = JSON.parse(localStorage.getItem('authKeyLocks') || '{}');
+            
+            lockData[lockKey] = {
+                deviceId: deviceId,
+                authKey: authKey,
+                lockedAt: new Date().toISOString(),
+                tier: tierData.name,
+                totalLimit: tierData.limit,
+                maxUses: tierData.maxUses,
+                usesRemaining: tierData.maxUses,
+                amountRemaining: tierData.limit,
+                totalUses: 0,
+                totalWithdrawn: 0,
+                withdrawals: []
+            };
+            
+            localStorage.setItem('authKeyLocks', JSON.stringify(lockData));
+            console.log('🔒 Auth key locked to device combo:', lockKey);
+        }
+
+       // Update key lock after withdrawal (device + key specific)
+        function updateKeyLock(authKey, amount) {
+            const deviceId = getDeviceId();
+            const lockKey = deviceId + '_' + authKey;
+            const lockData = JSON.parse(localStorage.getItem('authKeyLocks') || '{}');
+            
+            if (lockData[lockKey]) {
+                lockData[lockKey].usesRemaining--;
+                lockData[lockKey].amountRemaining -= amount;
+                lockData[lockKey].totalUses++;
+                lockData[lockKey].totalWithdrawn += amount;
+                lockData[lockKey].withdrawals.push({
+                    amount: amount,
+                    date: new Date().toISOString()
+                });
+                lockData[lockKey].lastUsed = new Date().toISOString();
+                
+                localStorage.setItem('authKeyLocks', JSON.stringify(lockData));
+                console.log('🔒 Key lock updated for:', lockKey, 
+                           '| Remaining uses:', lockData[lockKey].usesRemaining, 
+                           '| Remaining amount: $' + lockData[lockKey].amountRemaining.toFixed(2));
+            }
+        }
+
+        // Get key lock data for this device + key combination
+        function getKeyLockData(authKey) {
+            const deviceId = getDeviceId();
+            const lockKey = deviceId + '_' + authKey;
+            const lockData = JSON.parse(localStorage.getItem('authKeyLocks') || '{}');
+            return lockData[lockKey] || null;
+        } 
+
+   // Get all auth keys used on this device
+        function getUsedKeysOnDevice() {
+            const deviceId = getDeviceId();
+            const lockData = JSON.parse(localStorage.getItem('authKeyLocks') || '{}');
+            const usedKeys = [];
+            
+            for (const lockKey in lockData) {
+                if (lockKey.startsWith(deviceId + '_')) {
+                    const keyData = lockData[lockKey];
+                    usedKeys.push({
+                        authKey: keyData.authKey,
+                        tier: keyData.tier,
+                        totalUses: keyData.totalUses,
+                        maxUses: keyData.maxUses,
+                        totalWithdrawn: keyData.totalWithdrawn,
+                        totalLimit: keyData.totalLimit,
+                        isExhausted: keyData.usesRemaining <= 0 || keyData.amountRemaining <= 0
+                    });
+                }
+            }
+            
+            return usedKeys;
+        }
+
         // Load user data
         window.addEventListener('DOMContentLoaded', async function() {
             const token = localStorage.getItem('token');
@@ -438,23 +602,20 @@
         });
 
         // Restore auth session if exists
-            const savedAuthTier = sessionStorage.getItem('currentAuthKey');
-            if (savedAuthTier) {
-                const authKey = sessionStorage.getItem('currentAuthKey');
-                const savedTierData = sessionStorage.getItem('currentAuthTier');
+            const authKey = sessionStorage.getItem('currentAuthKey');
+            const savedTierData = sessionStorage.getItem('currentAuthTier');
+            
+            if (authKey && savedTierData) {
+                currentAuthTier = JSON.parse(savedTierData);
+                const keyLockData = getKeyLockData(authKey);
                 
-                if (authKey && savedTierData) {
-                    currentAuthTier = JSON.parse(savedTierData);
-                    const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
-                    const usedCount = keyData.count || 0;
-                    const totalWithdrawn = keyData.totalAmount || 0;
-                    
-                    withdrawalLimit = currentAuthTier.limit;
-                    remainingWithdrawals = currentAuthTier.maxUses - usedCount;
+                if (keyLockData) {
+                    withdrawalLimit = keyLockData.amountRemaining;
+                    remainingWithdrawals = keyLockData.usesRemaining;
                     
                     console.log('♻️ Session restored. Tier: ' + currentAuthTier.name + 
                                ', Remaining: ' + remainingWithdrawals + ' uses, ' +
-                               'Available: $' + (withdrawalLimit - totalWithdrawn).toFixed(2));
+                               'Available: $' + withdrawalLimit.toFixed(2));
                 }
             }
 
@@ -464,6 +625,13 @@
             
             if (!authKey) {
                 alert('⚠️ Please enter your authorization key');
+                return;
+            }
+
+            // Check if key is locked on this or another device
+            const lockStatus = isKeyLockedOnDevice(authKey);
+            if (lockStatus.locked) {
+                alert(lockStatus.message);
                 return;
             }
 
@@ -481,19 +649,37 @@
                 return;
             }
 
-            // Check if key has been used before
-            const keyUsage = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
-            const usedCount = keyUsage.count || 0;
-
-            if (usedCount >= foundTier.maxUses) {
-                alert('❌ This authorization key has reached its maximum usage limit');
+            // Check device lock status
+            let keyLockData = getKeyLockData(authKey);
+            
+            if (!keyLockData) {
+                // First time using this key on this device - lock it
+                lockKeyToDevice(authKey, foundTier);
+                keyLockData = getKeyLockData(authKey);
+                console.log('🔐 Key locked to this device on first use');
+            }
+            
+            // Check if key limit reached
+            if (keyLockData.usesRemaining <= 0) {
+                alert('❌ This authorization key has reached its maximum usage limit.\n\n' +
+                      'Withdrawals Made: ' + keyLockData.totalUses + '/' + foundTier.maxUses + '\n' +
+                      'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
+                return;
+            }
+            
+            if (keyLockData.amountRemaining <= 0) {
+                alert('❌ This authorization key has reached its withdrawal limit.\n\n' +
+                      'Limit: $' + foundTier.limit.toLocaleString() + '\n' +
+                      'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
                 return;
             }
 
-            // Set current tier data
+            const usedCount = keyLockData.totalUses;
+
+            // Set current tier data using device lock data
             currentAuthTier = foundTier;
-            withdrawalLimit = foundTier.limit;
-            remainingWithdrawals = foundTier.maxUses - usedCount;
+            withdrawalLimit = keyLockData.amountRemaining; // Use remaining amount, not total
+            remainingWithdrawals = keyLockData.usesRemaining;
 
             console.log('🔐 Auth Key Verified:', foundTier.name, 'Limit:', withdrawalLimit, 'Remaining:', remainingWithdrawals);
             
@@ -608,36 +794,32 @@
             const authKey = sessionStorage.getItem('currentAuthKey');
             if (!authKey || !currentAuthTier) return;
             
-            const totalWithdrawn = getTotalWithdrawn(authKey);
-            const remainingAmount = withdrawalLimit - totalWithdrawn;
-            const usagePercentage = (totalWithdrawn / withdrawalLimit) * 100;
+            const keyLockData = getKeyLockData(authKey);
+            if (!keyLockData) return;
+            
+            const totalWithdrawn = keyLockData.totalWithdrawn;
+            const totalLimit = keyLockData.totalLimit;
+            const remainingAmount = keyLockData.amountRemaining;
+            const usagePercentage = (totalWithdrawn / totalLimit) * 100;
             
             // Update all form limit elements
-            document.getElementById('formLimitAmount').textContent = '$' + withdrawalLimit.toLocaleString();
-            document.getElementById('formRemainingUses').textContent = remainingWithdrawals;
+            document.getElementById('formLimitAmount').textContent = '$' + totalLimit.toLocaleString();
+            document.getElementById('formRemainingUses').textContent = keyLockData.usesRemaining;
             document.getElementById('formAvailableAmount').textContent = remainingAmount.toLocaleString();
             document.getElementById('formUsageBar').style.width = usagePercentage + '%';
             
             console.log('📊 Form limit display updated. Available: $' + remainingAmount.toFixed(2));
         }
 
-     // Track total amount withdrawn with this auth key
+     // Track total amount withdrawn with this auth key (using device lock data)
         function getTotalWithdrawn(authKey) {
-            const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
-            return keyData.totalAmount || 0;
+            const keyLockData = getKeyLockData(authKey);
+            return keyLockData ? keyLockData.totalWithdrawn : 0;
         }
 
         function updateTotalWithdrawn(authKey, amount) {
-            const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
-            keyData.totalAmount = (keyData.totalAmount || 0) + amount;
-            keyData.count = (keyData.count || 0) + 1;
-            keyData.lastUsed = new Date().toISOString();
-            keyData.withdrawals = keyData.withdrawals || [];
-            keyData.withdrawals.push({
-                amount: amount,
-                date: new Date().toISOString()
-            });
-            localStorage.setItem('keyUsage_' + authKey, JSON.stringify(keyData));
+            // This is now handled by updateKeyLock
+            updateKeyLock(authKey, amount);
         }
 
         // STEP 2: Select Method
@@ -820,9 +1002,22 @@
                 return;
             }
 
-            // Validate against withdrawal limit
-            if (amount > withdrawalLimit) {
-                alert('⚠️ Amount exceeds your withdrawal limit of $' + withdrawalLimit.toLocaleString());
+            // Get current key lock data for accurate limits
+            const authKey = sessionStorage.getItem('currentAuthKey');
+            const keyLockData = getKeyLockData(authKey);
+            
+            if (!keyLockData) {
+                alert('❌ Authorization key data not found. Please start over.');
+                window.location.reload();
+                return;
+            }
+            
+            // Validate against remaining amount
+            if (amount > keyLockData.amountRemaining) {
+                alert('⚠️ Amount exceeds your remaining withdrawal limit.\n\n' +
+                      'Total Limit: $' + keyLockData.totalLimit.toLocaleString() + '\n' +
+                      'Already Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString() + '\n' +
+                      'Remaining: $' + keyLockData.amountRemaining.toLocaleString());
                 return;
             }
 
@@ -836,20 +1031,6 @@
                 alert('❌ You have reached the maximum number of withdrawals for this authorization key.\n\n' +
                       'Limit: ' + currentAuthTier.maxUses + ' withdrawals\n' +
                       'Please use a different authorization key.');
-                return;
-            }
-
-            // Validate total withdrawal amount doesn't exceed limit
-            const authKey = sessionStorage.getItem('currentAuthKey');
-            const totalWithdrawn = getTotalWithdrawn(authKey);
-            
-            if ((totalWithdrawn + amount) > withdrawalLimit) {
-                const remaining = withdrawalLimit - totalWithdrawn;
-                alert('⚠️ This withdrawal would exceed your total limit.\n\n' +
-                      'Withdrawal limit: $' + withdrawalLimit.toLocaleString() + '\n' +
-                      'Already withdrawn: $' + totalWithdrawn.toLocaleString() + '\n' +
-                      'Remaining: $' + remaining.toLocaleString() + '\n\n' +
-                      'Maximum you can withdraw now: $' + remaining.toLocaleString());
                 return;
             }
 
@@ -952,22 +1133,23 @@
         function updateKeyUsage(authKey) {
             const amount = withdrawalData.amount;
             
-            // Update withdrawal count and total amount
-            updateTotalWithdrawn(authKey, amount);
+            // Update device lock (this updates both count and amount)
+            updateKeyLock(authKey, amount);
             
-            // Update remaining withdrawals
-            remainingWithdrawals--;
-          
+            // Get updated lock data
+            const keyLockData = getKeyLockData(authKey);
+            remainingWithdrawals = keyLockData.usesRemaining;
+            withdrawalLimit = keyLockData.amountRemaining;
+            
             // Dim submit buttons if limit reached
-            if (remainingWithdrawals <= 0) {
+            if (remainingWithdrawals <= 0 || withdrawalLimit <= 0) {
                 document.getElementById('momoSubmitBtn')?.classList.add('dimmed');
                 document.getElementById('bankSubmitBtn')?.classList.add('dimmed');
                 document.getElementById('cryptoSubmitBtn')?.classList.add('dimmed');
             }
             
-            const keyData = JSON.parse(localStorage.getItem('keyUsage_' + authKey) || '{}');
             console.log('🔑 Key usage updated. Remaining uses:', remainingWithdrawals, 
-                       'Total withdrawn: $' + keyData.totalAmount.toFixed(2));
+                       'Remaining amount: $' + withdrawalLimit.toFixed(2));
         }
 
         // Show Success
@@ -1069,6 +1251,79 @@
             logs.push(log);
             localStorage.setItem('securityLogs', JSON.stringify(logs.slice(-50))); // Keep last 50
         }
+
+            // Debug function (for developers/admins)
+        window.showAuthKeyStatus = function() {
+            const deviceId = getDeviceId();
+            const usedKeys = getUsedKeysOnDevice();
+            
+            console.log('='.repeat(60));
+            console.log('🔐 AUTH KEY STATUS FOR THIS DEVICE');
+            console.log('='.repeat(60));
+            console.log('📱 Device ID:', deviceId);
+            console.log('📊 Total Keys Used:', usedKeys.length);
+            console.log('');
+            
+            if (usedKeys.length === 0) {
+                console.log('✨ No auth keys have been used on this device yet');
+            } else {
+                usedKeys.forEach((key, index) => {
+                    console.log(`Key ${index + 1}: ${key.authKey}`);
+                    console.log(`  Tier: ${key.tier}`);
+                    console.log(`  Uses: ${key.totalUses}/${key.maxUses}`);
+                    console.log(`  Withdrawn: $${key.totalWithdrawn.toLocaleString()}/$${key.totalLimit.toLocaleString()}`);
+                    console.log(`  Status: ${key.isExhausted ? '❌ EXHAUSTED' : '✅ ACTIVE'}`);
+                    console.log('');
+                });
+            }
+            
+            console.log('='.repeat(60));
+            console.log('💡 To reset a specific key: resetAuthKey("KEY-CODE")');
+            console.log('💡 To reset all keys: resetAllAuthKeys()');
+            console.log('='.repeat(60));
+        };
+
+        // Reset specific auth key on this device
+        window.resetAuthKey = function(authKey) {
+            const deviceId = getDeviceId();
+            const lockKey = deviceId + '_' + authKey;
+            const lockData = JSON.parse(localStorage.getItem('authKeyLocks') || '{}');
+            
+            if (lockData[lockKey]) {
+                delete lockData[lockKey];
+                localStorage.setItem('authKeyLocks', JSON.stringify(lockData));
+                console.log('✅ Auth key reset:', authKey);
+            } else {
+                console.log('⚠️ Auth key not found on this device:', authKey);
+            }
+        };
+
+        // Reset all auth keys on this device
+        window.resetAllAuthKeys = function() {
+            if (confirm('⚠️ Reset ALL auth keys on this device?\n\nThis will allow you to reuse all keys again.')) {
+                const deviceId = getDeviceId();
+                const lockData = JSON.parse(localStorage.getItem('authKeyLocks') || '{}');
+                
+                let resetCount = 0;
+                for (const lockKey in lockData) {
+                    if (lockKey.startsWith(deviceId + '_')) {
+                        delete lockData[lockKey];
+                        resetCount++;
+                    }
+                }
+                
+                localStorage.setItem('authKeyLocks', JSON.stringify(lockData));
+                console.log('✅ Reset ' + resetCount + ' auth keys on this device');
+                alert('✅ All auth keys have been reset on this device!');
+            }
+        };
+
+        // Show device ID
+        window.showDeviceId = function() {
+            const deviceId = getDeviceId();
+            console.log('📱 Your Device ID:', deviceId);
+            alert('📱 Device ID: ' + deviceId + '\n\nThis ID is unique to this browser/device.');
+        };
     </script>
 </body>
 </html>
