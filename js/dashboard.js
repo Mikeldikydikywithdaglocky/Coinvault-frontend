@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://eagle-acute-jean-victory.trycloudflare.com/api';
+const API_URL = 'https://cost-romance-attachments-fabrics.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
