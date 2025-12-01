@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://pirates-idol-houses-alexander.trycloudflare.com/api';
+const API_URL = 'https://cardiff-tournaments-duo-roy.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
