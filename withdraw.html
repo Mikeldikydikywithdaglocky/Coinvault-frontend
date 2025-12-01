@@ -1129,6 +1129,9 @@
                     // Update wallet balance
                     updateWalletBalance(withdrawalData.amount);
                     
+                    // Log transaction save
+                    console.log('✅ Transaction saved to database:', data.transaction);
+                    
                     showSuccess(reference);
                 } else {
                     alert('❌ ' + data.message);

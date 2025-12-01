@@ -643,14 +643,9 @@
                         </div>
                     `).join('');
                 } else {
-                    // Show section but with empty state
+                    // Show section but fetch real transactions
                     document.getElementById('transactionsSection').style.display = 'block';
-                    document.getElementById('transactionsList').innerHTML = `
-                        <div class="p-8 text-center text-gray-400">
-                            <div class="text-4xl mb-2">📭</div>
-                            <p>No transactions yet</p>
-                        </div>
-                    `;
+                    fetchUserTransactions();
                 }
                 
             } else {
@@ -674,7 +669,100 @@
                 document.getElementById('disconnectBtn').style.display = 'none';
             }
         }
+        
+        // Fetch user transactions from database
+        async function fetchUserTransactions() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                if (!token || token === 'demo') {
+                    document.getElementById('transactionsList').innerHTML = `
+                        <div class="p-8 text-center text-gray-400">
+                            <div class="text-4xl mb-2">🔭</div>
+                            <p>Login to see your transactions</p>
+                        </div>
+                    `;
+                    return;
+                }
 
+                console.log('📊 Fetching transactions...');
+
+                const response = await fetch(API_URL + '/api/wallet/transactions', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.transactions && data.transactions.length > 0) {
+                    console.log('✅ Found', data.transactions.length, 'transactions');
+                    
+                    const transactionsList = document.getElementById('transactionsList');
+                    transactionsList.innerHTML = data.transactions.map(tx => {
+                        const isReceived = tx.type === 'Received' || tx.type === 'Deposit';
+                        const isWithdrawal = tx.type === 'Withdrawal';
+                        
+                        let statusColor = 'bg-green-900 text-green-400';
+                        if (tx.status === 'Pending') statusColor = 'bg-yellow-900 text-yellow-400';
+                        if (tx.status === 'Failed') statusColor = 'bg-red-900 text-red-400';
+                        
+                        let icon = '↓';
+                        let iconBg = 'bg-green-600';
+                        if (isWithdrawal) {
+                            icon = '↑';
+                            iconBg = 'bg-red-600';
+                        }
+                        
+                        return `
+                            <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
+                                <div class="col-span-6 flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center ${iconBg}">
+                                        ${icon}
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">${tx.type}</div>
+                                        <div class="text-sm text-gray-400">${tx.displayName || tx.method}</div>
+                                        <div class="text-xs text-gray-500">${tx.date} ${tx.time}</div>
+                                    </div>
+                                </div>
+                                <div class="col-span-3 text-right">
+                                    <div class="font-medium ${isWithdrawal ? 'text-red-400' : 'text-green-400'}">
+                                        ${isWithdrawal ? '-' : '+'}$${tx.amountUSD.toFixed(2)}
+                                    </div>
+                                    <div class="text-xs text-gray-500">${tx.reference}</div>
+                                </div>
+                                <div class="col-span-3 text-right">
+                                    <span class="px-3 py-1 rounded-full text-xs ${statusColor}">
+                                        ${tx.status}
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                } else {
+                    console.log('ℹ️ No transactions found');
+                    document.getElementById('transactionsList').innerHTML = `
+                        <div class="p-8 text-center text-gray-400">
+                            <div class="text-4xl mb-2">🔭</div>
+                            <p>No transactions yet</p>
+                            <p class="text-sm mt-2">Your transaction history will appear here</p>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('❌ Failed to fetch transactions:', error);
+                document.getElementById('transactionsList').innerHTML = `
+                    <div class="p-8 text-center text-gray-400">
+                        <div class="text-4xl mb-2">⚠️</div>
+                        <p>Failed to load transactions</p>
+                    </div>
+                `;
+            }
+        }
 
 
         // Format address
@@ -780,6 +868,13 @@ window.addEventListener('DOMContentLoaded', function() {
     
     // Load saved wallet automatically
     loadSavedWallet();
+    
+    // Fetch transactions after a short delay (let wallet load first)
+    setTimeout(() => {
+        if (connectedWallet) {
+            fetchUserTransactions();
+        }
+    }, 1000);
     
     // Listen for balance changes from other tabs/pages
     window.addEventListener('storage', function(e) {
