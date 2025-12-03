@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://updates-arthur-generation-rca.trycloudflare.com/api';
+const API_URL = 'https://tuning-hire-forwarding-newer.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
