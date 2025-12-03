@@ -4,7 +4,7 @@
 const CONFIG = {
   // API Base URL - automatically uses ngrok URL
   // js/config.js - line 3
-API_URL: 'https://tuning-hire-forwarding-newer.trycloudflare.com/api',
+API_URL: 'https://tuning-hire-forwarding-newer.trycloudflare.com',
   
   // Network Configuration
   NETWORK: 'bitcoin', // 'bitcoin' or 'testnet'
