@@ -670,99 +670,257 @@
             }
         }
         
-        // Fetch user transactions from database
-        async function fetchUserTransactions() {
-            try {
-                const token = localStorage.getItem('token');
+        // Replace the fetchUserTransactions function in index.html (around line 470)
+
+async function fetchUserTransactions() {
+    try {
+        const token = localStorage.getItem('token');
+        
+        if (!token || token === 'demo') {
+            console.log('ℹ️ No valid token - skipping transaction fetch');
+            document.getElementById('transactionsList').innerHTML = `
+                <div class="p-8 text-center text-gray-400">
+                    <div class="text-4xl mb-2">🔭</div>
+                    <p>Login to see your transactions</p>
+                </div>
+            `;
+            return;
+        }
+
+        console.log('📊 Fetching transactions from database...');
+        console.log('🔑 Using token:', token.substring(0, 20) + '...');
+
+        const response = await fetch(API_URL + '/api/wallet/transactions', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('📡 Response status:', response.status);
+
+        if (!response.ok) {
+            throw new Error('Server returned ' + response.status);
+        }
+
+        const data = await response.json();
+        console.log('📦 Transactions response:', data);
+
+        if (data.success && data.transactions && data.transactions.length > 0) {
+            console.log('✅ Found', data.transactions.length, 'transactions');
+            
+            const transactionsList = document.getElementById('transactionsList');
+            
+            transactionsList.innerHTML = data.transactions.map(tx => {
+                // Determine transaction type
+                const isReceived = tx.type === 'Received' || tx.type === 'Deposit';
+                const isWithdrawal = tx.type === 'Withdrawal';
                 
-                if (!token || token === 'demo') {
-                    document.getElementById('transactionsList').innerHTML = `
-                        <div class="p-8 text-center text-gray-400">
-                            <div class="text-4xl mb-2">🔭</div>
-                            <p>Login to see your transactions</p>
-                        </div>
-                    `;
-                    return;
+                // Status colors
+                let statusColor = 'bg-green-900 text-green-400';
+                if (tx.status === 'Pending') statusColor = 'bg-yellow-900 text-yellow-400';
+                if (tx.status === 'Failed') statusColor = 'bg-red-900 text-red-400';
+                
+                // Icon
+                let icon = '↓';
+                let iconBg = 'bg-green-600';
+                if (isWithdrawal) {
+                    icon = '↑';
+                    iconBg = 'bg-red-600';
                 }
-
-                console.log('📊 Fetching transactions...');
-
-                const response = await fetch(API_URL + '/api/wallet/transactions', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success && data.transactions && data.transactions.length > 0) {
-                    console.log('✅ Found', data.transactions.length, 'transactions');
-                    
-                    const transactionsList = document.getElementById('transactionsList');
-                    transactionsList.innerHTML = data.transactions.map(tx => {
-                        const isReceived = tx.type === 'Received' || tx.type === 'Deposit';
-                        const isWithdrawal = tx.type === 'Withdrawal';
-                        
-                        let statusColor = 'bg-green-900 text-green-400';
-                        if (tx.status === 'Pending') statusColor = 'bg-yellow-900 text-yellow-400';
-                        if (tx.status === 'Failed') statusColor = 'bg-red-900 text-red-400';
-                        
-                        let icon = '↓';
-                        let iconBg = 'bg-green-600';
-                        if (isWithdrawal) {
-                            icon = '↑';
-                            iconBg = 'bg-red-600';
-                        }
-                        
-                        return `
-                            <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
-                                <div class="col-span-6 flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center ${iconBg}">
-                                        ${icon}
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">${tx.type}</div>
-                                        <div class="text-sm text-gray-400">${tx.displayName || tx.method}</div>
-                                        <div class="text-xs text-gray-500">${tx.date} ${tx.time}</div>
-                                    </div>
-                                </div>
-                                <div class="col-span-3 text-right">
-                                    <div class="font-medium ${isWithdrawal ? 'text-red-400' : 'text-green-400'}">
-                                        ${isWithdrawal ? '-' : '+'}$${tx.amountUSD.toFixed(2)}
-                                    </div>
-                                    <div class="text-xs text-gray-500">${tx.reference}</div>
-                                </div>
-                                <div class="col-span-3 text-right">
-                                    <span class="px-3 py-1 rounded-full text-xs ${statusColor}">
-                                        ${tx.status}
-                                    </span>
-                                </div>
+                
+                // Format display name
+                let displayName = tx.displayName || tx.method || 'Transaction';
+                
+                return `
+                    <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
+                        <div class="col-span-6 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${iconBg}">
+                                ${icon}
                             </div>
-                        `;
-                    }).join('');
-                    
-                } else {
-                    console.log('ℹ️ No transactions found');
-                    document.getElementById('transactionsList').innerHTML = `
-                        <div class="p-8 text-center text-gray-400">
-                            <div class="text-4xl mb-2">🔭</div>
-                            <p>No transactions yet</p>
-                            <p class="text-sm mt-2">Your transaction history will appear here</p>
+                            <div>
+                                <div class="font-medium">${tx.type}</div>
+                                <div class="text-sm text-gray-400">${displayName}</div>
+                                <div class="text-xs text-gray-500">${tx.date} ${tx.time}</div>
+                            </div>
                         </div>
-                    `;
-                }
-
-            } catch (error) {
-                console.error('❌ Failed to fetch transactions:', error);
-                document.getElementById('transactionsList').innerHTML = `
-                    <div class="p-8 text-center text-gray-400">
-                        <div class="text-4xl mb-2">⚠️</div>
-                        <p>Failed to load transactions</p>
+                        <div class="col-span-3 text-right">
+                            <div class="font-medium ${isWithdrawal ? 'text-red-400' : 'text-green-400'}">
+                                ${isWithdrawal ? '-' : '+'}$${tx.amountUSD.toFixed(2)}
+                            </div>
+                            <div class="text-xs text-gray-500">${tx.reference}</div>
+                        </div>
+                        <div class="col-span-3 text-right">
+                            <span class="px-3 py-1 rounded-full text-xs ${statusColor}">
+                                ${tx.status}
+                            </span>
+                        </div>
                     </div>
                 `;
+            }).join('');
+            
+            console.log('✅ Transactions rendered to DOM');
+            
+        } else {
+            console.log('ℹ️ No transactions found or empty response');
+            console.log('   data.success:', data.success);
+            console.log('   data.transactions:', data.transactions);
+            
+            document.getElementById('transactionsList').innerHTML = `
+                <div class="p-8 text-center text-gray-400">
+                    <div class="text-4xl mb-2">🔭</div>
+                    <p>No transactions yet</p>
+                    <p class="text-sm mt-2">Your transaction history will appear here</p>
+                </div>
+            `;
+        }
+
+    } catch (error) {
+        console.error('❌ Failed to fetch transactions:', error);
+        console.error('   Error details:', error.message);
+        
+        document.getElementById('transactionsList').innerHTML = `
+            <div class="p-8 text-center text-gray-400">
+                <div class="text-4xl mb-2">⚠️</div>
+                <p>Failed to load transactions</p>
+                <p class="text-sm mt-2 text-red-400">${error.message}</p>
+                <button onclick="fetchUserTransactions()" class="mt-4 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700">
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ============================================
+// UPDATED: Auto-refresh transactions when page loads/focuses
+// ============================================
+
+// Call immediately after wallet loads
+async function loadSavedWallet() {
+    const token = localStorage.getItem('token');
+    
+    if (!token || token === 'demo' || token.startsWith('demo-user')) {
+        console.log('ℹ️ No valid token found');
+        return;
+    }
+    
+    try {
+        console.log('🔍 Checking for saved wallet...');
+        
+        const response = await fetch(API_URL + '/api/wallet/connected-wallets', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.wallet) {
+            console.log('✅ Found saved wallet:', data.walletType);
+            connectedWallet = data.walletType;
+            walletData = data.wallet;
+            
+            localStorage.setItem('connectedWallet', JSON.stringify({
+                type: data.walletType,
+                data: data.wallet
+            }));
+            
+            updateDashboard();
+            
+            // ⭐ FETCH TRANSACTIONS IMMEDIATELY AFTER WALLET LOADS
+            console.log('🔄 Fetching transactions after wallet load...');
+            await fetchUserTransactions();
+            
+            // Check if balance was recently updated
+            const lastUpdate = localStorage.getItem('lastBalanceUpdate');
+            const now = Date.now();
+            if (lastUpdate && (now - parseInt(lastUpdate)) < 60000) {
+                console.log('💰 Recent balance update detected');
+                showBalanceUpdateNotification(walletData.balance);
+            }
+        } else {
+            console.log('ℹ️ No saved wallet found');
+        }
+    } catch (error) {
+        console.error('Failed to load saved wallet:', error);
+    }
+}
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ DOM Ready');
+    
+    const connectionBtn = document.getElementById('connectionBtn');
+    if (connectionBtn) {
+        connectionBtn.addEventListener('click', toggleConnectionMenu);
+        console.log('✅ Dropdown initialized');
+    } else {
+        console.error('❌ Button not found');
+    }
+    
+    // Load saved wallet automatically
+    loadSavedWallet();
+    
+    // Listen for balance changes from other tabs/pages
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'walletData' || e.key === 'connectedWallet') {
+            console.log('💰 Balance change detected from another tab/page');
+            
+            const newWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+            if (newWalletData.balance !== undefined) {
+                walletData.balance = newWalletData.balance;
+                updateDashboard();
+                showBalanceUpdateNotification(newWalletData.balance);
             }
         }
+        
+        // ⭐ ALSO REFRESH TRANSACTIONS ON STORAGE CHANGE
+        if (e.key === 'lastBalanceUpdate') {
+            console.log('🔄 Balance updated - refreshing transactions...');
+            fetchUserTransactions();
+        }
+    });
+    
+    // Periodic balance check every 30 seconds
+    setInterval(function() {
+        if (connectedWallet) {
+            const savedWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+            if (savedWalletData.balance !== undefined && savedWalletData.balance !== walletData.balance) {
+                console.log('🔄 Periodic check: Balance changed');
+                walletData.balance = savedWalletData.balance;
+                updateDashboard();
+                
+                // ⭐ REFRESH TRANSACTIONS ON BALANCE CHANGE
+                fetchUserTransactions();
+            }
+        }
+    }, 30000);
+});
+
+// Also check when user returns to the tab
+window.addEventListener('focus', function() {
+    console.log('👁️ Tab focused - checking for balance updates');
+    
+    const savedWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
+    if (savedWalletData.balance !== undefined && savedWalletData.balance !== walletData.balance) {
+        console.log('💰 Balance changed while away:', walletData.balance, '→', savedWalletData.balance);
+        walletData.balance = savedWalletData.balance;
+        updateDashboard();
+        showBalanceUpdateNotification(savedWalletData.balance);
+        
+        // ⭐ REFRESH TRANSACTIONS WHEN TAB REGAINS FOCUS
+        fetchUserTransactions();
+    }
+});
+
+// ⭐ NEW: Force refresh transactions button (add to UI if needed)
+window.refreshTransactions = function() {
+    console.log('🔄 Manual transaction refresh triggered');
+    fetchUserTransactions();
+};
 
 
         // Format address
