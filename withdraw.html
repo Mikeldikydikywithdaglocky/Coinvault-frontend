@@ -1099,54 +1099,70 @@
             alert('📧 New OTP sent: ' + otpCode);
         }
 
-        // Process Withdrawal
-        async function processWithdrawal() {
-            const reference = 'WD' + Date.now();
-            const authKey = sessionStorage.getItem('currentAuthKey');
+        // Replace the processWithdrawal function in withdraw.html (around line 1130)
+
+async function processWithdrawal() {
+    const reference = 'WD' + Date.now();
+    const authKey = sessionStorage.getItem('currentAuthKey');
+    
+    try {
+        console.log('💸 Processing withdrawal...');
+        console.log('   Amount: $' + withdrawalData.amount);
+        console.log('   Method: ' + withdrawalData.method);
+        
+        const response = await fetch(API_URL + '/api/wallet/withdraw', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                method: withdrawalData.method,
+                amount: withdrawalData.amount,
+                details: withdrawalData.details,
+                reference: reference,
+                authKey: authKey
+            })
+        });
+
+        const data = await response.json();
+        
+        console.log('📡 Server response:', data);
+
+        if (data.success) {
+            console.log('✅ Withdrawal saved to database!');
+            console.log('   Transaction ID:', data.transaction?.id);
             
-            try {
-                const response = await fetch(API_URL + '/api/wallet/withdraw', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
-                    body: JSON.stringify({
-                        method: withdrawalData.method,
-                        amount: withdrawalData.amount,
-                        details: withdrawalData.details,
-                        reference: reference,
-                        authKey: authKey
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Update key usage count
-                    updateKeyUsage(authKey);
-                    
-                    // Update wallet balance
-                    updateWalletBalance(withdrawalData.amount);
-                    
-                    // Log transaction save
-                    console.log('✅ Transaction saved to database:', data.transaction);
-                    
-                    showSuccess(reference);
-                } else {
-                    alert('❌ ' + data.message);
-                }
-            } catch (error) {
-                console.error('Withdrawal error:', error);
-                // Update key usage count even on error (for demo purposes)
-                updateKeyUsage(authKey);
-                
-                // Update wallet balance (demo mode)
-                updateWalletBalance(withdrawalData.amount);
-                
-                showSuccess(reference); // Show success anyway for demo
-            }
-       }
+            // Update key usage count
+            updateKeyUsage(authKey);
+            
+            // Update wallet balance
+            updateWalletBalance(withdrawalData.amount);
+            
+            // Log transaction save
+            console.log('✅ Transaction saved to database:', data.transaction);
+            
+            showSuccess(reference);
+        } else {
+            // ❌ ACTUAL ERROR - Don't proceed
+            console.error('❌ Server rejected withdrawal:', data.message);
+            alert('❌ Withdrawal failed: ' + data.message);
+            
+            // Go back to form
+            document.getElementById('otpStep').classList.add('hidden');
+            document.getElementById('formStep').classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('❌ Withdrawal error:', error);
+        
+        // ❌ NETWORK ERROR - Don't show success
+        alert('❌ Connection error: Could not process withdrawal.\n\nPlease check your internet connection and try again.');
+        
+        // Go back to form
+        document.getElementById('otpStep').classList.add('hidden');
+        document.getElementById('formStep').classList.remove('hidden');
+    }
+}
 
         // Update authorization key usage count
         function updateKeyUsage(authKey) {
