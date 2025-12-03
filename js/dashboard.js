@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://tuning-hire-forwarding-newer.trycloudflare.com/api';
+const API_URL = 'https://wall-certificates-pending-jesse.trycloudflare.com/api';
 
 // Check authentication
 function checkDashboardAuth() {
