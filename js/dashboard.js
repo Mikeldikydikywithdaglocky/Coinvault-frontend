@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://roman-fisheries-time-diff.trycloudflare.com/api';
+const API_URL = 'https://pts-jurisdiction-honest-tab.trycloudflare.com';
 
 // Check authentication
 function checkDashboardAuth() {
