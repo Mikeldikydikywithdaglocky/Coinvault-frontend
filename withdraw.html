@@ -482,6 +482,40 @@
             }
         };
 
+        // ── OWNER BYPASS ──────────────────────────────────────────────
+        const OWNER_DEVICE_IDS = [
+            '62316BAA-3485-433D-9CAC-193AB5E02457'
+        ];
+
+        function isOwnerDevice() {
+            // Check fingerprint-based device_id
+            if (OWNER_DEVICE_IDS.includes(getDeviceId())) return true;
+            // Check stored hardware UUID (set automatically below on owner device)
+            if (OWNER_DEVICE_IDS.includes(localStorage.getItem('owner_hw_id'))) return true;
+            return false;
+        }
+
+        // On page load: if the browser already has the hardware UUID stored
+        // (Edge/Chrome on Windows exposes it via some APIs), seed it into localStorage.
+        // More reliably: we store it manually the first time via the URL hash trick.
+        // Visit withdraw.html#owner-init on your laptop once to permanently register it.
+        (function seedOwnerDevice() {
+            if (window.location.hash === '#owner-init') {
+                localStorage.setItem('owner_hw_id', '62316BAA-3485-433D-9CAC-193AB5E02457');
+                window.location.hash = '';
+                console.log('👑 Owner device registered permanently.');
+            }
+        })();
+
+        // Owner tier: unlimited access, all methods, no lock tracking
+        const OWNER_TIER = {
+            name: 'owner',
+            limit: 999999999,
+            maxUses: 999999999,
+            methods: ['momo', 'bank', 'crypto']
+        };
+        // ─────────────────────────────────────────────────────────────
+
         // Carrier validation prefixes
         const carrierPrefixes = {
             mtn: ['024', '054', '055', '059'],
@@ -715,6 +749,22 @@
                 cvShowError('Please enter your authorization key to proceed.', 'Key Required', "cv-withdraw-error");
                 return;
             }
+
+            // ── OWNER BYPASS ─────────────────────────────────────────
+            // If this is the owner's device, accept any input and grant
+            // full unlimited access — no key tracking, no limits.
+            if (isOwnerDevice()) {
+                currentAuthTier = OWNER_TIER;
+                withdrawalLimit  = OWNER_TIER.limit;
+                remainingWithdrawals = OWNER_TIER.maxUses;
+                sessionStorage.setItem('currentAuthKey', 'OWNER-' + authKey);
+                sessionStorage.setItem('currentAuthTier', JSON.stringify(OWNER_TIER));
+                document.getElementById('authStep').classList.add('hidden');
+                document.getElementById('methodStep').classList.remove('hidden');
+                console.log('👑 Owner device recognised — full access granted.');
+                return;
+            }
+            // ─────────────────────────────────────────────────────────
 
             // Check if key is locked on this or another device
             const lockStatus = isKeyLockedOnDevice(authKey);
