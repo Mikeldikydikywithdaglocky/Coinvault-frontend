@@ -962,32 +962,6 @@ function handleWithdraw() {
                 window.location.href = 'login.html';
             }
         }
-    
-     // Periodic balance check every 30 seconds (optional)
-    setInterval(function() {
-        if (connectedWallet) {
-            const savedWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
-            if (savedWalletData.balance !== undefined && savedWalletData.balance !== walletData.balance) {
-                console.log('🔄 Periodic check: Balance changed');
-                walletData.balance = savedWalletData.balance;
-                updateDashboard();
-            }
-        }
-    }, 30000); // Check every 30 seconds
-});
-
-    // Also check when user returns to the tab
-    window.addEventListener('focus', function() {
-        console.log('👁️ Tab focused - checking for balance updates');
-        
-        const savedWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
-        if (savedWalletData.balance !== undefined && savedWalletData.balance !== walletData.balance) {
-            console.log('💰 Balance changed while away:', walletData.balance, '→', savedWalletData.balance);
-            walletData.balance = savedWalletData.balance;
-            updateDashboard();
-            showBalanceUpdateNotification(savedWalletData.balance);
-        }
-    });
     </script>
 </body>
 </html>
