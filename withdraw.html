@@ -234,8 +234,9 @@
                     <!-- AirtelTigo Money -->
                     <div onclick="selectCarrier('airteltigo')" 
                          class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
-                        <img src="https://yt3.googleusercontent.com/ytc/AIdro_lZ7qQvZK5kTGPXEYqWQRh5x9bxKh0fELCVNYjP0B9wUw=s900-c-k-c0x00ffffff-no-rj" 
-                             alt="AirtelTigo Money" class="h-20 mx-auto mb-4 object-contain rounded-lg">
+                        <div class="h-20 mx-auto mb-4 flex items-center justify-center">
+                            <div class="w-20 h-20 rounded-xl flex items-center justify-center font-bold text-white text-lg" style="background: linear-gradient(135deg, #e11d48, #f97316);">AT</div>
+                        </div>
                         <h3 class="text-xl font-bold mb-2">ATMoney</h3>
                         <p class="text-sm text-gray-400">027, 057, 026, 056</p>
                     </div>
@@ -500,7 +501,7 @@
             },
             airteltigo: {
                 name: 'AirtelTigo Money',
-                logo: 'https://yt3.googleusercontent.com/ytc/AIdro_lZ7qQvZK5kTGPXEYqWQRh5x9bxKh0fELCVNYjP0B9wUw=s900-c-k-c0x00ffffff-no-rj'
+                logo: ''
             }
         };
 
@@ -1528,9 +1529,9 @@ function cvHideError(containerId) {
 }
 
 // Convenience aliases matching what pages call
-function cvShowError(msg, title, cid, "cv-withdraw-error")   { cvShowError(msg, title || 'Error', cid); }
-function cvShowError(msg, title, cid, "cv-withdraw-error") { cvShowError(msg, title || 'Warning', cid); }
-function cvShowError(msg, title, cid, "cv-withdraw-error")    { cvShowError(msg, title || 'Notice', cid); }
+function cvError(msg, title)   { cvShowError(msg, title || 'Error', 'cv-withdraw-error'); }
+function cvWarning(msg, title) { cvShowError(msg, title || 'Warning', 'cv-withdraw-error'); }
+function cvInfo(msg, title)    { cvShowError(msg, title || 'Notice', 'cv-withdraw-error'); }
 </script>
 </body>
 </html>
