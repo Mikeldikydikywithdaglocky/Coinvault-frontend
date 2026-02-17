@@ -251,7 +251,7 @@
         console.log('🚀 CoinVault Loading...');
         
         // API Configuration
-        const API_URL = 'https://pts-jurisdiction-honest-tab.trycloudflare.com';
+        const API_URL = 'https://roy-clone-precipitation-informal.trycloudflare.com';
         
         // Wallet state
         let connectedWallet = null;
@@ -962,94 +962,6 @@ function handleWithdraw() {
                 window.location.href = 'login.html';
             }
         }
-
-        // === AUTO-LOAD SAVED WALLET ON PAGE LOAD ===
-async function loadSavedWallet() {
-    const token = localStorage.getItem('token');
-    
-    if (!token || token === 'demo' || token.startsWith('demo-user')) {
-        console.log('ℹ️ No valid token found');
-        return;
-    }
-    
-    try {
-        console.log('🔍 Checking for saved wallet...');
-        
-        const response = await fetch(API_URL + '/api/wallet/connected-wallets', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (data.success && data.wallet) {
-            console.log('✅ Found saved wallet:', data.walletType);
-            connectedWallet = data.walletType;
-            walletData = data.wallet;
-            
-            // Save to localStorage for other pages
-            localStorage.setItem('connectedWallet', JSON.stringify({
-                type: data.walletType,
-                data: data.wallet
-            }));
-            
-            updateDashboard();
-            
-            // Check if balance was recently updated
-            const lastUpdate = localStorage.getItem('lastBalanceUpdate');
-            const now = Date.now();
-            if (lastUpdate && (now - parseInt(lastUpdate)) < 60000) { // Within last minute
-                console.log('💰 Recent balance update detected');
-                showBalanceUpdateNotification(walletData.balance);
-            }
-        } else {
-            console.log('ℹ️ No saved wallet found');
-        }
-    } catch (error) {
-        console.error('Failed to load saved wallet:', error);
-    }
-}
-
-// Initialize on page load
-window.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ DOM Ready');
-    
-    const connectionBtn = document.getElementById('connectionBtn');
-    if (connectionBtn) {
-        connectionBtn.addEventListener('click', toggleConnectionMenu);
-        console.log('✅ Dropdown initialized');
-    } else {
-        console.error('❌ Button not found');
-    }
-    
-    // Load saved wallet automatically
-    loadSavedWallet();
-    
-    // Fetch transactions after a short delay (let wallet load first)
-    setTimeout(() => {
-        if (connectedWallet) {
-            fetchUserTransactions();
-        }
-    }, 1000);
-    
-    // Listen for balance changes from other tabs/pages
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'walletData' || e.key === 'connectedWallet') {
-            console.log('💰 Balance change detected from another tab/page');
-            
-            // Reload wallet data
-            const newWalletData = JSON.parse(localStorage.getItem('walletData') || '{}');
-            if (newWalletData.balance !== undefined) {
-                walletData.balance = newWalletData.balance;
-                updateDashboard();
-                
-                // Show notification
-                showBalanceUpdateNotification(newWalletData.balance);
-            }
-        }
-    });
     
      // Periodic balance check every 30 seconds (optional)
     setInterval(function() {

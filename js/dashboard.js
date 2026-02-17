@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://pts-jurisdiction-honest-tab.trycloudflare.com';
+const API_URL = 'https://roy-clone-precipitation-informal.trycloudflare.com';
 
 // Check authentication
 function checkDashboardAuth() {
