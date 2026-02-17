@@ -11,23 +11,33 @@
 </head>
 <body class="bg-gray-900 text-white">
 <!-- COPY THIS NAVBAR TO: market.html, swap.html, nfts.html, buy.html, sell.html, send.html, receive.html -->
-<nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 sticky top-0 z-40" style="backdrop-filter: blur(10px);">
+<nav class="bg-gray-800 border-b border-gray-700 px-4 py-4 sticky top-0 z-40 relative" style="backdrop-filter: blur(10px);">
     <div class="container mx-auto flex justify-between items-center">
         <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg>
             <a href="index.html" class="text-xl font-bold hover:text-indigo-400">CoinVault</a>
         </div>
-        <div class="flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-6">
             <a href="index.html" class="text-gray-400 hover:text-white transition">Wallet</a>
             <a href="market.html" class="text-gray-400 hover:text-white transition">Market</a>
             <a href="swap.html" class="text-gray-400 hover:text-white transition">Swap</a>
             <a href="nfts.html" class="text-gray-400 hover:text-white transition">NFTs</a>
             <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="text-gray-400 hover:text-red-400 transition">Logout</button>
         </div>
+        <button class="md:hidden text-gray-400 hover:text-white p-2" onclick="document.getElementById('sendMobileMenu').classList.toggle('hidden')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+    </div>
+    <div id="sendMobileMenu" class="hidden md:hidden border-t border-gray-700 mt-4 pb-2">
+        <a href="index.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Wallet</a>
+        <a href="market.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Market</a>
+        <a href="swap.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Swap</a>
+        <a href="nfts.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">NFTs</a>
+        <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="block w-full text-left px-4 py-3 text-red-400 hover:text-red-300">Logout</button>
     </div>
 </nav>
     
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-3 py-6">
         <div class="max-w-2xl mx-auto">
             <!-- Header -->
             <div class="mb-8">

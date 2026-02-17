@@ -9,46 +9,55 @@
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body class="bg-gray-900 text-white">
-<!-- COPY THIS NAVBAR TO: market.html, swap.html, nfts.html, buy.html, sell.html, send.html, receive.html -->
-<nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 sticky top-0 z-40" style="backdrop-filter: blur(10px);">
+<nav class="bg-gray-800 border-b border-gray-700 px-4 py-4 sticky top-0 z-40 relative" style="backdrop-filter: blur(10px);">
     <div class="container mx-auto flex justify-between items-center">
         <div class="flex items-center gap-2">
-            <span class="text-2xl">🔐</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg>
             <a href="index.html" class="text-xl font-bold hover:text-indigo-400">CoinVault</a>
         </div>
-        <div class="flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-6">
             <a href="index.html" class="text-gray-400 hover:text-white transition">Wallet</a>
             <a href="market.html" class="text-gray-400 hover:text-white transition">Market</a>
             <a href="swap.html" class="text-gray-400 hover:text-white transition">Swap</a>
             <a href="nfts.html" class="text-gray-400 hover:text-white transition">NFTs</a>
             <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="text-gray-400 hover:text-red-400 transition">Logout</button>
         </div>
+        <button class="md:hidden text-gray-400 hover:text-white p-2" onclick="document.getElementById('nftsMobileMenu').classList.toggle('hidden')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+    </div>
+    <div id="nftsMobileMenu" class="hidden md:hidden border-t border-gray-700 mt-4 pb-2">
+        <a href="index.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Wallet</a>
+        <a href="market.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Market</a>
+        <a href="swap.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Swap</a>
+        <a href="nfts.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">NFTs</a>
+        <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="block w-full text-left px-4 py-3 text-red-400 hover:text-red-300">Logout</button>
     </div>
 </nav>
     
-    <main class="container mx-auto px-4 py-16">
+    <main class="container mx-auto px-3 py-10">
         <div class="max-w-2xl mx-auto text-center">
             <!-- Animated Icon -->
             <div class="mb-8 relative">
-                <div class="w-32 h-32 mx-auto bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center animate-pulse">
-                    <i data-feather="image" class="w-16 h-16"></i>
+                <div class="w-24 h-24 md:w-32 md:h-32 mx-auto bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center animate-pulse">
+                    <i data-feather="image" class="w-10 h-10 md:w-16 md:h-16"></i>
                 </div>
                 <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-purple-600 rounded-2xl blur-3xl opacity-50 animate-pulse"></div>
             </div>
 
             <!-- Title -->
-            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
+            <h1 class="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
                 NFT Marketplace
             </h1>
-            <p class="text-2xl text-gray-400 mb-8">Coming Soon</p>
+            <p class="text-xl md:text-2xl text-gray-400 mb-6">Coming Soon</p>
             
             <!-- Description -->
-            <p class="text-lg text-gray-300 mb-12 max-w-xl mx-auto">
+            <p class="text-base text-gray-300 mb-8 max-w-xl mx-auto">
                 We're building an amazing NFT marketplace where you can discover, collect, and trade unique digital assets. Stay tuned!
             </p>
 
             <!-- Features -->
-            <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div class="bg-gray-800 p-6 rounded-xl">
                     <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                         <i data-feather="shopping-bag" class="w-6 h-6"></i>
@@ -83,12 +92,14 @@
     
     <script src="js/main.js"></script>
     <script>feather.replace();</script>
-<!-- COPY THIS FOOTER TO ALL PAGES -->
 <footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div>
-                <h3 class="font-bold mb-2">🔐 CoinVault</h3>
+                <h3 class="font-bold mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    CoinVault
+                </h3>
                 <p class="text-sm text-gray-400">Your secure crypto gateway</p>
             </div>
             <div>
@@ -109,10 +120,10 @@
             <div>
                 <h4 class="font-medium mb-2 text-sm">Language</h4>
                 <select class="bg-gray-700 text-white px-3 py-2 rounded text-sm w-full">
-                    <option>🇺🇸 English</option>
-                    <option>🇪🇸 Español</option>
-                    <option>🇫🇷 Français</option>
-                    <option>🇩🇪 Deutsch</option>
+                    <option>English</option>
+                    <option>Español</option>
+                    <option>Français</option>
+                    <option>Deutsch</option>
                 </select>
             </div>
         </div>

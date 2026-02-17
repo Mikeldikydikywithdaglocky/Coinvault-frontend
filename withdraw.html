@@ -36,24 +36,38 @@
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Navbar -->
-    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">🔐</span>
-                <span class="text-xl font-bold">CoinVault</span>
-            </div>
-            <button onclick="goBack()" class="text-gray-400 hover:text-white">
-                ← Back to Dashboard
-            </button>
+    <nav class="bg-gray-800 border-b border-gray-700 px-4 py-4 sticky top-0 z-40 relative" style="backdrop-filter: blur(10px);">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg>
+            <a href="index.html" class="text-xl font-bold hover:text-indigo-400">CoinVault</a>
         </div>
-    </nav>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-gray-400 hover:text-white transition">Wallet</a>
+            <a href="market.html" class="text-gray-400 hover:text-white transition">Market</a>
+            <a href="swap.html" class="text-gray-400 hover:text-white transition">Swap</a>
+            <a href="nfts.html" class="text-gray-400 hover:text-white transition">NFTs</a>
+            <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="text-gray-400 hover:text-red-400 transition">Logout</button>
+        </div>
+        <button class="md:hidden text-gray-400 hover:text-white p-2" onclick="document.getElementById('withdrawMobileMenu').classList.toggle('hidden')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+    </div>
+    <div id="withdrawMobileMenu" class="hidden md:hidden border-t border-gray-700 mt-4 pb-2">
+        <a href="index.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Wallet</a>
+        <a href="market.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Market</a>
+        <a href="swap.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Swap</a>
+        <a href="nfts.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">NFTs</a>
+        <button onclick="if(confirm('Logout?')){localStorage.clear();window.location.href='login.html';}" class="block w-full text-left px-4 py-3 text-red-400 hover:text-red-300">Logout</button>
+    </div>
+</nav>
 
-    <main class="container mx-auto px-4 py-8 flex-1">
+    <main class="container mx-auto px-3 py-6 flex-1">
         <!-- STEP 1: Auth Key Verification -->
         <div id="authStep" class="max-w-md mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
                 <div class="text-center mb-6">
-                    <div class="text-6xl mb-4">🔐</div>
+                    <div class="flex justify-center mb-4"><div class="w-16 h-16 bg-indigo-600 bg-opacity-20 rounded-2xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg></div></div>
                     <h2 class="text-3xl font-bold mb-2">Withdrawal Authorization</h2>
                     <p class="text-gray-400">Enter your authorization key to proceed</p>
                 </div>
@@ -64,7 +78,7 @@
                            placeholder="Enter your auth key"
                            class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
                     <p class="text-xs text-gray-500 mt-2">
-                        🔒 This key authorizes withdrawal transactions
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>This key authorizes withdrawal transactions
                     </p>
                 </div>
 
@@ -75,7 +89,7 @@
 
                 <div class="mt-6 p-4 bg-yellow-900 bg-opacity-30 rounded-lg border border-yellow-700">
                     <p class="text-xs text-yellow-300">
-                        ⚠️ <strong>Security Notice:</strong> Never share your authorization key. CoinVault will never ask for it via email or support.
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><strong>Security Notice:</strong> Never share your authorization key. CoinVault will never ask for it via email or support.
                     </p>
                 </div>
             </div>
@@ -89,8 +103,8 @@
                 <div class="grid gap-4 mb-6">
                     <!-- Mobile Money -->
                     <button onclick="selectMethod('momo')" 
-                            class="method-btn flex items-center gap-4 p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-yellow-500">
-                        <div class="text-5xl">📱</div>
+                            class="method-btn flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-yellow-500">
+                        <div class="flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
                         <div class="text-left flex-1">
                             <div class="text-xl font-bold">Mobile Money</div>
                             <div class="text-sm text-gray-400">MTN, Vodafone, AirtelTigo</div>
@@ -100,8 +114,8 @@
 
                     <!-- Bank Transfer -->
                     <button onclick="selectMethod('bank')" 
-                            class="method-btn flex items-center gap-4 p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-blue-500">
-                        <div class="text-5xl">🏦</div>
+                            class="method-btn flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-blue-500">
+                        <div class="flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></div>
                         <div class="text-left flex-1">
                             <div class="text-xl font-bold">Bank Transfer</div>
                             <div class="text-sm text-gray-400">Direct deposit to your bank account</div>
@@ -111,8 +125,8 @@
 
                     <!-- Crypto Transfer -->
                     <button onclick="selectMethod('crypto')" 
-                            class="method-btn flex items-center gap-4 p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-purple-500">
-                        <div class="text-5xl">₿</div>
+                            class="method-btn flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-purple-500">
+                        <div class="flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                         <div class="text-left flex-1">
                             <div class="text-xl font-bold">Crypto Transfer</div>
                             <div class="text-sm text-gray-400">Send to external wallet address</div>
@@ -133,7 +147,7 @@
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
                 <h2 class="text-3xl font-bold mb-6 text-center">Select Mobile Money Carrier</h2>
 
-                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                     <!-- MTN Mobile Money -->
                     <div onclick="selectCarrier('mtn')" 
                          class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
@@ -181,7 +195,7 @@
                 <!-- Withdrawal Limit Notice (shown on form page) -->
                 <div id="formLimitNotice" class="mb-6 p-4 bg-red-900 bg-opacity-30 rounded-lg border border-red-700">
                     <p class="text-xs text-red-300 mb-2 text-center">
-                        🚨 <strong>Withdrawal Limit:</strong> <span id="formLimitAmount">$0</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><strong>Withdrawal Limit:</strong> <span id="formLimitAmount">$0</span>
                     </p>
                     <p class="text-xs text-red-300 text-center">
                         🔄 <strong>Remaining Uses:</strong> <span id="formRemainingUses">0</span> | 

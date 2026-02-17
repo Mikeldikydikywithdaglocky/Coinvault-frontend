@@ -26,26 +26,38 @@
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Navbar -->
-    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+    <nav class="bg-gray-800 border-b border-gray-700 px-4 py-4 relative z-40">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg>
                 <span class="text-xl font-bold">CoinVault</span>
             </div>
-            <div class="flex gap-6">
+            <!-- Desktop nav -->
+            <div class="hidden md:flex gap-6">
                 <a href="index.html" class="text-white font-medium">Wallet</a>
                 <a href="market.html" class="text-gray-400 hover:text-white">Market</a>
                 <a href="swap.html" class="text-gray-400 hover:text-white">Swap</a>
                 <a href="nfts.html" class="text-gray-400 hover:text-white">NFTs</a>
             </div>
+            <!-- Mobile hamburger -->
+            <button id="navToggle" class="md:hidden text-gray-400 hover:text-white p-2" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+        </div>
+        <!-- Mobile dropdown menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 mt-4 pb-2">
+            <a href="index.html" class="block px-4 py-3 text-white font-medium border-b border-gray-700">Wallet</a>
+            <a href="market.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Market</a>
+            <a href="swap.html" class="block px-4 py-3 text-gray-400 hover:text-white border-b border-gray-700">Swap</a>
+            <a href="nfts.html" class="block px-4 py-3 text-gray-400 hover:text-white">NFTs</a>
         </div>
     </nav>
     
-    <main class="container mx-auto px-4 py-8 flex-1">
+    <main class="container mx-auto px-3 py-6 flex-1">
         <!-- Wallet Overview -->
-        <section class="mb-12">
-            <div class="bg-gradient-to-r from-purple-900 to-blue-800 rounded-2xl p-6 shadow-2xl">
-                <div class="flex justify-between items-center mb-6">
+        <section class="mb-8">
+            <div class="bg-gradient-to-r from-purple-900 to-blue-800 rounded-2xl p-4 md:p-6 shadow-2xl">
+                <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
                     <h2 class="text-2xl font-bold">Your Portfolio</h2>
                     
                     <!-- Import Wallet Button -->
@@ -110,7 +122,7 @@
                 
                 <div class="text-center py-8">
                     <p class="text-gray-300 mb-2">Total Balance</p>
-                    <h1 class="text-5xl font-bold mb-4" id="totalBalance">$0.00</h1>
+                    <h1 class="text-3xl md:text-5xl font-bold mb-4" id="totalBalance">$0.00</h1>
                     
                     <!-- Wallet Address -->
                     <div id="walletAddressSection" class="flex items-center justify-center gap-2 mb-6 bg-black bg-opacity-30 rounded-xl px-4 py-3 max-w-md mx-auto">
@@ -122,15 +134,15 @@
                     </div>
                     
                     <!-- Withdraw & Receive Buttons -->
-                    <div class="flex justify-center gap-4">
+                    <div class="flex justify-center gap-3 flex-wrap">
     <button id="withdrawBtn" onclick="handleWithdraw()" 
-            class="bg-gray-600 text-gray-400 px-8 py-3 rounded-full font-medium cursor-not-allowed flex items-center gap-2" 
+            class="bg-gray-600 text-gray-400 px-6 py-3 rounded-full font-medium cursor-not-allowed flex items-center gap-2 text-sm md:text-base md:px-8" 
             disabled title="Connect a wallet to enable withdrawals">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
         Withdraw
     </button>
     <a href="receive.html" 
-            class="bg-white text-indigo-700 px-8 py-3 rounded-full font-medium hover:bg-indigo-100 transition inline-flex items-center gap-2">
+            class="bg-white text-indigo-700 px-6 py-3 rounded-full font-medium hover:bg-indigo-100 transition inline-flex items-center gap-2 text-sm md:text-base md:px-8">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
         Receive
     </a>
@@ -141,9 +153,9 @@
         </section>
 
         <!-- Quick Actions (3 buttons only) -->
-<section class="mb-12">
-    <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
-    <div class="grid grid-cols-3 gap-4">
+<section class="mb-8">
+    <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-3 gap-3">
         <a href="send.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer group">
             <div class="flex justify-center mb-3">
                 <div class="w-12 h-12 bg-indigo-600 bg-opacity-20 rounded-xl flex items-center justify-center group-hover:bg-opacity-40 transition">
@@ -172,17 +184,21 @@
 </section>
 
         <!-- Assets (Hidden until wallet connected) -->
-        <section class="mb-12" id="assetsSection" style="display: none;">
-            <div class="flex justify-between items-center mb-6">
+        <section class="mb-8" id="assetsSection" style="display: none;">
+            <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">Your Assets</h2>
             </div>
             
             <div class="bg-gray-800 rounded-xl overflow-hidden">
-                <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 font-medium text-gray-400 text-sm">
+                <div class="hidden md:grid grid-cols-12 gap-4 p-4 border-b border-gray-700 font-medium text-gray-400 text-sm">
                     <div class="col-span-5">Asset</div>
                     <div class="col-span-3 text-right">Balance</div>
                     <div class="col-span-2 text-right">Price</div>
                     <div class="col-span-2 text-right">Value</div>
+                </div>
+                <div class="md:hidden grid grid-cols-2 gap-2 p-3 border-b border-gray-700 font-medium text-gray-400 text-xs">
+                    <div>Asset</div>
+                    <div class="text-right">Value</div>
                 </div>
                 
                 <div id="assetsList">
@@ -193,15 +209,19 @@
 
         <!-- Recent Transactions (Hidden until wallet connected) -->
         <section id="transactionsSection" style="display: none;">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">Recent Transactions</h2>
             </div>
             
             <div class="bg-gray-800 rounded-xl overflow-hidden">
-                <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 font-medium text-gray-400">
+                <div class="hidden md:grid grid-cols-12 gap-4 p-4 border-b border-gray-700 font-medium text-gray-400">
                     <div class="col-span-6">Transaction</div>
                     <div class="col-span-3 text-right">Amount</div>
                     <div class="col-span-3 text-right">Status</div>
+                </div>
+                <div class="md:hidden grid grid-cols-2 gap-2 p-3 border-b border-gray-700 font-medium text-gray-400 text-xs">
+                    <div>Transaction</div>
+                    <div class="text-right">Amount / Status</div>
                 </div>
                 
                 <div id="transactionsList">
@@ -604,25 +624,19 @@
                     document.getElementById('assetsSection').style.display = 'block';
                     const assetsList = document.getElementById('assetsList');
                     assetsList.innerHTML = walletData.assets.map(asset => `
-                        <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
-                            <div class="col-span-5 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl" style="background-color: ${asset.color || '#4F46E5'}">
+                        <div class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700 transition gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0" style="background-color: ${asset.color || '#4F46E5'}">
                                     ${asset.symbol === 'BTC' ? '₿' : asset.symbol.charAt(0)}
                                 </div>
-                                <div>
-                                    <div class="font-medium">${asset.name}</div>
-                                    <div class="text-sm text-gray-400">${asset.symbol}</div>
+                                <div class="min-w-0">
+                                    <div class="font-medium truncate">${asset.name}</div>
+                                    <div class="text-sm text-gray-400">${asset.balance.toFixed(6)} ${asset.symbol}</div>
                                 </div>
                             </div>
-                            <div class="col-span-3 text-right">
-                                <div class="font-medium">${asset.balance.toFixed(8)}</div>
-                                <div class="text-sm text-gray-400">${asset.symbol}</div>
-                            </div>
-                            <div class="col-span-2 text-right">
-                                <div class="font-medium">$${formatBalanceWithCommas(asset.price)}</div>
-                            </div>
-                            <div class="col-span-2 text-right">
+                            <div class="text-right flex-shrink-0">
                                 <div class="font-medium text-green-400">$${formatBalanceWithCommas(asset.balance * asset.price)}</div>
+                                <div class="text-xs text-gray-400">$${formatBalanceWithCommas(asset.price)}</div>
                             </div>
                         </div>
                     `).join('');
@@ -633,29 +647,21 @@
                     document.getElementById('transactionsSection').style.display = 'block';
                     const transactionsList = document.getElementById('transactionsList');
                     transactionsList.innerHTML = walletData.transactions.map(tx => `
-                        <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
-                            <div class="col-span-6 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center ${
-                                    tx.type === 'Received' ? 'bg-green-600' : 'bg-red-600'
-                                }">
+                        <div class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700 transition gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${tx.type === 'Received' ? 'bg-green-600' : 'bg-red-600'}">
                                     ${tx.type === 'Received' ? '↓' : '↑'}
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <div class="font-medium">${tx.type}</div>
-                                    <div class="text-sm text-gray-400">${tx.date}</div>
+                                    <div class="text-xs text-gray-400">${tx.date}</div>
                                 </div>
                             </div>
-                            <div class="col-span-3 text-right">
-                                <div class="font-medium ${tx.type === 'Received' ? 'text-green-400' : 'text-red-400'}">
-                                    ${tx.type === 'Received' ? '+' : '-'}${tx.amount.toFixed(8)} ${tx.symbol}
+                            <div class="text-right flex-shrink-0">
+                                <div class="font-medium text-sm ${tx.type === 'Received' ? 'text-green-400' : 'text-red-400'}">
+                                    ${tx.type === 'Received' ? '+' : '-'}${tx.amount.toFixed(6)} ${tx.symbol}
                                 </div>
-                            </div>
-                            <div class="col-span-3 text-right">
-                                <span class="px-3 py-1 rounded-full text-xs ${
-                                    tx.status === 'Completed' 
-                                        ? 'bg-green-900 text-green-400' 
-                                        : 'bg-yellow-900 text-yellow-400'
-                                }">
+                                <span class="px-2 py-0.5 rounded-full text-xs ${tx.status === 'Completed' ? 'bg-green-900 text-green-400' : 'bg-yellow-900 text-yellow-400'}">
                                     ${tx.status}
                                 </span>
                             </div>
@@ -753,25 +759,23 @@ async function fetchUserTransactions() {
                 let displayName = tx.displayName || tx.method || 'Transaction';
                 
                 return `
-                    <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 hover:bg-gray-700 transition">
-                        <div class="col-span-6 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${iconBg}">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-700 hover:bg-gray-700 transition gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}">
                                 ${icon}
                             </div>
-                            <div>
-                                <div class="font-medium">${tx.type}</div>
-                                <div class="text-sm text-gray-400">${displayName}</div>
+                            <div class="min-w-0">
+                                <div class="font-medium truncate">${tx.type}</div>
+                                <div class="text-xs text-gray-400 truncate">${displayName}</div>
                                 <div class="text-xs text-gray-500">${tx.date} ${tx.time}</div>
                             </div>
                         </div>
-                        <div class="col-span-3 text-right">
-                            <div class="font-medium ${isWithdrawal ? 'text-red-400' : 'text-green-400'}">
+                        <div class="text-right flex-shrink-0">
+                            <div class="font-medium text-sm ${isWithdrawal ? 'text-red-400' : 'text-green-400'}">
                                 ${isWithdrawal ? '-' : '+'}$${tx.amountUSD.toFixed(2)}
                             </div>
-                            <div class="text-xs text-gray-500">${tx.reference}</div>
-                        </div>
-                        <div class="col-span-3 text-right">
-                            <span class="px-3 py-1 rounded-full text-xs ${statusColor}">
+                            <div class="text-xs text-gray-500 truncate max-w-20">${tx.reference}</div>
+                            <span class="px-2 py-0.5 rounded-full text-xs ${statusColor}">
                                 ${tx.status}
                             </span>
                         </div>
@@ -788,7 +792,9 @@ async function fetchUserTransactions() {
             
             document.getElementById('transactionsList').innerHTML = `
                 <div class="p-8 text-center text-gray-400">
-                    <div class="text-4xl mb-2">🔭</div>
+                    <div class="flex justify-center mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
                     <p>No transactions yet</p>
                     <p class="text-sm mt-2">Your transaction history will appear here</p>
                 </div>
