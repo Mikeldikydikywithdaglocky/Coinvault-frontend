@@ -107,7 +107,6 @@ async function fetchCryptoPrices() {
             
             console.log(`✅ ${api.name} API SUCCESS:`, liveCryptoPrices);
             updateCryptoDropdown();
-            showToast(`Live prices from ${api.name}`, "success");
             return; // Success! Stop trying other APIs
             
         } catch (error) {
@@ -125,7 +124,6 @@ async function fetchCryptoPrices() {
         BNB: 315
     };
     updateCryptoDropdown();
-    showToast("Using cached crypto prices", "error");
 }
 
 // ✅ FREE UNLIMITED USD → GHS using exchangerate.host (NO API KEY!)
@@ -137,13 +135,11 @@ async function fetchUsdToGhsRate() {
         if (data && data.rates && data.rates.GHS) {
             usdToGhsRate = data.rates.GHS;
             console.log("✅ Live USD → GHS rate:", usdToGhsRate);
-            showToast(`Live rate loaded: ₵${usdToGhsRate.toFixed(2)} per $1`, "success");
         } else {
             throw new Error("No GHS rate found");
         }
     } catch (error) {
         console.error("USD → GHS conversion failed:", error);
-        showToast("Using default USD → GHS rate (₵15.00)", "error");
         usdToGhsRate = 15.0;
     }
 }

@@ -14,7 +14,7 @@
 <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 sticky top-0 z-40" style="backdrop-filter: blur(10px);">
     <div class="container mx-auto flex justify-between items-center">
         <div class="flex items-center gap-2">
-            <span class="text-2xl">🔐</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg>
             <a href="index.html" class="text-xl font-bold hover:text-indigo-400">CoinVault</a>
         </div>
         <div class="flex items-center gap-6">
@@ -188,7 +188,10 @@
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div>
-                <h3 class="font-bold mb-2">🔐 CoinVault</h3>
+                <h3 class="font-bold mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    CoinVault
+                </h3>
                 <p class="text-sm text-gray-400">Your secure crypto gateway</p>
             </div>
             <div>
@@ -306,34 +309,6 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-```
-
----
-
-# ✅ **What This Does:**
-
-## **Sell Page:**
-- Shows **real BTC balance** from your wallet
-- Shows **0.00000000** for ETH, USDT, BNB (since BlueWallet only has Bitcoin)
-- **MAX button works** - fills in your actual BTC balance
-- Warns you if you try to sell more than you have
-
-## **Send Page:**
-- Shows **real BTC balance** in the dropdown
-- Shows **0.00000000** for other cryptos
-- Updates the balance display correctly
-
----
-
-# 🧪 **Test It:**
-
-1. **Connect your BlueWallet** with BTC
-2. **Go to Sell page** - should show:
-```
-   Bitcoin (BTC) - Balance: 0.00357698
-   Ethereum (ETH) - Balance: 0.00000000
-   Tether (USDT) - Balance: 0.00
-   BNB (BNB) - Balance: 0.00000000
 
 </body>
 </html>
