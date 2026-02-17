@@ -29,7 +29,7 @@
     <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <span class="text-2xl">🔐</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg>
                 <span class="text-xl font-bold">CoinVault</span>
             </div>
             <div class="flex gap-6">
@@ -52,9 +52,11 @@
                     <div class="relative">
                         <button id="connectionBtn" 
                                 class="bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-full flex items-center gap-2 transition-all">
-                            <span id="connectionIcon">📲</span>
+                            <span id="connectionIcon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            </span>
                             <span id="connectionText">Import Wallet</span>
-                            <span>▼</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                         </button>
                         
                         <!-- Import Dropdown -->
@@ -74,8 +76,8 @@
                             </button>
                             
                             <button onclick="connectWallet('trustwallet')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition border-t border-gray-700">
-                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl">
-                                    🛡️
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 </div>
                                 <div class="text-left">
                                     <div class="font-medium">Trust Wallet</div>
@@ -84,8 +86,8 @@
                             </button>
                             
                             <button onclick="connectWallet('bluewallet')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition border-t border-gray-700">
-                                <div class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center text-xl">
-                                    🔷
+                                <div class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                 </div>
                                 <div class="text-left">
                                     <div class="font-medium">BlueWallet</div>
@@ -94,12 +96,12 @@
                             </button>
                             
                             <button onclick="disconnectWallet()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-700 transition border-t border-gray-700 text-red-400" id="disconnectBtn" style="display: none;">
-                                <span class="text-xl">🚪</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                                 <div>Disconnect Wallet</div>
                             </button>
                             
                             <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-700 transition border-t border-gray-700 text-red-400">
-                                <span class="text-xl">🚪</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                                 <div>Logout</div>
                             </button>
                         </div>
@@ -112,23 +114,25 @@
                     
                     <!-- Wallet Address -->
                     <div id="walletAddressSection" class="flex items-center justify-center gap-2 mb-6 bg-black bg-opacity-30 rounded-xl px-4 py-3 max-w-md mx-auto">
-                        <span class="text-lg">🔑</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="4"/><path d="M10.85 14.15L19 6M18 7l2 2M15 10l2 2"/></svg>
                         <span id="walletAddress" class="text-sm font-mono text-gray-300">No wallet connected</span>
                         <button id="copyBtn" onclick="copyWalletAddress()" class="ml-2 text-indigo-400 hover:text-indigo-300 hidden" title="Copy address">
-                            <span class="text-lg">📋</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                         </button>
                     </div>
                     
                     <!-- Withdraw & Receive Buttons -->
                     <div class="flex justify-center gap-4">
     <button id="withdrawBtn" onclick="handleWithdraw()" 
-            class="bg-gray-600 text-gray-400 px-8 py-3 rounded-full font-medium cursor-not-allowed" 
+            class="bg-gray-600 text-gray-400 px-8 py-3 rounded-full font-medium cursor-not-allowed flex items-center gap-2" 
             disabled title="Connect a wallet to enable withdrawals">
-        💸 Withdraw
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+        Withdraw
     </button>
     <a href="receive.html" 
-            class="bg-white text-indigo-700 px-8 py-3 rounded-full font-medium hover:bg-indigo-100 transition inline-block">
-        📥 Receive
+            class="bg-white text-indigo-700 px-8 py-3 rounded-full font-medium hover:bg-indigo-100 transition inline-flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        Receive
     </a>
 </div>
                     <p id="withdrawHint" class="text-xs text-gray-500 mt-2">Connect a wallet to enable withdrawals</p>
@@ -140,17 +144,29 @@
 <section class="mb-12">
     <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
     <div class="grid grid-cols-3 gap-4">
-        <a href="send.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer">
-            <div class="text-4xl mb-2">📤</div>
-            <span class="font-medium">Send</span>
+        <a href="send.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer group">
+            <div class="flex justify-center mb-3">
+                <div class="w-12 h-12 bg-indigo-600 bg-opacity-20 rounded-xl flex items-center justify-center group-hover:bg-opacity-40 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </div>
+            </div>
+            <span class="font-medium text-sm">Send</span>
         </a>
-        <a href="buy.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer">
-            <div class="text-4xl mb-2">💳</div>
-            <span class="font-medium">Buy</span>
+        <a href="buy.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer group">
+            <div class="flex justify-center mb-3">
+                <div class="w-12 h-12 bg-green-600 bg-opacity-20 rounded-xl flex items-center justify-center group-hover:bg-opacity-40 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+            </div>
+            <span class="font-medium text-sm">Buy</span>
         </a>
-        <a href="sell.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer">
-            <div class="text-4xl mb-2">💰</div>
-            <span class="font-medium">Sell</span>
+        <a href="sell.html" class="bg-gray-800 p-6 rounded-xl hover:bg-gray-700 transition text-center cursor-pointer group">
+            <div class="flex justify-center mb-3">
+                <div class="w-12 h-12 bg-purple-600 bg-opacity-20 rounded-xl flex items-center justify-center group-hover:bg-opacity-40 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+            </div>
+            <span class="font-medium text-sm">Sell</span>
         </a>
     </div>
 </section>
@@ -213,7 +229,10 @@
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <div>
-                    <h3 class="font-bold mb-2">🔐 CoinVault</h3>
+                    <h3 class="font-bold mb-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        CoinVault
+                    </h3>
                     <p class="text-sm text-gray-400">Your secure crypto gateway</p>
                 </div>
                 <div>
@@ -234,10 +253,10 @@
                 <div>
                     <h4 class="font-medium mb-2 text-sm">Language</h4>
                     <select class="bg-gray-700 text-white px-3 py-2 rounded text-sm w-full">
-                        <option>🇺🇸 English</option>
-                        <option>🇪🇸 Español</option>
-                        <option>🇫🇷 Français</option>
-                        <option>🇩🇪 Deutsch</option>
+                        <option>English</option>
+                        <option>Español</option>
+                        <option>Français</option>
+                        <option>Deutsch</option>
                     </select>
                 </div>
             </div>
@@ -574,7 +593,7 @@
                 withdrawBtn.classList.remove('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
                 withdrawBtn.classList.add('bg-white', 'text-indigo-700', 'hover:bg-indigo-100', 'cursor-pointer');
                 
-                document.getElementById('connectionIcon').textContent = '✓';
+                document.getElementById('connectionIcon').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
                 document.getElementById('connectionText').textContent = 'Connected: ' + connectedWallet;
                 document.getElementById('connectionBtn').classList.remove('bg-indigo-600');
                 document.getElementById('connectionBtn').classList.add('bg-green-600');
@@ -662,7 +681,7 @@
                 withdrawBtn.classList.add('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
                 withdrawBtn.classList.remove('bg-white', 'text-indigo-700', 'hover:bg-indigo-100');
                 
-                document.getElementById('connectionIcon').textContent = '📲';
+                document.getElementById('connectionIcon').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>';
                 document.getElementById('connectionText').textContent = 'Import Wallet';
                 document.getElementById('connectionBtn').classList.remove('bg-green-600');
                 document.getElementById('connectionBtn').classList.add('bg-indigo-600');
@@ -782,7 +801,9 @@ async function fetchUserTransactions() {
         
         document.getElementById('transactionsList').innerHTML = `
             <div class="p-8 text-center text-gray-400">
-                <div class="text-4xl mb-2">⚠️</div>
+                <div class="flex justify-center mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
                 <p>Failed to load transactions</p>
                 <p class="text-sm mt-2 text-red-400">${error.message}</p>
                 <button onclick="fetchUserTransactions()" class="mt-4 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700">
