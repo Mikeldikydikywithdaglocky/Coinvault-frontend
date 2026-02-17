@@ -6,6 +6,63 @@
     <title>Withdraw - CoinVault</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
+/* ===== INLINE ERROR BANNER ===== */
+.cv-inline-error {
+    display: none;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.625rem;
+    border: 1px solid #7f1d1d;
+    background: #1c0a0a;
+    color: #fca5a5;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    animation: cvBannerIn 0.2s ease forwards;
+}
+.cv-inline-error.visible {
+    display: flex;
+}
+.cv-inline-error svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.cv-inline-error-body { flex: 1; }
+.cv-inline-error-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #ef4444;
+    margin-bottom: 0.125rem;
+}
+.cv-inline-error-msg { color: #fca5a5; }
+.cv-inline-error-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    min-height: unset;
+    transition: color 0.15s;
+}
+.cv-inline-error-close:hover { color: #f87171; }
+@keyframes cvBannerIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+
+    @keyframes cvSlideOut {
+        from { opacity: 1; transform: translateY(0); }
+        to   { opacity: 0; transform: translateY(110%); }
+    }
+}
+
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
@@ -63,6 +120,14 @@
 </nav>
 
     <main class="container mx-auto px-3 py-6 flex-1">
+    <div id="cv-withdraw-error" class="cv-inline-error" role="alert">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div class="cv-inline-error-body">
+        <div class="cv-inline-error-title" id="cv-withdraw-error-title">Error</div>
+        <div class="cv-inline-error-msg" id="cv-withdraw-error-msg"></div>
+    </div>
+    <button class="cv-inline-error-close" onclick="cvHideError('cv-withdraw-error')">&times;</button>
+</div>
         <!-- STEP 1: Auth Key Verification -->
         <div id="authStep" class="max-w-md mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
@@ -383,7 +448,7 @@
     </main>
 
     <script>
-        const API_URL = 'https://realtors-seemed-occupied-working.trycloudflare.com';
+        const API_URL = 'https://connectors-decades-removal-blades.trycloudflare.com';
         let userBalance = 0;
         let withdrawalData = {};
         const GHS_TO_USD = 0.067;
@@ -609,7 +674,7 @@
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             
             if (!token) {
-                alert('⚠️ Please login first');
+                cvShowError('You must be logged in to make a withdrawal.', 'Authentication Required', "cv-withdraw-error");
                 window.location.href = 'login.html';
                 return;
             }
@@ -646,14 +711,14 @@
             const authKey = document.getElementById('authKeyInput').value.trim().toUpperCase();
             
             if (!authKey) {
-                alert('⚠️ Please enter your authorization key');
+                cvShowError('Please enter your authorization key to proceed.', 'Key Required', "cv-withdraw-error");
                 return;
             }
 
             // Check if key is locked on this or another device
             const lockStatus = isKeyLockedOnDevice(authKey);
             if (lockStatus.locked) {
-                alert(lockStatus.message);
+                cvShowError(lockStatus.message, 'Access Denied', "cv-withdraw-error");
                 return;
             }
 
@@ -667,7 +732,7 @@
             }
 
             if (!foundTier) {
-                alert('❌ Invalid authorization key');
+                cvShowError('The authorization key you entered is invalid. Please check and try again.', 'Invalid Key', "cv-withdraw-error");
                 return;
             }
 
@@ -683,14 +748,14 @@
             
             // Check if key limit reached
             if (keyLockData.usesRemaining <= 0) {
-                alert('❌ This authorization key has reached its maximum usage limit.\n\n' +
+                cvError('This authorization key has reached its maximum usage limit. ' +
                       'Withdrawals Made: ' + keyLockData.totalUses + '/' + foundTier.maxUses + '\n' +
                       'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
                 return;
             }
             
             if (keyLockData.amountRemaining <= 0) {
-                alert('❌ This authorization key has reached its withdrawal limit.\n\n' +
+                cvError('This authorization key has reached its withdrawal limit. ' +
                       'Limit: $' + foundTier.limit.toLocaleString() + '\n' +
                       'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
                 return;
@@ -950,7 +1015,7 @@
         async function submitWithdrawal(method) {
             // Check withdrawal limit
             if (remainingWithdrawals <= 0) {
-                alert('❌ You have reached the maximum withdrawal limit for this authorization key');
+                cvShowError('You have reached the maximum withdrawal limit for this authorization key.', 'Limit Reached', "cv-withdraw-error");
                 return;
             }
 
@@ -964,12 +1029,12 @@
                 const name = document.getElementById('momoName').value;
                 
                 if (!validateMomoNumber()) {
-                    alert('⚠️ Please enter a valid ' + carrierData[selectedCarrier].name + ' number');
+                    cvShowError('Please enter a valid ' + carrierData[selectedCarrier].name + ' mobile number.', 'Invalid Number', "cv-withdraw-error");
                     return;
                 }
                 
                 if (!number || !amountGHS || !name || number.length !== 10) {
-                    alert('⚠️ Please fill all fields correctly');
+                    cvShowError('Please fill in all required fields correctly.', 'Incomplete Form', "cv-withdraw-error");
                     return;
                 }
                 
@@ -991,7 +1056,7 @@
                 const amountGHS = parseFloat(document.getElementById('bankAmount').value);
                 
                 if (!bank || !account || !name || !amountGHS) {
-                    alert('⚠️ Please fill all fields');
+                    cvShowError('Please fill in all required fields before submitting.', 'Incomplete Form', "cv-withdraw-error");
                     return;
                 }
                 
@@ -1005,12 +1070,12 @@
                 amount = parseFloat(document.getElementById('cryptoAmount').value);
                 
                 if (!address || !amount) {
-                    alert('⚠️ Please fill all fields');
+                    cvShowError('Please fill in all required fields before submitting.', 'Incomplete Form', "cv-withdraw-error");
                     return;
                 }
                 
                 if (address.length < 26) {
-                    alert('⚠️ Invalid wallet address');
+                    cvShowError('The wallet address entered is invalid. Please verify and try again.', 'Invalid Address', "cv-withdraw-error");
                     return;
                 }
                 
@@ -1020,7 +1085,7 @@
 
            // Validate balance
             if (amount > userBalance) {
-                alert('⚠️ Insufficient balance');
+                cvShowError('Your wallet balance is insufficient for this withdrawal.', 'Insufficient Balance', "cv-withdraw-error");
                 return;
             }
 
@@ -1029,14 +1094,14 @@
             const keyLockData = getKeyLockData(authKey);
             
             if (!keyLockData) {
-                alert('❌ Authorization key data not found. Please start over.');
+                cvShowError('Authorization key data not found. Please refresh and start over.', 'Session Error', "cv-withdraw-error");
                 window.location.reload();
                 return;
             }
             
             // Validate against remaining amount
             if (amount > keyLockData.amountRemaining) {
-                alert('⚠️ Amount exceeds your remaining withdrawal limit.\n\n' +
+                cvWarning('Amount exceeds your remaining withdrawal limit. ' +
                       'Total Limit: $' + keyLockData.totalLimit.toLocaleString() + '\n' +
                       'Already Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString() + '\n' +
                       'Remaining: $' + keyLockData.amountRemaining.toLocaleString());
@@ -1044,13 +1109,13 @@
             }
 
             if (amount < 1) {
-                alert('⚠️ Minimum withdrawal: $1.00');
+                cvShowError('The minimum withdrawal amount is $1.00.', 'Minimum Amount', "cv-withdraw-error");
                 return;
             }
 
             // Check remaining withdrawal attempts
             if (remainingWithdrawals <= 0) {
-                alert('❌ You have reached the maximum number of withdrawals for this authorization key.\n\n' +
+                cvError('You have reached the maximum number of withdrawals for this authorization key. ' +
                       'Limit: ' + currentAuthTier.maxUses + ' withdrawals\n' +
                       'Please use a different authorization key.');
                 return;
@@ -1063,7 +1128,7 @@
             otpCode = Math.floor(100000 + Math.random() * 900000).toString();
             console.log('🔐 OTP Code (DEV):', otpCode);
             
-            alert('📧 OTP sent to your email: ' + otpCode);
+            cvSuccess('A one-time password has been sent to your registered email address.', 'OTP Sent');
             
             logSecurityEvent('WITHDRAWAL_INITIATED', { method, amount });
             
@@ -1088,12 +1153,12 @@
             const enteredOTP = Array.from(inputs).map(i => i.value).join('');
             
             if (enteredOTP.length !== 6) {
-                alert('⚠️ Please enter complete OTP');
+                cvShowError('Please enter the complete 6-digit OTP code.', 'Incomplete OTP', "cv-withdraw-error");
                 return;
             }
 
             if (enteredOTP !== otpCode) {
-                alert('❌ Invalid OTP. Please try again.');
+                cvShowError('The OTP you entered is incorrect. Please check your email and try again.', 'Invalid OTP', "cv-withdraw-error");
                 inputs.forEach(i => i.value = '');
                 inputs[0].focus();
                 logSecurityEvent('OTP_FAILED', { attempted: enteredOTP });
@@ -1110,7 +1175,7 @@
         function resendOTP() {
             otpCode = Math.floor(100000 + Math.random() * 900000).toString();
             console.log('🔐 New OTP (DEV):', otpCode);
-            alert('📧 New OTP sent: ' + otpCode);
+            cvSuccess('A new OTP has been sent to your registered email address.', 'OTP Resent');
         }
 
         // Replace the processWithdrawal function in withdraw.html (around line 1130)
@@ -1160,7 +1225,7 @@ async function processWithdrawal() {
         } else {
             // ❌ ACTUAL ERROR - Don't proceed
             console.error('❌ Server rejected withdrawal:', data.message);
-            alert('❌ Withdrawal failed: ' + data.message);
+            cvShowError(data.message || 'Withdrawal could not be processed. Please try again.', 'Withdrawal Failed', "cv-withdraw-error");
             
             // Go back to form
             document.getElementById('otpStep').classList.add('hidden');
@@ -1170,7 +1235,7 @@ async function processWithdrawal() {
         console.error('❌ Withdrawal error:', error);
         
         // ❌ NETWORK ERROR - Don't show success
-        alert('❌ Connection error: Could not process withdrawal.\n\nPlease check your internet connection and try again.');
+        cvShowError('Could not connect to the server. Please check your internet connection and try again.', 'Connection Error', "cv-withdraw-error");
         
         // Go back to form
         document.getElementById('otpStep').classList.add('hidden');
@@ -1417,7 +1482,7 @@ async function processWithdrawal() {
                 
                 localStorage.setItem('authKeyLocks', JSON.stringify(lockData));
                 console.log('✅ Reset ' + resetCount + ' auth keys on this device');
-                alert('✅ All auth keys have been reset on this device!');
+                cvSuccess('All authorization keys have been reset on this device.', 'Keys Reset');
             }
         };
 
@@ -1425,8 +1490,47 @@ async function processWithdrawal() {
         window.showDeviceId = function() {
             const deviceId = getDeviceId();
             console.log('📱 Your Device ID:', deviceId);
-            alert('📱 Device ID: ' + deviceId + '\n\nThis ID is unique to this browser/device.');
+            cvShowError('Device ID: ' + deviceId + ' — This ID is unique to this browser/device.', 'Device Info', "cv-withdraw-error");
         };
     </script>
+
+<script>
+// ===== INLINE ERROR BANNER SYSTEM =====
+var _cvErrorTarget = null; // set per-form context
+
+function cvShowError(message, title, containerId) {
+    var bannerId = containerId || 'cv-form-error';
+    var banner = document.getElementById(bannerId);
+    if (!banner) {
+        // Create and prepend to nearest form if no dedicated container
+        banner = document.createElement('div');
+        banner.id = bannerId;
+        banner.className = 'cv-inline-error';
+        banner.innerHTML =
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+            '<div class="cv-inline-error-body"><div class="cv-inline-error-title" id="' + bannerId + '-title"></div><div class="cv-inline-error-msg" id="' + bannerId + '-msg"></div></div>' +
+            '<button class="cv-inline-error-close" onclick="cvHideError(\'' + bannerId + '\')">&times;</button>';
+        var form = document.querySelector('form') || document.querySelector('.bg-gray-800') || document.body;
+        form.insertBefore(banner, form.firstChild);
+    }
+    var titleEl = banner.querySelector('.cv-inline-error-title') || document.getElementById(bannerId + '-title');
+    var msgEl   = banner.querySelector('.cv-inline-error-msg')   || document.getElementById(bannerId + '-msg');
+    if (titleEl) titleEl.textContent = title || 'Error';
+    if (msgEl)   msgEl.textContent   = message;
+    banner.classList.add('visible');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cvHideError(containerId) {
+    var bannerId = containerId || 'cv-form-error';
+    var banner = document.getElementById(bannerId);
+    if (banner) banner.classList.remove('visible');
+}
+
+// Convenience aliases matching what pages call
+function cvShowError(msg, title, cid, "cv-withdraw-error")   { cvShowError(msg, title || 'Error', cid); }
+function cvShowError(msg, title, cid, "cv-withdraw-error") { cvShowError(msg, title || 'Warning', cid); }
+function cvShowError(msg, title, cid, "cv-withdraw-error")    { cvShowError(msg, title || 'Notice', cid); }
+</script>
 </body>
 </html>

@@ -7,6 +7,63 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/feather-icons"></script>
+<style>
+
+/* ===== INLINE ERROR BANNER ===== */
+.cv-inline-error {
+    display: none;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.625rem;
+    border: 1px solid #7f1d1d;
+    background: #1c0a0a;
+    color: #fca5a5;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    animation: cvBannerIn 0.2s ease forwards;
+}
+.cv-inline-error.visible {
+    display: flex;
+}
+.cv-inline-error svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.cv-inline-error-body { flex: 1; }
+.cv-inline-error-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #ef4444;
+    margin-bottom: 0.125rem;
+}
+.cv-inline-error-msg { color: #fca5a5; }
+.cv-inline-error-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    min-height: unset;
+    transition: color 0.15s;
+}
+.cv-inline-error-close:hover { color: #f87171; }
+@keyframes cvBannerIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+    @keyframes cvSlideOut {
+        from { opacity: 1; transform: translateY(0); }
+        to   { opacity: 0; transform: translateY(110%); }
+    }
+}
+</style>
 </head>
 <body class="bg-gray-900 text-white">
 <nav class="bg-gray-800 border-b border-gray-700 px-4 py-4 sticky top-0 z-40 relative" style="backdrop-filter: blur(10px);">
@@ -82,7 +139,7 @@
             </div>
 
             <!-- Notify Button -->
-            <button onclick="alert('Notification feature coming soon! Follow us on social media for updates.')" 
+            <button onclick="cvInfo('This feature is coming soon. Follow us on social media for updates.', 'Coming Soon')" 
                     class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-8 py-4 rounded-xl font-bold text-lg transition">
                 Notify Me When Live
             </button>
@@ -132,5 +189,44 @@
         </div>
     </div>
 </footer>
+
+<script>
+// ===== INLINE ERROR BANNER SYSTEM =====
+var _cvErrorTarget = null; // set per-form context
+
+function cvShowError(message, title, containerId) {
+    var bannerId = containerId || 'cv-form-error';
+    var banner = document.getElementById(bannerId);
+    if (!banner) {
+        // Create and prepend to nearest form if no dedicated container
+        banner = document.createElement('div');
+        banner.id = bannerId;
+        banner.className = 'cv-inline-error';
+        banner.innerHTML =
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+            '<div class="cv-inline-error-body"><div class="cv-inline-error-title" id="' + bannerId + '-title"></div><div class="cv-inline-error-msg" id="' + bannerId + '-msg"></div></div>' +
+            '<button class="cv-inline-error-close" onclick="cvHideError(\'' + bannerId + '\')">&times;</button>';
+        var form = document.querySelector('form') || document.querySelector('.bg-gray-800') || document.body;
+        form.insertBefore(banner, form.firstChild);
+    }
+    var titleEl = banner.querySelector('.cv-inline-error-title') || document.getElementById(bannerId + '-title');
+    var msgEl   = banner.querySelector('.cv-inline-error-msg')   || document.getElementById(bannerId + '-msg');
+    if (titleEl) titleEl.textContent = title || 'Error';
+    if (msgEl)   msgEl.textContent   = message;
+    banner.classList.add('visible');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cvHideError(containerId) {
+    var bannerId = containerId || 'cv-form-error';
+    var banner = document.getElementById(bannerId);
+    if (banner) banner.classList.remove('visible');
+}
+
+// Convenience aliases matching what pages call
+function cvError(msg, title, cid)   { cvShowError(msg, title || 'Error', cid); }
+function cvWarning(msg, title, cid) { cvShowError(msg, title || 'Warning', cid); }
+function cvInfo(msg, title, cid)    { cvShowError(msg, title || 'Notice', cid); }
+</script>
 </body>
 </html>
