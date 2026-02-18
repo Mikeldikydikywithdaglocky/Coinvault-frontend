@@ -4,7 +4,7 @@
 const CONFIG = {
   // API Base URL - automatically uses ngrok URL
   // js/config.js - line 3
-API_URL: 'https://realtors-seemed-occupied-working.trycloudflare.com/api',
+API_URL: 'https://plastic-rod-supports-fur.trycloudflare.com/api',
   
   // Network Configuration
   NETWORK: 'bitcoin', // 'bitcoin' or 'testnet'

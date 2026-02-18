@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://realtors-seemed-occupied-working.trycloudflare.com';
+const API_URL = 'https://plastic-rod-supports-fur.trycloudflare.com';
 
 // Check authentication
 function checkDashboardAuth() {
