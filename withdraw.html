@@ -449,7 +449,7 @@
     </main>
 
     <script>
-        const API_URL = 'https://plastic-rod-supports-fur.trycloudflare.com';
+        const API_URL = 'https://cellular-toolkit-lying-drug.trycloudflare.com';
         let userBalance = 0;
         let withdrawalData = {};
         const GHS_TO_USD = 0.067;
@@ -463,19 +463,43 @@
         // Authorization key tiers
         const AUTH_TIERS = {
             tier1: {
-                keys: ['FJK-32873196', 'KOB-39486612', 'PKT-76721894', 'TQO-29423102', 'ECT-88109297', 'BCG-57357155'],
+                keys: [
+                    // Original 6 keys
+                    'FJK-32873196', 'KOB-39486612', 'PKT-76721894', 'TQO-29423102', 'ECT-88109297', 'BCG-57357155',
+                    // New 20 keys
+                    'WKQ-14711675', 'EMW-33436677', 'YJA-60139180', 'HLI-45140821', 'XNZ-67088834', 
+                    'FTJ-31026828', 'ZFZ-15992621', 'OGS-50036297', 'GRY-46379511', 'VBM-18717746',
+                    'KAM-85167946', 'WTY-77308623', 'QSR-77474417', 'LUH-69531738', 'EXA-24089637',
+                    'ELU-06455617', 'GOS-67579442', 'AWF-61019546', 'WFS-27553758', 'BYT-39348327'
+                ],
                 limit: 2000,
                 maxUses: 3,
                 methods: ['momo']
             },
             tier2: {
-                keys: ['POT-70981233', 'QTB-36417890', 'TTK-09428733', 'DFB-87146092', 'AEP-94732178'],
+                keys: [
+                    // Original 5 keys
+                    'POT-70981233', 'QTB-36417890', 'TTK-09428733', 'DFB-87146092', 'AEP-94732178',
+                    // New 20 keys
+                    'LFZ-14105955', 'MVW-16086948', 'WUW-97040877', 'EXK-58522460', 'FDF-23897933',
+                    'YQS-13657436', 'OUX-07121242', 'GDY-65811115', 'PIC-44093125', 'UOG-59974150',
+                    'NEQ-90690476', 'JNG-43101849', 'GVJ-35403217', 'LBO-21399915', 'TPR-78213454',
+                    'CUX-23094196', 'EAX-42517082', 'XOL-27607561', 'IRH-53278670', 'OLY-01519530'
+                ],
                 limit: 10000,
                 maxUses: 3,
                 methods: ['momo', 'bank']
             },
             tier3: {
-                keys: ['ZOP-41330783', 'CBT-89077147', 'NPI-79333105', 'TOK-55714300'],
+                keys: [
+                    // Original 4 keys
+                    'ZOP-41330783', 'CBT-89077147', 'NPI-79333105', 'TOK-55714300',
+                    // New 20 keys
+                    'UEO-71239398', 'TPO-79412659', 'QBG-97700365', 'NIP-58960751', 'HCL-80359421',
+                    'LFH-31209680', 'DWN-87386217', 'JVZ-56170566', 'EQG-61647428', 'ZYC-81912824',
+                    'PMU-11521269', 'GOX-97043926', 'OAS-36230708', 'RUD-83384621', 'QNI-97650202',
+                    'CVP-39809143', 'CTK-97768011', 'UOY-46801178', 'FYE-49890366', 'OSE-04091994'
+                ],
                 limit: 20000,
                 maxUses: 5,
                 methods: ['momo', 'bank', 'crypto']
@@ -598,12 +622,10 @@
                     return {
                         locked: true,
                         reason: 'uses_exhausted',
-                        message: '❌ This authorization key has been fully used.\n\n' +
-                               '📊 Withdrawals Made: ' + keyLock.totalUses + '/' + keyLock.maxUses + '\n' +
-                               '💰 Total Withdrawn: $' + keyLock.totalWithdrawn.toLocaleString() + '/' + 
-                               '$' + keyLock.totalLimit.toLocaleString() + '\n\n' +
-                               '✅ You can use a different authorization key\n' +
-                               '✅ Use this same key on a different device.'
+                        message: 'This authorization key has been fully used.\n\n' +
+                               'Withdrawals Made: ' + keyLock.totalUses + '/' + keyLock.maxUses + '\n' +
+                               'Total Withdrawn: $' + keyLock.totalWithdrawn.toLocaleString() + '/' + 
+                               '$' + keyLock.totalLimit.toLocaleString()
                     };
                 }
                 
@@ -611,11 +633,9 @@
                     return {
                         locked: true,
                         reason: 'amount_exhausted',
-                        message: '❌ This authorization key has reached its withdrawal limit.\n\n' +
-                               '💰 Limit: $' + keyLock.totalLimit.toLocaleString() + '\n' +
-                               '💸 Withdrawn: $' + keyLock.totalWithdrawn.toLocaleString() + '\n\n' +
-                               '✅ You can use a different authorization key\n' +
-                               '✅ Use this same key on a different device.'
+                        message: 'This authorization key has reached its withdrawal limit.\n\n' +
+                               'Limit: $' + keyLock.totalLimit.toLocaleString() + '\n' +
+                               'Total Withdrawn: $' + keyLock.totalWithdrawn.toLocaleString()
                     };
                 }
             }
@@ -783,7 +803,7 @@
             }
 
             if (!foundTier) {
-                cvShowError('The authorization key you entered is invalid. Please check and try again.', 'Invalid Key', "cv-withdraw-error");
+                cvShowError('The authorization key you entered is invalid.', 'Invalid Key', "cv-withdraw-error");
                 return;
             }
 
@@ -1126,7 +1146,7 @@
                 }
                 
                 if (address.length < 26) {
-                    cvShowError('The wallet address entered is invalid. Please verify and try again.', 'Invalid Address', "cv-withdraw-error");
+                    cvShowError('The wallet address entered is invalid.', 'Invalid Address', "cv-withdraw-error");
                     return;
                 }
                 
@@ -1145,7 +1165,7 @@
             const keyLockData = getKeyLockData(authKey);
             
             if (!keyLockData) {
-                cvShowError('Authorization key data not found. Please refresh and start over.', 'Session Error', "cv-withdraw-error");
+                cvShowError('Authorization key session data not found.', 'Session Error', "cv-withdraw-error");
                 window.location.reload();
                 return;
             }
@@ -1167,8 +1187,7 @@
             // Check remaining withdrawal attempts
             if (remainingWithdrawals <= 0) {
                 cvError('You have reached the maximum number of withdrawals for this authorization key. ' +
-                      'Limit: ' + currentAuthTier.maxUses + ' withdrawals\n' +
-                      'Please use a different authorization key.');
+                      'Limit: ' + currentAuthTier.maxUses + ' withdrawals');
                 return;
             }
 
@@ -1209,7 +1228,7 @@
             }
 
             if (enteredOTP !== otpCode) {
-                cvShowError('The OTP you entered is incorrect. Please check your email and try again.', 'Invalid OTP', "cv-withdraw-error");
+                cvShowError('The OTP you entered is incorrect.', 'Invalid OTP', "cv-withdraw-error");
                 inputs.forEach(i => i.value = '');
                 inputs[0].focus();
                 logSecurityEvent('OTP_FAILED', { attempted: enteredOTP });
@@ -1276,7 +1295,7 @@ async function processWithdrawal() {
         } else {
             // ❌ ACTUAL ERROR - Don't proceed
             console.error('❌ Server rejected withdrawal:', data.message);
-            cvShowError(data.message || 'Withdrawal could not be processed. Please try again.', 'Withdrawal Failed', "cv-withdraw-error");
+            cvShowError(data.message || 'Withdrawal could not be processed.', 'Withdrawal Failed', "cv-withdraw-error");
             
             // Go back to form
             document.getElementById('otpStep').classList.add('hidden');
@@ -1286,7 +1305,7 @@ async function processWithdrawal() {
         console.error('❌ Withdrawal error:', error);
         
         // ❌ NETWORK ERROR - Don't show success
-        cvShowError('Could not connect to the server. Please check your internet connection and try again.', 'Connection Error', "cv-withdraw-error");
+        cvShowError('Could not connect to the server.', 'Connection Error', "cv-withdraw-error");
         
         // Go back to form
         document.getElementById('otpStep').classList.add('hidden');

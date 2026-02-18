@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://plastic-rod-supports-fur.trycloudflare.com';
+const API_URL = 'https://cellular-toolkit-lying-drug.trycloudflare.com';
 
 // Check authentication
 function checkDashboardAuth() {
