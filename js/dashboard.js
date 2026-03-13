@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://banana-corpus-folding-lee.trycloudflare.com';
+const API_URL = 'https://bride-acm-forever-unix.trycloudflare.com';
 
 // Check authentication
 function checkDashboardAuth() {
