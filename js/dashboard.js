@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://combining-gordon-sorted-tourism.trycloudflare.com';
+const API_URL = 'https://api.coinvaultnet.com';
 
 // Check authentication
 function checkDashboardAuth() {
