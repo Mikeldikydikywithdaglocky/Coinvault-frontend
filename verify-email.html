@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Email Verification</title>
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+background:#020617;
+color:white;
+overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+height:100vh;
+}
+
+/* STARFIELD */
+
+.star{
+position:absolute;
+width:2px;
+height:2px;
+background:white;
+opacity:0.4;
+animation:twinkle 4s infinite alternate;
+}
+
+@keyframes twinkle{
+0%{opacity:0.2}
+100%{opacity:0.6}
+}
+
+/* COMETS */
+
+.comet{
+position:absolute;
+width:2px;
+height:18px;
+background:linear-gradient(rgba(255,255,255,0.25),transparent);
+opacity:0.25;
+transform:rotate(-35deg);
+animation:fall linear forwards;
+}
+
+@keyframes fall{
+
+0%{
+transform:translateX(100vw) translateY(-100px) rotate(-35deg);
+opacity:0;
+}
+
+20%{opacity:0.3}
+
+100%{
+transform:translateX(-200px) translateY(120vh) rotate(-35deg);
+opacity:0;
+}
+
+}
+
+/* CARD */
+
+.card{
+
+background:rgba(15,23,42,0.75);
+backdrop-filter:blur(14px);
+padding:45px;
+border-radius:18px;
+width:420px;
+text-align:center;
+
+box-shadow:
+0 20px 60px rgba(0,0,0,0.8),
+0 0 40px rgba(59,130,246,0.08);
+
+position:relative;
+z-index:10;
+
+}
+
+h2{
+margin-top:0;
+font-weight:600;
+}
+
+#message{
+margin-top:12px;
+line-height:1.6;
+opacity:0.9;
+}
+
+/* VERIFIED BADGE */
+
+.badge{
+
+width:80px;
+height:80px;
+border-radius:50%;
+background:#22c55e;
+display:none;
+align-items:center;
+justify-content:center;
+font-size:40px;
+margin:auto;
+margin-bottom:18px;
+
+box-shadow:
+0 0 30px rgba(34,197,94,0.7),
+0 0 60px rgba(34,197,94,0.3);
+
+}
+
+/* LOADER */
+
+.loader{
+border:3px solid rgba(255,255,255,0.1);
+border-top:3px solid #22c55e;
+border-radius:50%;
+width:32px;
+height:32px;
+margin:25px auto;
+animation:spin 1s linear infinite;
+display:none;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+/* BUTTON */
+
+button{
+
+margin-top:20px;
+background:linear-gradient(135deg,#22c55e,#16a34a);
+border:none;
+padding:13px 28px;
+border-radius:8px;
+color:white;
+font-weight:600;
+font-size:15px;
+cursor:pointer;
+display:none;
+
+box-shadow:0 6px 20px rgba(0,0,0,0.4);
+
+}
+
+button:hover{
+transform:translateY(-1px);
+}
+
+/* CONFETTI */
+
+.confetti{
+position:absolute;
+width:8px;
+height:8px;
+background:red;
+animation:confettiFall 3s linear forwards;
+}
+
+@keyframes confettiFall{
+
+0%{
+transform:translateY(-100px) rotate(0deg);
+opacity:1;
+}
+
+100%{
+transform:translateY(110vh) rotate(360deg);
+opacity:0;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="badge" id="badge">✓</div>
+
+<h2>Email Verification</h2>
+
+<p id="message">Verifying your email...</p>
+
+<div class="loader" id="loader"></div>
+
+<button id="loginBtn" onclick="goDashboard()">Go to Dashboard</button>
+
+</div>
+
+
+<script>
+
+/* STARFIELD */
+
+for(let i=0;i<80;i++){
+
+const star=document.createElement("div")
+star.className="star"
+
+star.style.top=Math.random()*100+"%"
+star.style.left=Math.random()*100+"%"
+
+document.body.appendChild(star)
+
+}
+
+/* COMETS */
+
+function spawnComet(){
+
+const comet=document.createElement("div")
+comet.className="comet"
+
+comet.style.top=Math.random()*40+"%"
+comet.style.animationDuration=(4+Math.random()*4)+"s"
+
+document.body.appendChild(comet)
+
+setTimeout(()=>{
+
+comet.remove()
+
+},7000)
+
+}
+
+setInterval(spawnComet,1500)
+
+/* CONFETTI */
+
+function confettiBurst(){
+
+for(let i=0;i<60;i++){
+
+const confetti=document.createElement("div")
+
+confetti.className="confetti"
+
+confetti.style.left=Math.random()*100+"%"
+confetti.style.background=
+["#22c55e","#3b82f6","#facc15","#ef4444"][Math.floor(Math.random()*4)]
+
+confetti.style.animationDuration=(2+Math.random()*2)+"s"
+
+document.body.appendChild(confetti)
+
+setTimeout(()=>{
+
+confetti.remove()
+
+},4000)
+
+}
+
+}
+
+/* EMAIL VERIFICATION */
+
+const params=new URLSearchParams(window.location.search)
+const token=params.get("token")
+
+async function verifyEmail(){
+
+if(!token){
+
+document.getElementById("message").innerText="Invalid verification link."
+return
+
+}
+
+try{
+
+const res=await fetch("https://api.Coinvaultnet.com/api/auth/verify-email",{
+
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({token})
+
+})
+
+const data=await res.json()
+
+if(data.success){
+
+document.getElementById("badge").style.display="flex"
+
+document.getElementById("message").innerHTML =
+"<strong>Congratulations!</strong><br>Your account has been successfully verified.<br><br>Preparing your secure dashboard..."
+
+document.getElementById("loader").style.display="block"
+
+confettiBurst()
+
+/* AUTO LOGIN */
+
+localStorage.setItem("token", data.token)
+
+/* REDIRECT */
+
+setTimeout(()=>{
+
+window.location.href="index.html"
+
+},4000)
+
+}
+
+function goDashboard(){
+
+window.location.href="index.html"
+
+}
+
+verifyEmail()
+
+</script>
+
+</body>
+</html>

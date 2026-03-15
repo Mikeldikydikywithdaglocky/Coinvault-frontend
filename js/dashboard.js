@@ -1,7 +1,7 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://watt-serves-routes-samuel.trycloudflare.com';
+const API_URL = 'https://combining-gordon-sorted-tourism.trycloudflare.com';
 
 // Check authentication
 function checkDashboardAuth() {
