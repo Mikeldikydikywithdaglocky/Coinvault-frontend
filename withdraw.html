@@ -392,13 +392,23 @@
                 <h2 class="text-2xl font-bold mb-2">Verify Your Identity</h2>
                 <p class="text-gray-400 mb-6">Enter the 6-digit code sent to <span id="userEmail" class="text-indigo-400 font-mono"></span></p>
 
-                <div class="flex gap-2 justify-center mb-6">
-                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 1)">
-                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 2)">
-                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 3)">
-                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 4)">
-                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 5)">
-                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 6)">
+                <!-- Hidden input that triggers OTP autocomplete on mobile keyboards -->
+                <input
+                    id="otpHidden"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    maxlength="6"
+                    style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;"
+                    oninput="handleHiddenOTPInput(this.value)"
+                >
+                <div class="flex gap-2 justify-center mb-6" onclick="document.getElementById('otpHidden').focus()">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 1)" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 2)" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 3)" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 4)" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 5)" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-2xl bg-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" oninput="moveToNext(this, 6)" inputmode="numeric">
                 </div>
 
                 <button onclick="verifyOTP()" 
@@ -1202,6 +1212,25 @@
             // Send OTP via email
             await sendOTPEmail();
         }
+        
+        // Handle OTP autocomplete from keyboard/email suggestion
+        function handleHiddenOTPInput(value) {
+            const digits = value.replace(/\D/g, '').slice(0, 6);
+            const inputs = document.querySelectorAll('.otp-input');
+            inputs.forEach((input, i) => {
+                input.value = digits[i] || '';
+            });
+            if (digits.length === 6) {
+                verifyOTP();
+            }
+        }
+
+        // Focus hidden input when OTP step is shown
+        function focusOTPInput() {
+            setTimeout(() => {
+                document.getElementById('otpHidden').focus();
+            }, 300);
+        }
 
         // OTP Input Navigation
         function moveToNext(input, index) {
@@ -1651,6 +1680,7 @@ function cvSuccess(msg, title) {
                     // Show OTP screen
                     document.getElementById('formStep').classList.add('hidden');
                     document.getElementById('otpStep').classList.remove('hidden');
+                    focusOTPInput();
                 } else {
                     cvShowError('Failed to send OTP. Please try again.', 'Error', "cv-withdraw-error");
                 }
