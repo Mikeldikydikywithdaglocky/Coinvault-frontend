@@ -1197,17 +1197,10 @@
             withdrawalData.amount = amount;
             withdrawalData.details = details;
             
-            // Generate OTP
-            otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-            console.log('🔐 OTP Code (DEV):', otpCode);
-            
-            cvSuccess('A one-time password has been sent to your registered email address.', 'OTP Sent');
-            
             logSecurityEvent('WITHDRAWAL_INITIATED', { method, amount });
             
-            // Show OTP screen
-            document.getElementById('formStep').classList.add('hidden');
-            document.getElementById('otpStep').classList.remove('hidden');
+            // Send OTP via email
+            await sendOTPEmail();
         }
 
         // OTP Input Navigation
@@ -1230,25 +1223,40 @@
                 return;
             }
 
-            if (enteredOTP !== otpCode) {
-                cvShowError('The OTP you entered is incorrect.', 'Invalid OTP', "cv-withdraw-error");
-                inputs.forEach(i => i.value = '');
-                inputs[0].focus();
-                logSecurityEvent('OTP_FAILED', { attempted: enteredOTP });
-                return;
-            }
+            // Verify OTP with backend
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const response = await fetch(API_URL + '/api/wallet/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ otp: enteredOTP, email: user.email })
+                });
 
-            console.log('✅ OTP Verified');
-            logSecurityEvent('OTP_VERIFIED', { success: true });
-            
-            // Process withdrawal
-            await processWithdrawal();
+                const data = await response.json();
+
+                if (!data.success) {
+                    cvShowError('The OTP you entered is incorrect or has expired.', 'Invalid OTP', "cv-withdraw-error");
+                    inputs.forEach(i => i.value = '');
+                    inputs[0].focus();
+                    logSecurityEvent('OTP_FAILED', { attempted: enteredOTP });
+                    return;
+                }
+
+                console.log('✅ OTP Verified');
+                logSecurityEvent('OTP_VERIFIED', { success: true });
+                await processWithdrawal();
+
+            } catch (error) {
+                cvShowError('Could not verify OTP. Please try again.', 'Error', "cv-withdraw-error");
+            }
         }
 
-        function resendOTP() {
-            otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-            console.log('🔐 New OTP (DEV):', otpCode);
-            cvSuccess('A new OTP has been sent to your registered email address.', 'OTP Resent');
+        async function resendOTP() {
+            cvSuccess('Sending new OTP...', 'Please wait');
+            await sendOTPEmail();
         }
 
         // Replace the processWithdrawal function in withdraw.html (around line 1130)
@@ -1618,6 +1626,39 @@ function cvSuccess(msg, title) {
     bar.style.transform = 'translateY(0)';
     setTimeout(function() { bar.style.transform = 'translateY(-100%)'; }, 3000);
 }
+
+// Send OTP via backend
+        async function sendOTPEmail() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const email = user.email || '';
+
+                const response = await fetch(API_URL + '/api/wallet/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show user email on OTP screen
+                    document.getElementById('userEmail').textContent = email;
+                    cvSuccess('A 6-digit code has been sent to ' + email, 'OTP Sent');
+                    // Show OTP screen
+                    document.getElementById('formStep').classList.add('hidden');
+                    document.getElementById('otpStep').classList.remove('hidden');
+                } else {
+                    cvShowError('Failed to send OTP. Please try again.', 'Error', "cv-withdraw-error");
+                }
+            } catch (error) {
+                cvShowError('Could not send OTP. Please check your connection.', 'Error', "cv-withdraw-error");
+            }
+        }
+
 </script>
 </body>
 </html>
