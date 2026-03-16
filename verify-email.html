@@ -1,335 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Email Verification</title>
-
+<title>Email Verification - CoinVault</title>
 <style>
-
-body{
-margin:0;
-font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-background:#020617;
-color:white;
-overflow:hidden;
-display:flex;
-align-items:center;
-justify-content:center;
-height:100vh;
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: #020617;
+    color: white;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
 /* STARFIELD */
-
-.star{
-position:absolute;
-width:2px;
-height:2px;
-background:white;
-opacity:0.4;
-animation:twinkle 4s infinite alternate;
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    opacity: 0.4;
+    animation: twinkle 4s infinite alternate;
 }
-
-@keyframes twinkle{
-0%{opacity:0.2}
-100%{opacity:0.6}
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    100% { opacity: 0.6; }
 }
 
 /* COMETS */
-
-.comet{
-position:absolute;
-width:2px;
-height:18px;
-background:linear-gradient(rgba(255,255,255,0.25),transparent);
-opacity:0.25;
-transform:rotate(-35deg);
-animation:fall linear forwards;
+.comet {
+    position: absolute;
+    width: 2px;
+    height: 18px;
+    background: linear-gradient(rgba(255,255,255,0.25), transparent);
+    opacity: 0.25;
+    transform: rotate(-35deg);
+    animation: fall linear forwards;
 }
-
-@keyframes fall{
-
-0%{
-transform:translateX(100vw) translateY(-100px) rotate(-35deg);
-opacity:0;
-}
-
-20%{opacity:0.3}
-
-100%{
-transform:translateX(-200px) translateY(120vh) rotate(-35deg);
-opacity:0;
-}
-
+@keyframes fall {
+    0% { transform: translateX(100vw) translateY(-100px) rotate(-35deg); opacity: 0; }
+    20% { opacity: 0.3; }
+    100% { transform: translateX(-200px) translateY(120vh) rotate(-35deg); opacity: 0; }
 }
 
 /* CARD */
-
-.card{
-
-background:rgba(15,23,42,0.75);
-backdrop-filter:blur(14px);
-padding:45px;
-border-radius:18px;
-width:420px;
-text-align:center;
-
-box-shadow:
-0 20px 60px rgba(0,0,0,0.8),
-0 0 40px rgba(59,130,246,0.08);
-
-position:relative;
-z-index:10;
-
+.card {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(14px);
+    padding: 45px;
+    border-radius: 18px;
+    width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(59,130,246,0.08);
+    position: relative;
+    z-index: 10;
 }
 
-h2{
-margin-top:0;
-font-weight:600;
+h2 { margin-top: 0; font-weight: 600; }
+
+#message {
+    margin-top: 12px;
+    line-height: 1.6;
+    opacity: 0.9;
 }
 
-#message{
-margin-top:12px;
-line-height:1.6;
-opacity:0.9;
+/* BADGE */
+.badge {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #22c55e;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: auto;
+    margin-bottom: 18px;
+    box-shadow: 0 0 30px rgba(34,197,94,0.7), 0 0 60px rgba(34,197,94,0.3);
 }
 
-/* VERIFIED BADGE */
-
-.badge{
-
-width:80px;
-height:80px;
-border-radius:50%;
-background:#22c55e;
-display:none;
-align-items:center;
-justify-content:center;
-font-size:40px;
-margin:auto;
-margin-bottom:18px;
-
-box-shadow:
-0 0 30px rgba(34,197,94,0.7),
-0 0 60px rgba(34,197,94,0.3);
-
+/* ERROR BADGE */
+.error-badge {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #ef4444;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: auto;
+    margin-bottom: 18px;
+    box-shadow: 0 0 30px rgba(239,68,68,0.7), 0 0 60px rgba(239,68,68,0.3);
 }
 
 /* LOADER */
-
-.loader{
-border:3px solid rgba(255,255,255,0.1);
-border-top:3px solid #22c55e;
-border-radius:50%;
-width:32px;
-height:32px;
-margin:25px auto;
-animation:spin 1s linear infinite;
-display:none;
+.loader {
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top: 3px solid #22c55e;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    margin: 25px auto;
+    animation: spin 1s linear infinite;
 }
-
-@keyframes spin{
-to{transform:rotate(360deg)}
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* BUTTON */
-
-button{
-
-margin-top:20px;
-background:linear-gradient(135deg,#22c55e,#16a34a);
-border:none;
-padding:13px 28px;
-border-radius:8px;
-color:white;
-font-weight:600;
-font-size:15px;
-cursor:pointer;
-display:none;
-
-box-shadow:0 6px 20px rgba(0,0,0,0.4);
-
+.btn {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+    padding: 13px 28px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    display: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
 }
+.btn:hover { transform: translateY(-1px); }
 
-button:hover{
-transform:translateY(-1px);
+.btn-secondary {
+    margin-top: 12px;
+    background: transparent;
+    border: 1px solid #4b5563;
+    padding: 10px 24px;
+    border-radius: 8px;
+    color: #9ca3af;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
 }
+.btn-secondary:hover { border-color: #6b7280; color: white; }
 
 /* CONFETTI */
-
-.confetti{
-position:absolute;
-width:8px;
-height:8px;
-background:red;
-animation:confettiFall 3s linear forwards;
+.confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    animation: confettiFall 3s linear forwards;
 }
-
-@keyframes confettiFall{
-
-0%{
-transform:translateY(-100px) rotate(0deg);
-opacity:1;
+@keyframes confettiFall {
+    0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
-
-100%{
-transform:translateY(110vh) rotate(360deg);
-opacity:0;
-}
-
-}
-
 </style>
-
 </head>
-
 <body>
 
 <div class="card">
+    <div class="error-badge" id="errorBadge">✕</div>
+    <div class="badge" id="badge">✓</div>
 
-<div class="badge" id="badge">✓</div>
+    <h2 id="title">Email Verification</h2>
+    <p id="message">Verifying your email...</p>
 
-<h2>Email Verification</h2>
+    <div class="loader" id="loader"></div>
 
-<p id="message">Verifying your email...</p>
-
-<div class="loader" id="loader"></div>
-
-<button id="loginBtn" onclick="goDashboard()">Go to Dashboard</button>
-
+    <button class="btn" id="dashboardBtn" onclick="window.location.href='index.html'">Go to Dashboard</button>
+    <button class="btn-secondary" id="loginBtn" onclick="window.location.href='login.html'">Back to Login</button>
 </div>
 
-
 <script>
-
-/* STARFIELD */
-
-for(let i=0;i<80;i++){
-
-const star=document.createElement("div")
-star.className="star"
-
-star.style.top=Math.random()*100+"%"
-star.style.left=Math.random()*100+"%"
-
-document.body.appendChild(star)
-
+// STARFIELD
+for (let i = 0; i < 80; i++) {
+    const star = document.createElement("div");
+    star.className = "star";
+    star.style.top = Math.random() * 100 + "%";
+    star.style.left = Math.random() * 100 + "%";
+    document.body.appendChild(star);
 }
 
-/* COMETS */
+// COMETS
+function spawnComet() {
+    const comet = document.createElement("div");
+    comet.className = "comet";
+    comet.style.top = Math.random() * 40 + "%";
+    comet.style.animationDuration = (4 + Math.random() * 4) + "s";
+    document.body.appendChild(comet);
+    setTimeout(() => comet.remove(), 7000);
+}
+setInterval(spawnComet, 1500);
 
-function spawnComet(){
-
-const comet=document.createElement("div")
-comet.className="comet"
-
-comet.style.top=Math.random()*40+"%"
-comet.style.animationDuration=(4+Math.random()*4)+"s"
-
-document.body.appendChild(comet)
-
-setTimeout(()=>{
-
-comet.remove()
-
-},7000)
-
+// CONFETTI
+function confettiBurst() {
+    for (let i = 0; i < 60; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        confetti.style.left = Math.random() * 100 + "%";
+        confetti.style.background = ["#22c55e","#3b82f6","#facc15","#ef4444"][Math.floor(Math.random() * 4)];
+        confetti.style.animationDuration = (2 + Math.random() * 2) + "s";
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
+    }
 }
 
-setInterval(spawnComet,1500)
-
-/* CONFETTI */
-
-function confettiBurst(){
-
-for(let i=0;i<60;i++){
-
-const confetti=document.createElement("div")
-
-confetti.className="confetti"
-
-confetti.style.left=Math.random()*100+"%"
-confetti.style.background=
-["#22c55e","#3b82f6","#facc15","#ef4444"][Math.floor(Math.random()*4)]
-
-confetti.style.animationDuration=(2+Math.random()*2)+"s"
-
-document.body.appendChild(confetti)
-
-setTimeout(()=>{
-
-confetti.remove()
-
-},4000)
-
+// SHOW SUCCESS STATE
+function showSuccess() {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("badge").style.display = "flex";
+    document.getElementById("title").textContent = "Email Verified!";
+    document.getElementById("message").innerHTML =
+        "<strong>Congratulations!</strong><br>Your account has been successfully verified.<br><br>Redirecting to your dashboard...";
+    document.getElementById("dashboardBtn").style.display = "inline-block";
+    confettiBurst();
 }
 
+// SHOW ERROR STATE
+function showError(msg) {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("errorBadge").style.display = "flex";
+    document.getElementById("title").textContent = "Verification Failed";
+    document.getElementById("message").textContent = msg;
+    document.getElementById("loginBtn").style.display = "inline-block";
 }
 
-/* EMAIL VERIFICATION */
+// VERIFY EMAIL
+async function verifyEmail() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
 
-const params=new URLSearchParams(window.location.search)
-const token=params.get("token")
+    if (!token) {
+        showError("Invalid verification link. Please request a new one.");
+        return;
+    }
 
-async function verifyEmail(){
+    try {
+        const res = await fetch("https://api.coinvaultnet.com/api/auth/verify-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token })
+        });
 
-if(!token){
+        const data = await res.json();
 
-document.getElementById("message").innerText="Invalid verification link."
-return
+        if (data.success) {
+            // Save token so user is logged in
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+            }
 
+            showSuccess();
+
+            // Auto redirect after 3 seconds
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 3000);
+
+        } else {
+            showError(data.message || "Verification failed. The link may have expired.");
+        }
+
+    } catch (error) {
+        showError("Could not connect to server. Please try again.");
+    }
 }
 
-try{
-
-const res=await fetch("https://api.Coinvaultnet.com/api/auth/verify-email",{
-
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({token})
-
-})
-
-const data=await res.json()
-
-if(data.success){
-
-document.getElementById("badge").style.display="flex"
-
-document.getElementById("message").innerHTML =
-"<strong>Congratulations!</strong><br>Your account has been successfully verified.<br><br>Preparing your secure dashboard..."
-
-document.getElementById("loader").style.display="block"
-
-confettiBurst()
-
-/* AUTO LOGIN */
-
-localStorage.setItem("token", data.token)
-
-/* REDIRECT */
-
-setTimeout(()=>{
-
-window.location.href="index.html"
-
-},4000)
-
-}
-
-function goDashboard(){
-
-window.location.href="index.html"
-
-}
-
-verifyEmail()
-
+// Run on page load
+verifyEmail();
 </script>
 
 </body>

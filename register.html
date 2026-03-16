@@ -65,13 +65,10 @@ if (localStorage.getItem("token")) {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-
-
     @keyframes cvSlideOut {
         from { opacity: 1; transform: translateY(0); }
         to   { opacity: 0; transform: translateY(110%); }
     }
-}
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -142,16 +139,13 @@ if (localStorage.getItem("token")) {
 
                 <!-- Error Message -->
                 <div id="cv-form-error" class="cv-inline-error" role="alert">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <div class="cv-inline-error-body">
-        <div class="cv-inline-error-title" id="cv-form-error-title">Error</div>
-        <div class="cv-inline-error-msg" id="cv-form-error-msg"></div>
-    </div>
-    <button class="cv-inline-error-close" onclick="cvHideError('cv-form-error')">&times;</button>
-</div>
-
-                <!-- Success Message -->
-                <div id="successMessage" class="hidden"></div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <div class="cv-inline-error-body">
+                        <div class="cv-inline-error-title" id="cv-form-error-title">Error</div>
+                        <div class="cv-inline-error-msg" id="cv-form-error-msg"></div>
+                    </div>
+                    <button class="cv-inline-error-close" onclick="cvHideError('cv-form-error')">&times;</button>
+                </div>
 
                 <!-- Register Button -->
                 <button 
@@ -172,9 +166,6 @@ if (localStorage.getItem("token")) {
     </div>
 
     <script>
-        // API Configuration - CHANGE THIS TO YOUR BACKEND URL
-        
-
         async function handleRegister(e) {
             e.preventDefault();
             
@@ -183,12 +174,9 @@ if (localStorage.getItem("token")) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const registerBtn = document.getElementById('registerBtn');
-            const errorMsg = document.getElementById('errorMessage');
-            const successMsg = document.getElementById('successMessage');
 
-            // Hide previous messages
+            // Hide previous errors
             cvHideError('cv-form-error');
-            document.getElementById('successMessage') && document.getElementById('successMessage').classList.add('hidden');
 
             // Validation
             if (!name || !email || !password || !confirmPassword) {
@@ -211,40 +199,30 @@ if (localStorage.getItem("token")) {
             registerBtn.textContent = 'Creating Account...';
 
             try {
-    const data = await CONFIG.apiRequest('/auth/register', {
-        method: 'POST',
-        body: { fullName: name, email, password },
-        auth: false
-    });
+                const data = await CONFIG.apiRequest('/auth/register', {
+                    method: 'POST',
+                    body: { fullName: name, email, password },
+                    auth: false
+                });
 
-    if (data.success) {
-        showSuccess('Account created successfully! Redirecting to login...');
-        document.getElementById('registerForm').reset();
-        
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 2000);
-    } else {
-        showError(data.message || 'Registration failed');
-        registerBtn.disabled = false;
-        registerBtn.textContent = 'Create Account';
-    }
-} catch (error) {
-    console.error('Registration error:', error);
-    showError(error.message || 'Network error. Please try again.');
-    registerBtn.disabled = false;
-    registerBtn.textContent = 'Create Account';
-}
+                if (data.success) {
+                    // Redirect to check-email page with email as param
+                    window.location.href = `check-email.html?email=${encodeURIComponent(email)}`;
+                } else {
+                    showError(data.message || 'Registration failed');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Create Account';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError(error.message || 'Network error. Please try again.');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Create Account';
+            }
         }
 
         function showError(message) { cvShowError(message, 'Registration Error', 'cv-form-error'); }
 
-        function showSuccess(message) {
-    var el = document.getElementById('successMessage');
-    if (el) { el.textContent = message; el.classList.remove('hidden'); }
-}
-
-        // Check if already logged in
         window.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('token');
             if (token) {
@@ -254,14 +232,10 @@ if (localStorage.getItem("token")) {
     </script>
 
 <script>
-// ===== INLINE ERROR BANNER SYSTEM =====
-var _cvErrorTarget = null; // set per-form context
-
 function cvShowError(message, title, containerId) {
     var bannerId = containerId || 'cv-form-error';
     var banner = document.getElementById(bannerId);
     if (!banner) {
-        // Create and prepend to nearest form if no dedicated container
         banner = document.createElement('div');
         banner.id = bannerId;
         banner.className = 'cv-inline-error';
@@ -286,7 +260,6 @@ function cvHideError(containerId) {
     if (banner) banner.classList.remove('visible');
 }
 
-// Convenience aliases matching what pages call
 function cvError(msg, title, cid)   { cvShowError(msg, title || 'Error', cid); }
 function cvWarning(msg, title, cid) { cvShowError(msg, title || 'Warning', cid); }
 function cvInfo(msg, title, cid)    { cvShowError(msg, title || 'Notice', cid); }

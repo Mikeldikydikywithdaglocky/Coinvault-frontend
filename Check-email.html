@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Your Email - CoinVault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        .pulse-ring {
+            animation: pulseRing 2s ease-in-out infinite;
+        }
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
+
+        .dot-bounce {
+            display: inline-block;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        .dot-bounce:nth-child(2) { animation-delay: 0.2s; }
+        .dot-bounce:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+
+        .resend-btn {
+            transition: all 0.2s;
+        }
+        .resend-btn:hover:not(:disabled) {
+            color: #16a34a;
+            text-decoration: underline;
+        }
+        .resend-btn:disabled {
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .success-banner {
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .success-banner.visible { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+
+    <div class="max-w-md w-full mx-4">
+        <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl text-center">
+
+            <!-- Email Icon -->
+            <div class="flex justify-center mb-6">
+                <div class="pulse-ring w-20 h-20 bg-indigo-600 bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="text-2xl font-bold mb-2">Check Your Email</h1>
+            <p class="text-gray-400 mb-2">We sent a verification link to</p>
+            <p class="text-indigo-400 font-semibold mb-6" id="emailDisplay">your email</p>
+
+            <!-- Waiting indicator -->
+            <div class="bg-gray-700 bg-opacity-50 rounded-xl p-4 mb-6">
+                <p class="text-gray-300 text-sm mb-2">Waiting for verification</p>
+                <div class="flex justify-center gap-1">
+                    <span class="dot-bounce text-indigo-400 text-xl">•</span>
+                    <span class="dot-bounce text-indigo-400 text-xl">•</span>
+                    <span class="dot-bounce text-indigo-400 text-xl">•</span>
+                </div>
+            </div>
+
+            <!-- Success banner (shown after resend) -->
+            <div id="successBanner" class="success-banner items-center gap-2 bg-green-900 bg-opacity-40 border border-green-700 rounded-xl p-3 mb-4 text-green-400 text-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="successMsg">Verification email resent!</span>
+            </div>
+
+            <!-- Error banner -->
+            <div id="errorBanner" class="success-banner items-center gap-2 bg-red-900 bg-opacity-40 border border-red-700 rounded-xl p-3 mb-4 text-red-400 text-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span id="errorMsg">Failed to resend email.</span>
+            </div>
+
+            <!-- Instructions -->
+            <div class="text-left text-sm text-gray-400 space-y-2 mb-6">
+                <p>📬 Click the <span class="text-white font-medium">"Verify Email"</span> button in the email</p>
+                <p>🔒 The link expires in <span class="text-white font-medium">24 hours</span></p>
+                <p>📁 Check your <span class="text-white font-medium">spam/junk folder</span> if you don't see it</p>
+            </div>
+
+            <!-- Resend -->
+            <p class="text-gray-400 text-sm">
+                Didn't receive it?
+                <button id="resendBtn" class="resend-btn text-green-400 font-semibold ml-1" onclick="resendEmail()">
+                    Resend verification email
+                </button>
+            </p>
+
+            <!-- Back to login -->
+            <p class="text-gray-500 text-xs mt-4">
+                Wrong email? 
+                <a href="register.html" class="text-indigo-400 hover:text-indigo-300">Register again</a>
+                &nbsp;or&nbsp;
+                <a href="login.html" class="text-indigo-400 hover:text-indigo-300">Back to login</a>
+            </p>
+
+        </div>
+    </div>
+
+    <script>
+        // Get email from URL params
+        const params = new URLSearchParams(window.location.search);
+        const email = params.get('email');
+
+        if (!email) {
+            // No email param — redirect to register
+            window.location.href = 'register.html';
+        } else {
+            document.getElementById('emailDisplay').textContent = email;
+        }
+
+        // Poll backend every 3 seconds to check if email is verified
+        const pollInterval = setInterval(async () => {
+            try {
+                const data = await CONFIG.apiRequest('/auth/check-verified', {
+                    method: 'POST',
+                    body: { email },
+                    auth: false
+                });
+
+                if (data.verified) {
+                    clearInterval(pollInterval);
+                    // Save token and redirect
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                    }
+                    window.location.href = 'index.html';
+                }
+            } catch (e) {
+                // Silently ignore polling errors
+            }
+        }, 3000);
+
+        // Resend verification email
+        async function resendEmail() {
+            const btn = document.getElementById('resendBtn');
+            const successBanner = document.getElementById('successBanner');
+            const errorBanner = document.getElementById('errorBanner');
+
+            // Hide banners
+            successBanner.classList.remove('visible');
+            errorBanner.classList.remove('visible');
+
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            try {
+                await CONFIG.apiRequest('/auth/resend-verification', {
+                    method: 'POST',
+                    body: { email },
+                    auth: false
+                });
+
+                document.getElementById('successMsg').textContent = 'Verification email resent! Check your inbox.';
+                successBanner.classList.add('visible');
+
+                // Cooldown 30 seconds before allowing resend again
+                let countdown = 30;
+                const timer = setInterval(() => {
+                    btn.textContent = `Resend again in ${countdown}s`;
+                    countdown--;
+                    if (countdown < 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.textContent = 'Resend verification email';
+                    }
+                }, 1000);
+
+            } catch (error) {
+                document.getElementById('errorMsg').textContent = error.message || 'Failed to resend. Please try again.';
+                errorBanner.classList.add('visible');
+                btn.disabled = false;
+                btn.textContent = 'Resend verification email';
+            }
+        }
+    </script>
+
+</body>
+</html>
