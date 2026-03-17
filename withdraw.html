@@ -758,12 +758,13 @@
             const walletData = JSON.parse(localStorage.getItem('walletData') || '{}');
             userBalance = walletData.balance || 0;
             
-            document.getElementById('userEmail').textContent = user.email || 'your@email.com';
+            // Set user email on OTP screen immediately
+            const emailEl = document.getElementById('userEmail');
+            if (emailEl) emailEl.textContent = user.email || '';
             
             console.log('✅ Withdrawal page loaded. Balance:', userBalance);
-        });
 
-        // Restore auth session if exists
+            // Restore auth session if exists
             const authKey = sessionStorage.getItem('currentAuthKey');
             const savedTierData = sessionStorage.getItem('currentAuthTier');
             
@@ -780,6 +781,7 @@
                                'Available: $' + withdrawalLimit.toFixed(2));
                 }
             }
+        });
 
         // STEP 1: Verify Auth Key with Tier System
         function verifyAuthKey() {
@@ -1291,8 +1293,29 @@
         }
 
         async function resendOTP() {
+            const btn = document.querySelector('button[onclick="resendOTP()"]');
+            if (btn && btn.disabled) return;
+
             cvSuccess('Sending new OTP...', 'Please wait');
-            await sendOTPEmail();
+            await sendOTPEmail(true);
+
+            // Start 60s countdown on resend button
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+                let seconds = 60;
+                btn.textContent = 'Resend Code (' + seconds + 's)';
+                const timer = setInterval(() => {
+                    seconds--;
+                    btn.textContent = 'Resend Code (' + seconds + 's)';
+                    if (seconds <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50');
+                        btn.textContent = 'Resend Code';
+                    }
+                }, 1000);
+            }
         }
 
         // Replace the processWithdrawal function in withdraw.html (around line 1130)
@@ -1664,7 +1687,7 @@ function cvSuccess(msg, title) {
 }
 
 // Send OTP via backend
-        async function sendOTPEmail() {
+        async function sendOTPEmail(isResend = false) {
             try {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 const email = user.email || '';
@@ -1681,13 +1704,18 @@ function cvSuccess(msg, title) {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Show user email on OTP screen
-                    document.getElementById('userEmail').textContent = email;
+                    // Always set email on OTP screen
+                    const emailEl = document.getElementById('userEmail');
+                    if (emailEl) emailEl.textContent = email;
+
                     cvSuccess('A 6-digit code has been sent to ' + email, 'OTP Sent');
-                    // Show OTP screen
-                    document.getElementById('formStep').classList.add('hidden');
-                    document.getElementById('otpStep').classList.remove('hidden');
-                    focusOTPInput();
+
+                    // Only transition screens on first send, not resend
+                    if (!isResend) {
+                        document.getElementById('formStep').classList.add('hidden');
+                        document.getElementById('otpStep').classList.remove('hidden');
+                        focusOTPInput();
+                    }
                 } else {
                     cvShowError('Failed to send OTP. Please try again.', 'Error', "cv-withdraw-error");
                 }

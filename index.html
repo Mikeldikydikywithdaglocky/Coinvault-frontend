@@ -562,19 +562,31 @@
         // Disconnect wallet
         async function disconnectWallet() {
             if (confirm('Are you sure you want to disconnect your wallet?')) {
-                connectedWallet = null;
-                walletData = {
-                    address: null,
-                    balance: 0,
-                    assets: [],
-                    transactions: []
-                };
-                updateDashboard();
-                
-                const menu = document.getElementById('connectionMenu');
-                if (menu) {
-                    menu.classList.add('dropdown-hidden');
+                try {
+                    const token = localStorage.getItem('token');
+                    // Tell backend to remove connected wallet
+                    if (token && connectedWallet) {
+                        await fetch(API_URL + '/api/wallet/disconnect/' + connectedWallet, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                    }
+                } catch(e) {
+                    console.warn('Backend disconnect failed, clearing locally anyway:', e.message);
                 }
+
+                // Clear ALL wallet state from memory and localStorage
+                connectedWallet = null;
+                walletData = { address: null, balance: 0, assets: [], transactions: [] };
+
+                localStorage.removeItem('connectedWallet');
+                localStorage.removeItem('walletData');
+                localStorage.removeItem('lastBalanceUpdate');
+
+                updateDashboard();
+
+                const menu = document.getElementById('connectionMenu');
+                if (menu) menu.classList.add('dropdown-hidden');
             }
         }
         
