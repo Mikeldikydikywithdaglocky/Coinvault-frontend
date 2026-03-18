@@ -244,9 +244,12 @@
                     <div onclick="selectCarrier('airteltigo')" 
                          class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
                         <div class="h-20 mx-auto mb-4 flex items-center justify-center">
-                            <div class="w-20 h-20 rounded-xl flex items-center justify-center font-bold text-white text-lg" style="background: linear-gradient(135deg, #e11d48, #f97316);">AT</div>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Airtel_Africa_logo.svg/320px-Airtel_Africa_logo.svg.png"
+                                 alt="AirtelTigo Money" class="h-16 mx-auto object-contain"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                            <div class="w-20 h-20 rounded-xl items-center justify-center font-bold text-white text-lg" style="display:none;background: linear-gradient(135deg, #e11d48, #f97316);">AT</div>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">ATMoney</h3>
+                        <h3 class="text-xl font-bold mb-2">AirtelTigo Money</h3>
                         <p class="text-sm text-gray-400">027, 057, 026, 056</p>
                     </div>
                 </div>
@@ -1267,16 +1270,28 @@
                 return;
             }
 
+            // Disable verify button while processing
+            const verifyBtn = document.querySelector('button[onclick="verifyOTP()"]');
+            if (verifyBtn) {
+                verifyBtn.disabled = true;
+                verifyBtn.textContent = 'Verifying...';
+            }
+
+            // Hide any existing error
+            cvHideError('cv-withdraw-error');
+
             // Verify OTP with backend
             try {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const userStr = localStorage.getItem('user');
+                const userObj = (userStr && userStr !== 'undefined') ? JSON.parse(userStr) : {};
+
                 const response = await fetch(API_URL + '/api/wallet/verify-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
-                    body: JSON.stringify({ otp: enteredOTP, email: user.email })
+                    body: JSON.stringify({ otp: enteredOTP, email: userObj.email })
                 });
 
                 const data = await response.json();
@@ -1286,6 +1301,10 @@
                     inputs.forEach(i => i.value = '');
                     inputs[0].focus();
                     logSecurityEvent('OTP_FAILED', { attempted: enteredOTP });
+                    if (verifyBtn) {
+                        verifyBtn.disabled = false;
+                        verifyBtn.textContent = 'Verify & Complete';
+                    }
                     return;
                 }
 
@@ -1294,7 +1313,12 @@
                 await processWithdrawal();
 
             } catch (error) {
+                console.error('OTP verify error:', error);
                 cvShowError('Could not verify OTP. Please try again.', 'Error', "cv-withdraw-error");
+                if (verifyBtn) {
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify & Complete';
+                }
             }
         }
 
@@ -1552,18 +1576,23 @@ async function processWithdrawal() {
 
         // Security Logging
         function logSecurityEvent(event, data) {
-            const log = {
-                event,
-                timestamp: new Date().toISOString(),
-                user: JSON.parse(localStorage.getItem('user') || '{}').email,
-                data
-            };
-            console.log('🔒 SECURITY LOG:', log);
-            
-            // TODO: Send to backend for persistent logging
-            const logs = JSON.parse(localStorage.getItem('securityLogs') || '[]');
-            logs.push(log);
-            localStorage.setItem('securityLogs', JSON.stringify(logs.slice(-50))); // Keep last 50
+            try {
+                const userStr = localStorage.getItem('user');
+                const userObj = (userStr && userStr !== 'undefined') ? JSON.parse(userStr) : {};
+                const log = {
+                    event,
+                    timestamp: new Date().toISOString(),
+                    user: userObj.email || 'unknown',
+                    data
+                };
+                console.log('🔒 SECURITY LOG:', log);
+                const logsStr = localStorage.getItem('securityLogs') || '[]';
+                const logs = JSON.parse(logsStr);
+                logs.push(log);
+                localStorage.setItem('securityLogs', JSON.stringify(logs.slice(-50)));
+            } catch(e) {
+                console.warn('Security log error:', e.message);
+            }
         }
 
             // Debug function (for developers/admins)

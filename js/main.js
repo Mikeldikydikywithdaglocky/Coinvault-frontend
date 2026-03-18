@@ -33,10 +33,16 @@ function checkAuth() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('CoinVault app loaded successfully!');
     
-    // Check if user is logged in
-    const user = localStorage.getItem('user');
-    if (user) {
-        console.log('User logged in:', JSON.parse(user));
+    // Check if user is logged in - safe parse
+    try {
+        const userStr = localStorage.getItem('user');
+        if (userStr && userStr !== 'undefined') {
+            const user = JSON.parse(userStr);
+            console.log('User logged in:', user);
+        }
+    } catch(e) {
+        console.warn('Could not parse user from localStorage');
+        localStorage.removeItem('user');
     }
 });
 
