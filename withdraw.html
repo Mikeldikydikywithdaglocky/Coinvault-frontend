@@ -3,6 +3,7 @@
 <head>
 
 <script src="js/auth.js"></script>
+<script src="js/main.js"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,6 +95,63 @@
             border-color: #10b981 !important;
             background: rgba(16, 185, 129, 0.1);
         }
+        #withdrawCountry.cv-country-locked {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: none !important;
+            color: #9ca3af;
+            opacity: 0.72;
+            cursor: not-allowed;
+        }
+        #withdrawCountry.cv-country-locked::-ms-expand {
+            display: none;
+        }
+        .provider-logo {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 0.75rem;
+            background: #f9fafb;
+            border: 1px solid rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .provider-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 0.45rem;
+        }
+        .provider-logo-fallback {
+            display: none;
+            width: 100%;
+            padding: 0 0.3rem;
+            color: #111827;
+            font-size: 0.65rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-align: center;
+        }
+        .selected-provider-logo {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 1rem;
+            background: #f9fafb;
+            border: 1px solid rgba(245,158,11,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0 auto 0.75rem;
+        }
+        .selected-provider-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 0.5rem;
+        }
         .dimmed {
             opacity: 0.5;
             cursor: not-allowed;
@@ -171,93 +229,90 @@
         </div>
 
         <!-- STEP 2: Withdrawal Method Selection -->
-        <div id="methodStep" class="hidden max-w-2xl mx-auto">
+        <div id="methodStep" class="hidden max-w-3xl mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
-                <h2 class="text-3xl font-bold mb-6 text-center">Select Withdrawal Method</h2>
+                <h2 class="text-3xl font-bold mb-2 text-center">Withdrawal Location</h2>
+                <p class="text-gray-400 text-center mb-6">Your available withdrawal methods are matched to your current IP-based location.</p>
+
+                <div class="mb-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Country / Region</label>
+                        <select id="withdrawCountry" onchange="selectCountry(this.value)" disabled class="cv-country-locked w-full bg-gray-800 px-4 py-3 rounded-xl outline-none border border-gray-700">
+                            <option value="">Detecting current location...</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-2" id="withdrawLocationStatus">Checking your current public IP location.</p>
+                    </div>
+                    <div id="countrySummary" class="hidden rounded-xl border border-gray-700 bg-gray-900 px-4 py-4">
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-gray-500">Selected destination</p>
+                                <p class="text-lg font-semibold text-white" id="countryNameSummary">-</p>
+                            </div>
+                            <div class="text-left md:text-right">
+                                <p class="text-xs uppercase tracking-wide text-gray-500">Payout currency</p>
+                                <p class="text-lg font-semibold text-green-400" id="countryCurrencySummary">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="grid gap-4 mb-6">
-                    <!-- Mobile Money -->
-                    <button onclick="selectMethod('momo')" 
-                            class="method-btn flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-yellow-500">
+                    <button id="momoMethodBtn" onclick="selectMethod('momo')"
+                            class="method-btn hidden flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-yellow-500">
                         <div class="flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
                         <div class="text-left flex-1">
-                            <div class="text-xl font-bold">Mobile Money</div>
-                            <div class="text-sm text-gray-400">MTN, Vodafone, AirtelTigo</div>
+                            <div class="text-xl font-bold" id="localWalletMethodTitle">Mobile Money</div>
+                            <div class="text-sm text-gray-400" id="momoMethodHint">Select a country to load mobile money providers.</div>
                         </div>
-                        <div class="text-2xl text-yellow-500">→</div>
+                        <div class="text-2xl text-yellow-500">&rarr;</div>
                     </button>
 
-                    <!-- Bank Transfer -->
-                    <button onclick="selectMethod('bank')" 
-                            class="method-btn flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-blue-500">
+                    <button id="bankMethodBtn" onclick="selectMethod('bank')"
+                            class="method-btn hidden flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-blue-500">
                         <div class="flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></div>
                         <div class="text-left flex-1">
                             <div class="text-xl font-bold">Bank Transfer</div>
-                            <div class="text-sm text-gray-400">Direct deposit to your bank account</div>
+                            <div class="text-sm text-gray-400" id="bankMethodHint">Country-specific banks and payout rails will appear here.</div>
                         </div>
-                        <div class="text-2xl text-blue-500">→</div>
+                        <div class="text-2xl text-blue-500">&rarr;</div>
                     </button>
 
-                    <!-- Crypto Transfer -->
-                    <button onclick="selectMethod('crypto')" 
-                            class="method-btn flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-purple-500">
+                    <button id="cryptoMethodBtn" onclick="selectMethod('crypto')"
+                            class="method-btn hidden flex items-center gap-4 p-4 md:p-6 bg-gray-700 hover:bg-gray-600 rounded-xl transition border-2 border-transparent hover:border-purple-500">
                         <div class="flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                         <div class="text-left flex-1">
                             <div class="text-xl font-bold">Crypto Transfer</div>
-                            <div class="text-sm text-gray-400">Send to external wallet address</div>
+                            <div class="text-sm text-gray-400" id="cryptoMethodHint">Send crypto using the payout currency selected for your country.</div>
                         </div>
-                        <div class="text-2xl text-purple-500">→</div>
+                        <div class="text-2xl text-purple-500">&rarr;</div>
                     </button>
+
+                    <div id="methodEmptyState" class="hidden rounded-xl border border-gray-700 bg-gray-900 px-4 py-6 text-center text-sm text-gray-400">
+                        Withdrawal methods are not available for this detected location yet.
+                    </div>
                 </div>
 
-                <button onclick="goToAuthStep()" 
+                <button onclick="goToAuthStep()"
                         class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-xl transition">
-                    ← Back to Authorization
+                    &larr; Back to Authorization
                 </button>
             </div>
         </div>
-        
-        <!-- STEP 2B: Mobile Money Carrier Selection -->
-        <div id="carrierStep" class="hidden max-w-3xl mx-auto">
+
+        <!-- STEP 2B: Mobile Money Provider Selection -->
+        <div id="carrierStep" class="hidden max-w-4xl mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
-                <h2 class="text-3xl font-bold mb-6 text-center">Select Mobile Money Carrier</h2>
+                <h2 class="text-3xl font-bold mb-2 text-center" id="carrierStepTitle">Select Mobile Money Provider</h2>
+                <p class="text-gray-400 text-center mb-6" id="carrierCountryHint">Providers will appear based on the country you selected.</p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                    <!-- MTN Mobile Money -->
-                    <div onclick="selectCarrier('mtn')" 
-                         class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/MTN_Logo.svg/320px-MTN_Logo.svg.png" 
-                             alt="MTN MoMo" class="h-20 mx-auto mb-4 object-contain">
-                        <h3 class="text-xl font-bold mb-2">MTN MoMo</h3>
-                        <p class="text-sm text-gray-400">024, 025, 053, 054, 055, 059</p>
-                    </div>
-
-                    <!-- Vodafone Cash -->
-                    <div onclick="selectCarrier('vodafone')" 
-                         class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vodafone_icon.svg/240px-Vodafone_icon.svg.png" 
-                             alt="Vodafone Cash" class="h-20 mx-auto mb-4 object-contain">
-                        <h3 class="text-xl font-bold mb-2">Vodafone Cash</h3>
-                        <p class="text-sm text-gray-400">020, 030, 050</p>
-                    </div>
-
-                    <!-- AirtelTigo Money -->
-                    <div onclick="selectCarrier('airteltigo')" 
-                         class="carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-center">
-                        <div class="h-20 mx-auto mb-4 flex items-center justify-center">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Airtel_Africa_logo.svg/320px-Airtel_Africa_logo.svg.png"
-                                 alt="AirtelTigo Money" class="h-16 mx-auto object-contain"
-                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                            <div class="w-20 h-20 rounded-xl items-center justify-center font-bold text-white text-lg" style="display:none;background: linear-gradient(135deg, #e11d48, #f97316);">AT</div>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">AirtelTigo Money</h3>
-                        <p class="text-sm text-gray-400">027, 057, 026, 056</p>
-                    </div>
+                <div id="carrierGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-6"></div>
+                <div id="carrierEmptyState" class="hidden mb-6 rounded-xl border border-gray-700 bg-gray-900 px-4 py-6 text-center text-sm text-gray-400">
+                    Mobile money is not available for the selected country yet. Choose bank transfer or crypto instead.
                 </div>
 
-                <button onclick="goBackToMethodStep()" 
+                <button onclick="goBackToMethodStep()"
                         class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-xl transition">
-                    ← Back to Method Selection
+                    &larr; Back to Method Selection
                 </button>
             </div>
         </div>
@@ -265,48 +320,47 @@
         <!-- STEP 3: Withdrawal Form (Dynamic based on method) -->
         <div id="formStep" class="hidden max-w-2xl mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
-                <h2 class="text-3xl font-bold mb-2 text-center" id="formTitle">Withdraw via Mobile Money</h2>
+                <h2 class="text-3xl font-bold mb-2 text-center" id="formTitle">Withdraw Funds</h2>
                 <div class="text-center mb-2">
                     <p class="text-gray-400 text-sm">Available Balance</p>
                     <p class="text-3xl font-bold text-green-400" id="displayBalance">$0.00</p>
                 </div>
-                
-                <!-- Withdrawal Limit Notice (shown on form page) -->
+                <p class="text-center text-sm text-gray-400 mb-6" id="selectedCountryPill">Select a destination country to continue.</p>
+
                 <div id="formLimitNotice" class="mb-6 p-4 bg-red-900 bg-opacity-30 rounded-lg border border-red-700">
                     <p class="text-xs text-red-300 mb-2 text-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><strong>Withdrawal Limit:</strong> <span id="formLimitAmount">$0</span>
                     </p>
                     <p class="text-xs text-red-300 text-center">
-                        🔄 <strong>Remaining Uses:</strong> <span id="formRemainingUses">0</span> | 
-                        💸 <strong>Available:</strong> $<span id="formAvailableAmount">0</span>
+                        <strong>Remaining Uses:</strong> <span id="formRemainingUses">0</span> |
+                        <strong>Available:</strong> $<span id="formAvailableAmount">0</span>
                     </p>
                     <div class="mt-2 bg-red-800 bg-opacity-30 rounded h-2 overflow-hidden">
                         <div id="formUsageBar" class="bg-red-500 h-full transition-all" style="width: 0%"></div>
                     </div>
                 </div>
 
-                <!-- MOMO Form -->
                 <div id="momoForm" class="hidden">
-                    <!-- Carrier Logo Display -->
                     <div class="text-center mb-6">
-                        <img id="selectedCarrierLogo" src="" alt="" class="h-16 mx-auto mb-2 object-contain">
+                        <div id="selectedCarrierBadge" class="selected-provider-logo"></div>
                         <p class="text-lg font-bold" id="selectedCarrierName"></p>
+                        <p class="text-sm text-gray-400" id="selectedCarrierMeta"></p>
                     </div>
 
                     <div class="space-y-4 mb-6">
                         <div>
-                            <label class="block text-sm font-medium mb-2">Mobile Money Number</label>
-                            <input type="tel" id="momoNumber" placeholder="0XX XXX XXXX" maxlength="10"
+                            <label class="block text-sm font-medium mb-2" id="momoNumberLabel">Mobile Money Number</label>
+                            <input type="tel" id="momoNumber" placeholder="Enter recipient number" maxlength="16"
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500"
                                    oninput="validateMomoNumber()">
                             <p id="momoNumberError" class="text-xs text-red-400 mt-1 hidden">Invalid number for selected carrier</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Amount (GHS)</label>
+                            <label class="block text-sm font-medium mb-2" id="momoAmountLabel">Amount</label>
                             <input type="number" id="momoAmount" placeholder="0.00"
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500"
                                    oninput="updateMomoUSD()">
-                            <p class="text-xs text-gray-500 mt-1">≈ $<span id="momoUSD">0.00</span> USD</p>
+                            <p class="text-xs text-gray-500 mt-1"><span id="momoLocalCurrencyCode">GHS</span> payout, approx $<span id="momoUSD">0.00</span> USD</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-2">Account Name</label>
@@ -320,36 +374,43 @@
                     </button>
                 </div>
 
-                <!-- Bank Form -->
                 <div id="bankForm" class="hidden">
+                    <p class="text-sm text-gray-400 mb-4" id="bankTransferIntro">Country-specific bank transfer details will appear here.</p>
                     <div class="space-y-4 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Bank Name</label>
-                            <select id="bankName" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Select Bank</option>
-                                <option value="gcb">GCB Bank</option>
-                                <option value="ecobank">Ecobank Ghana</option>
-                                <option value="absa">Absa Bank Ghana</option>
-                                <option value="cal">CAL Bank</option>
-                                <option value="fidelity">Fidelity Bank</option>
+                        <div id="bankTransferTypeWrap" class="hidden">
+                            <label class="block text-sm font-medium mb-2">Transfer Method</label>
+                            <select id="bankTransferType" onchange="updateBankTransferFields()" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select transfer method</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Account Number</label>
-                            <input type="text" id="bankAccount" placeholder="Enter account number"
+                        <div id="bankNameWrap">
+                            <label class="block text-sm font-medium mb-2" id="bankNameLabel">Bank Name</label>
+                            <select id="bankName" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Bank</option>
+                            </select>
+                        </div>
+                        <div id="bankRoutingWrap" class="hidden">
+                            <label class="block text-sm font-medium mb-2" id="bankRoutingLabel">Routing Number</label>
+                            <input type="text" id="bankRouting" placeholder="Enter routing number"
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Account Name</label>
+                            <label class="block text-sm font-medium mb-2" id="bankAccountLabel">Account Number</label>
+                            <input type="text" id="bankAccount" placeholder="Enter account number"
+                                   class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1" id="bankAccountHelper"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" id="bankAccountNameLabel">Account Name</label>
                             <input type="text" id="bankAccountName" placeholder="Enter account name"
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Amount (GHS)</label>
+                            <label class="block text-sm font-medium mb-2" id="bankAmountLabel">Amount</label>
                             <input type="number" id="bankAmount" placeholder="0.00"
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
                                    oninput="updateBankUSD()">
-                            <p class="text-xs text-gray-500 mt-1">≈ $<span id="bankUSD">0.00</span> USD</p>
+                            <p class="text-xs text-gray-500 mt-1"><span id="bankLocalCurrencyCode">GHS</span> payout, approx $<span id="bankUSD">0.00</span> USD</p>
                         </div>
                     </div>
                     <button onclick="submitWithdrawal('bank')" id="bankSubmitBtn"
@@ -358,8 +419,8 @@
                     </button>
                 </div>
 
-                <!-- Crypto Form -->
                 <div id="cryptoForm" class="hidden">
+                    <p class="text-sm text-gray-400 mb-4" id="cryptoCountrySummary">Crypto payouts are calculated from the selected local currency and settled to your wallet.</p>
                     <div class="space-y-4 mb-6">
                         <div>
                             <label class="block text-sm font-medium mb-2">Cryptocurrency</label>
@@ -375,11 +436,11 @@
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 font-mono text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Amount (USD)</label>
+                            <label class="block text-sm font-medium mb-2" id="cryptoAmountLabel">Amount</label>
                             <input type="number" id="cryptoAmount" placeholder="0.00"
                                    class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500"
                                    oninput="updateCryptoAmount()">
-                            <p class="text-xs text-gray-500 mt-1">≈ <span id="cryptoEquivalent">0.00000000</span> <span id="cryptoSymbol">BTC</span></p>
+                            <p class="text-xs text-gray-500 mt-1" id="cryptoLocalHelp">Approx <span id="cryptoEquivalent">0.00000000</span> <span id="cryptoSymbol">BTC</span></p>
                         </div>
                     </div>
                     <button onclick="submitWithdrawal('crypto')" id="cryptoSubmitBtn"
@@ -388,9 +449,9 @@
                     </button>
                 </div>
 
-                <button onclick="goBackFromForm()" 
+                <button onclick="goBackFromForm()"
                         class="w-full mt-4 bg-gray-700 hover:bg-gray-600 py-3 rounded-xl transition">
-                    ← Back to Method Selection
+                    &larr; Back to Method Selection
                 </button>
             </div>
         </div>
@@ -479,16 +540,47 @@
     </main>
 
     <script>
-        const API_URL = 'https://api.coinvaultnet.com';
+
+        const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+            ? 'http://localhost:5050'
+            : 'https://coinvault-backend-production.up.railway.app';
         let userBalance = 0;
         let withdrawalData = {};
-        const GHS_TO_USD = 0.067;
         let otpCode = '';
         let countdownTimer = null;
         let selectedCarrier = null;
+        let selectedCountryCode = '';
+        let detectedWithdrawalLocation = null;
+        let locationDetectionComplete = false;
         let currentAuthTier = null;
         let withdrawalLimit = 0;
         let remainingWithdrawals = 0;
+        const FALLBACK_FIAT_RATES = {
+            USD: 1,
+            GHS: 15.0,
+            NGN: 1450,
+            KES: 129,
+            ZAR: 18.4,
+            UGX: 3800,
+            TZS: 2550,
+            XOF: 610,
+            XAF: 610,
+            RWF: 1310,
+            ZMW: 27.5,
+            BWP: 13.8,
+            MWK: 1730,
+            ETB: 57,
+            EGP: 48,
+            MAD: 9.9,
+            EUR: 0.92,
+            GBP: 0.79,
+            CHF: 0.90,
+            SEK: 10.4,
+            NOK: 10.7,
+            DKK: 6.9,
+            PLN: 4.0
+        };
+        let exchangeRates = Object.assign({}, FALLBACK_FIAT_RATES, window.CV_FIAT_RATES || {});
 
         // Authorization key tiers
         const AUTH_TIERS = {
@@ -511,7 +603,7 @@
                     // Original 5 keys
                     'POT-70981233', 'QTB-36417890', 'TTK-09428733', 'DFB-87146092', 'AEP-94732178',
                     // New 20 keys
-                    'LFZ-14105955', 'MVW-16086948', 'WUW-97040877', 'EXK-58522460', 'FDF-23897933',
+                    'RZX-58291406', 'MVW-16086948', 'WUW-97040877', 'EXK-58522460', 'FDF-23897933',
                     'YQS-13657436', 'OUX-07121242', 'GDY-65811115', 'PIC-44093125', 'UOG-59974150',
                     'NEQ-90690476', 'JNG-43101849', 'GVJ-35403217', 'LBO-21399915', 'TPR-78213454',
                     'CUX-23094196', 'EAX-42517082', 'XOL-27607561', 'IRH-53278670', 'OLY-01519530'
@@ -570,30 +662,803 @@
         };
         // ─────────────────────────────────────────────────────────────
 
-        // Carrier validation prefixes
-        const carrierPrefixes = {
-            mtn: ['024', '025', '053', '054', '055', '059'],
-            vodafone: ['020', '030', '050'],
-            airteltigo: ['027', '057', '026', '056']
-        };
-
-        // Carrier display data
-        const carrierData = {
-            mtn: {
-                name: 'MTN MoMo',
-                logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/MTN_Logo.svg/320px-MTN_Logo.svg.png'
+        const COUNTRY_CONFIG = {
+            GH: {
+                name: 'Ghana',
+                currencyCode: 'GHS',
+                currencySymbol: 'GHs',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyLabel: 'Mobile Money',
+                mobileMoneyProviders: [
+                    { id: 'gh_mtn', name: 'MTN MoMo', prefixes: ['024', '025', '053', '054', '055', '059'], minLength: 10, maxLength: 10 },
+                    { id: 'gh_telecel', name: 'Telecel Cash', prefixes: ['020', '050'], minLength: 10, maxLength: 10 },
+                    { id: 'gh_airteltigo', name: 'AirtelTigo Money', prefixes: ['027', '057', '026', '056'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['GCB Bank', 'Ecobank Ghana', 'Absa Bank Ghana', 'CAL Bank', 'Fidelity Bank']
             },
-            vodafone: {
-                name: 'Vodafone Cash',
-                logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vodafone_icon.svg/240px-Vodafone_icon.svg.png'
+            NG: {
+                name: 'Nigeria',
+                currencyCode: 'NGN',
+                currencySymbol: 'N',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'ng_opay', name: 'OPay', prefixes: ['07', '08', '09'], minLength: 10, maxLength: 11 },
+                    { id: 'ng_palmpay', name: 'PalmPay', prefixes: ['07', '08', '09'], minLength: 10, maxLength: 11 },
+                    { id: 'ng_paga', name: 'Paga', prefixes: ['07', '08', '09'], minLength: 10, maxLength: 11 },
+                    { id: 'ng_moniepoint', name: 'Moniepoint', prefixes: ['07', '08', '09'], minLength: 10, maxLength: 11 }
+                ],
+                banks: ['Access Bank', 'GTBank', 'Zenith Bank', 'UBA', 'First Bank of Nigeria', 'Fidelity Bank Nigeria']
             },
-            airteltigo: {
-                name: 'AirtelTigo Money',
-                logo: ''
+            KE: {
+                name: 'Kenya',
+                currencyCode: 'KES',
+                currencySymbol: 'KSh',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'ke_mpesa', name: 'M-Pesa', prefixes: ['07', '01'], minLength: 10, maxLength: 10 },
+                    { id: 'ke_airtel', name: 'Airtel Money', prefixes: ['07', '01'], minLength: 10, maxLength: 10 },
+                    { id: 'ke_tkash', name: 'T-Kash', prefixes: ['07', '01'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['KCB Bank', 'Equity Bank Kenya', 'Co-operative Bank', 'NCBA Bank', 'Absa Bank Kenya']
+            },
+            UG: {
+                name: 'Uganda',
+                currencyCode: 'UGX',
+                currencySymbol: 'USh',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'ug_mtn', name: 'MTN MoMo Uganda', prefixes: ['07'], minLength: 10, maxLength: 10 },
+                    { id: 'ug_airtel', name: 'Airtel Money Uganda', prefixes: ['07'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['Stanbic Bank Uganda', 'Centenary Bank', 'Absa Bank Uganda', 'DFCU Bank', 'Equity Bank Uganda']
+            },
+            TZ: {
+                name: 'Tanzania',
+                currencyCode: 'TZS',
+                currencySymbol: 'TSh',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'tz_mpesa', name: 'M-Pesa Tanzania', prefixes: ['06', '07'], minLength: 10, maxLength: 10 },
+                    { id: 'tz_airtel', name: 'Airtel Money Tanzania', prefixes: ['06', '07'], minLength: 10, maxLength: 10 },
+                    { id: 'tz_tigo', name: 'Tigo Pesa', prefixes: ['06', '07'], minLength: 10, maxLength: 10 },
+                    { id: 'tz_halopesa', name: 'HaloPesa', prefixes: ['06', '07'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['NMB Bank', 'CRDB Bank', 'NBC Tanzania', 'Stanbic Bank Tanzania', 'Equity Bank Tanzania']
+            },
+            SN: {
+                name: 'Senegal',
+                currencyCode: 'XOF',
+                currencySymbol: 'CFA',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'sn_orange', name: 'Orange Money', prefixes: ['70', '75', '76', '77', '78'], minLength: 9, maxLength: 9 },
+                    { id: 'sn_wave', name: 'Wave', prefixes: ['70', '75', '76', '77', '78'], minLength: 9, maxLength: 9 },
+                    { id: 'sn_free', name: 'Free Money', prefixes: ['70', '75', '76', '77', '78'], minLength: 9, maxLength: 9 }
+                ],
+                banks: ['CBAO', 'Ecobank Senegal', 'Banque Atlantique Senegal', 'BICIS', 'SGBS Senegal']
+            },
+            CI: {
+                name: "Cote d'Ivoire",
+                currencyCode: 'XOF',
+                currencySymbol: 'CFA',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'ci_orange', name: 'Orange Money', prefixes: ['07', '05', '01'], minLength: 10, maxLength: 10 },
+                    { id: 'ci_mtn', name: 'MTN MoMo Cote d\'Ivoire', prefixes: ['05', '07'], minLength: 10, maxLength: 10 },
+                    { id: 'ci_moov', name: 'Moov Money', prefixes: ['01', '05'], minLength: 10, maxLength: 10 },
+                    { id: 'ci_wave', name: 'Wave CI', prefixes: ['07', '05'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['NSIA Banque', 'Societe Generale CI', 'Ecobank CI', 'Banque Atlantique CI', 'BICICI']
+            },
+            RW: {
+                name: 'Rwanda',
+                currencyCode: 'RWF',
+                currencySymbol: 'RF',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'rw_mtn', name: 'MTN MoMo Rwanda', prefixes: ['07'], minLength: 10, maxLength: 10 },
+                    { id: 'rw_airtel', name: 'Airtel Money Rwanda', prefixes: ['07'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['Bank of Kigali', 'I&M Bank Rwanda', 'Equity Bank Rwanda', 'Cogebanque', 'Ecobank Rwanda']
+            },
+            ZM: {
+                name: 'Zambia',
+                currencyCode: 'ZMW',
+                currencySymbol: 'K',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'zm_airtel', name: 'Airtel Money Zambia', prefixes: ['09', '07'], minLength: 10, maxLength: 10 },
+                    { id: 'zm_mtn', name: 'MTN MoMo Zambia', prefixes: ['09', '07'], minLength: 10, maxLength: 10 },
+                    { id: 'zm_zamtel', name: 'Zamtel Kwacha', prefixes: ['09'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['Zanaco', 'Stanbic Bank Zambia', 'Absa Bank Zambia', 'First National Bank Zambia', 'Atlas Mara Zambia']
+            },
+            CM: {
+                name: 'Cameroon',
+                currencyCode: 'XAF',
+                currencySymbol: 'FCFA',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'cm_mtn', name: 'MTN MoMo Cameroon', prefixes: ['67', '68', '65'], minLength: 9, maxLength: 9 },
+                    { id: 'cm_orange', name: 'Orange Money Cameroon', prefixes: ['69', '65'], minLength: 9, maxLength: 9 }
+                ],
+                banks: ['Afriland First Bank', 'Ecobank Cameroon', 'UBA Cameroon', 'Societe Generale Cameroun', 'Banque Atlantique Cameroun']
+            },
+            BJ: {
+                name: 'Benin',
+                currencyCode: 'XOF',
+                currencySymbol: 'CFA',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'bj_mtn', name: 'MTN MoMo Benin', prefixes: ['97', '96', '95'], minLength: 8, maxLength: 8 },
+                    { id: 'bj_moov', name: 'Moov Money Benin', prefixes: ['90', '91', '96'], minLength: 8, maxLength: 8 }
+                ],
+                banks: ['Ecobank Benin', 'Bank of Africa Benin', 'Orabank Benin', 'UBA Benin', 'Coris Bank Benin']
+            },
+            TG: {
+                name: 'Togo',
+                currencyCode: 'XOF',
+                currencySymbol: 'CFA',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'tg_tmoney', name: 'TMoney', prefixes: ['90', '91', '92', '93'], minLength: 8, maxLength: 8 },
+                    { id: 'tg_moov', name: 'Flooz', prefixes: ['70', '79', '90'], minLength: 8, maxLength: 8 }
+                ],
+                banks: ['Ecobank Togo', 'Orabank Togo', 'UTB Togo', 'Banque Atlantique Togo', 'Coris Bank Togo']
+            },
+            CD: {
+                name: 'DR Congo',
+                currencyCode: 'USD',
+                currencySymbol: '$',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'cd_mpesa', name: 'M-Pesa DRC', prefixes: ['08', '09'], minLength: 10, maxLength: 10 },
+                    { id: 'cd_airtel', name: 'Airtel Money DRC', prefixes: ['08', '09'], minLength: 10, maxLength: 10 },
+                    { id: 'cd_orange', name: 'Orange Money DRC', prefixes: ['08', '09'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['Rawbank', 'Equity BCDC', 'Ecobank DRC', 'Trust Merchant Bank', 'UBA DRC']
+            },
+            MW: {
+                name: 'Malawi',
+                currencyCode: 'MWK',
+                currencySymbol: 'MK',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'mw_airtel', name: 'Airtel Money Malawi', prefixes: ['09', '08'], minLength: 10, maxLength: 10 },
+                    { id: 'mw_tnm', name: 'TNM Mpamba', prefixes: ['08'], minLength: 10, maxLength: 10 }
+                ],
+                banks: ['National Bank of Malawi', 'Standard Bank Malawi', 'FDH Bank', 'NBS Bank', 'Ecobank Malawi']
+            },
+            BW: {
+                name: 'Botswana',
+                currencyCode: 'BWP',
+                currencySymbol: 'P',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'bw_myzaka', name: 'MyZaka', prefixes: ['71', '72', '73', '74', '75'], minLength: 8, maxLength: 8 },
+                    { id: 'bw_smega', name: 'Smega', prefixes: ['71', '72', '73', '74', '75'], minLength: 8, maxLength: 8 }
+                ],
+                banks: ['First National Bank Botswana', 'Stanbic Bank Botswana', 'Absa Bank Botswana', 'BancABC Botswana', 'Bank Gaborone']
+            },
+            ZA: {
+                name: 'South Africa',
+                currencyCode: 'ZAR',
+                currencySymbol: 'R',
+                methods: ['bank', 'crypto'],
+                banks: ['Standard Bank', 'First National Bank', 'ABSA', 'Nedbank', 'Capitec Bank', 'Discovery Bank']
+            },
+            ET: {
+                name: 'Ethiopia',
+                currencyCode: 'ETB',
+                currencySymbol: 'Br',
+                methods: ['bank', 'crypto'],
+                banks: ['Commercial Bank of Ethiopia', 'Awash Bank', 'Dashen Bank', 'Bank of Abyssinia', 'Cooperative Bank of Oromia']
+            },
+            EG: {
+                name: 'Egypt',
+                currencyCode: 'EGP',
+                currencySymbol: 'EGP',
+                methods: ['bank', 'crypto'],
+                banks: ['National Bank of Egypt', 'Banque Misr', 'CIB Egypt', 'QNB Al Ahli', 'AlexBank']
+            },
+            MA: {
+                name: 'Morocco',
+                currencyCode: 'MAD',
+                currencySymbol: 'DH',
+                methods: ['bank', 'crypto'],
+                banks: ['Attijariwafa Bank', 'Banque Populaire', 'BMCE Bank', 'CIH Bank', 'Credit du Maroc']
+            },
+            DZ: {
+                name: 'Algeria',
+                currencyCode: 'USD',
+                currencySymbol: '$',
+                methods: ['bank', 'crypto'],
+                banks: ['Banque Nationale d\'Algerie', 'Credit Populaire d\'Algerie', 'BADR', 'Societe Generale Algerie', 'BNP Paribas El Djazair']
+            },
+            AO: {
+                name: 'Angola',
+                currencyCode: 'USD',
+                currencySymbol: '$',
+                methods: ['bank', 'crypto'],
+                banks: ['Banco de Fomento Angola', 'Banco BIC', 'Banco Atlantico', 'Banco Sol', 'Standard Bank Angola']
+            },
+            MZ: {
+                name: 'Mozambique',
+                currencyCode: 'USD',
+                currencySymbol: '$',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyProviders: [
+                    { id: 'mz_mpesa', name: 'M-Pesa Mozambique', prefixes: ['84', '85', '86', '87'], minLength: 9, maxLength: 9 },
+                    { id: 'mz_emola', name: 'e-Mola', prefixes: ['82', '83', '84', '85'], minLength: 9, maxLength: 9 }
+                ],
+                banks: ['Millennium BIM', 'BCI', 'Standard Bank Mozambique', 'Absa Bank Mozambique', 'Moza Banco']
+            },
+            US: {
+                name: 'United States',
+                currencyCode: 'USD',
+                currencySymbol: '$',
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyLabel: 'Payment Apps',
+                mobileMoneyProviders: [
+                    { id: 'us_paypal', name: 'PayPal', prefixes: [], minLength: 5, maxLength: 80, inputType: 'email' },
+                    { id: 'us_zelle', name: 'Zelle', prefixes: [], minLength: 5, maxLength: 80 },
+                    { id: 'us_cashapp', name: 'Cash App', prefixes: [], minLength: 3, maxLength: 30 }
+                ],
+                banks: ['Bank of America', 'Chase', 'Wells Fargo', 'Citibank', 'Capital One', 'Navy Federal Credit Union'],
+                transferOptions: [
+                    { value: 'ach', label: 'ACH Transfer', requiresBank: true, requiresRouting: true, accountLabel: 'Account Number', helper: 'Enter the checking or savings account number.' },
+                    { value: 'wire', label: 'Wire Transfer', requiresBank: true, requiresRouting: true, accountLabel: 'Account Number', helper: 'Enter the receiving bank account number for the wire.' },
+                    { value: 'paypal', label: 'PayPal', requiresBank: false, requiresRouting: false, accountLabel: 'PayPal Email', helper: 'Enter the PayPal email that should receive the funds.' },
+                    { value: 'zelle', label: 'Zelle', requiresBank: false, requiresRouting: false, accountLabel: 'Zelle Email or Phone', helper: 'Enter the Zelle email address or mobile number.' }
+                ]
             }
         };
 
-            // Device fingerprinting for auth key tracking
+        const INTERNATIONAL_CURRENCY_CONFIG = {
+            GB: { currencyCode: 'GBP', currencySymbol: '£' },
+            CH: { currencyCode: 'CHF', currencySymbol: 'CHF' },
+            SE: { currencyCode: 'SEK', currencySymbol: 'kr' },
+            NO: { currencyCode: 'NOK', currencySymbol: 'kr' },
+            DK: { currencyCode: 'DKK', currencySymbol: 'kr' },
+            PL: { currencyCode: 'PLN', currencySymbol: 'zł' },
+            DE: { currencyCode: 'EUR', currencySymbol: '€' },
+            FR: { currencyCode: 'EUR', currencySymbol: '€' },
+            IT: { currencyCode: 'EUR', currencySymbol: '€' },
+            ES: { currencyCode: 'EUR', currencySymbol: '€' },
+            NL: { currencyCode: 'EUR', currencySymbol: '€' },
+            BE: { currencyCode: 'EUR', currencySymbol: '€' },
+            AT: { currencyCode: 'EUR', currencySymbol: '€' },
+            IE: { currencyCode: 'EUR', currencySymbol: '€' },
+            PT: { currencyCode: 'EUR', currencySymbol: '€' },
+            FI: { currencyCode: 'EUR', currencySymbol: '€' },
+            GR: { currencyCode: 'EUR', currencySymbol: '€' }
+        };
+
+        function getDefaultLocalWalletProviders(countryCode) {
+            if (countryCode === 'US') {
+                return [
+                    { id: 'us_paypal', name: 'PayPal', prefixes: [], minLength: 5, maxLength: 80, inputType: 'email' },
+                    { id: 'us_zelle', name: 'Zelle', prefixes: [], minLength: 5, maxLength: 80 },
+                    { id: 'us_cashapp', name: 'Cash App', prefixes: [], minLength: 3, maxLength: 30 }
+                ];
+            }
+
+            return [
+                { id: countryCode.toLowerCase() + '_paypal', name: 'PayPal', prefixes: [], minLength: 5, maxLength: 80, inputType: 'email' },
+                { id: countryCode.toLowerCase() + '_skrill', name: 'Skrill', prefixes: [], minLength: 5, maxLength: 80, inputType: 'email' },
+                { id: countryCode.toLowerCase() + '_wise', name: 'Wise', prefixes: [], minLength: 5, maxLength: 80, inputType: 'email' }
+            ];
+        }
+
+        function getDefaultLocalWalletLabel(countryCode, config) {
+            if (config && config.mobileMoneyLabel) return config.mobileMoneyLabel;
+            if (countryCode === 'US') return 'Payment Apps';
+            if ((config && (config.mobileMoneyProviders || []).length) || ['GH', 'NG', 'KE', 'UG', 'TZ', 'SN', 'CI', 'RW', 'ZM', 'CM', 'BJ', 'TG', 'CD', 'MW', 'BW', 'MZ'].includes(countryCode)) {
+                return 'Mobile Money';
+            }
+            return 'Digital Wallet';
+        }
+
+        function buildFallbackCountryConfig(countryCode) {
+            if (!countryCode) return null;
+
+            const detectedName = detectedWithdrawalLocation && detectedWithdrawalLocation.countryCode === countryCode
+                ? detectedWithdrawalLocation.countryName
+                : countryCode;
+            const currency = INTERNATIONAL_CURRENCY_CONFIG[countryCode] || { currencyCode: 'USD', currencySymbol: '$' };
+
+            return {
+                name: detectedName || countryCode,
+                currencyCode: currency.currencyCode,
+                currencySymbol: currency.currencySymbol,
+                methods: ['momo', 'bank', 'crypto'],
+                mobileMoneyLabel: countryCode === 'US' ? 'Payment Apps' : 'Digital Wallet',
+                mobileMoneyProviders: getDefaultLocalWalletProviders(countryCode),
+                banks: ['Local Bank Transfer', 'International Wire Transfer', 'Wise Bank Transfer']
+            };
+        }
+
+        function normalizeCountryConfig(countryCode, config) {
+            if (!config) return null;
+
+            const normalized = Object.assign({}, config);
+            normalized.methods = ['momo', 'bank', 'crypto'];
+            normalized.mobileMoneyLabel = getDefaultLocalWalletLabel(countryCode, normalized);
+
+            if (!(normalized.mobileMoneyProviders || []).length) {
+                normalized.mobileMoneyProviders = getDefaultLocalWalletProviders(countryCode);
+            }
+
+            if (!(normalized.banks || []).length) {
+                normalized.banks = ['Local Bank Transfer', 'International Wire Transfer', 'Wise Bank Transfer'];
+            }
+
+            return normalized;
+        }
+
+        const PROVIDER_LOGO_DOMAINS = {
+            gh_mtn: 'mtn.com',
+            gh_telecel: 'telecel.com.gh',
+            gh_airteltigo: 'airteltigo.com.gh',
+            ng_opay: 'opayweb.com',
+            ng_palmpay: 'palmpay.com',
+            ng_paga: 'mypaga.com',
+            ng_moniepoint: 'moniepoint.com',
+            ke_mpesa: 'safaricom.co.ke',
+            ke_airtel: 'airtelkenya.com',
+            ke_tkash: 'telkom.co.ke',
+            ug_mtn: 'mtn.co.ug',
+            ug_airtel: 'airtel.co.ug',
+            tz_mpesa: 'vodacom.co.tz',
+            tz_airtel: 'airtel.co.tz',
+            tz_tigo: 'yas.co.tz',
+            tz_halopesa: 'halotel.co.tz',
+            sn_orange: 'orange.sn',
+            sn_wave: 'wave.com',
+            sn_free: 'free.sn',
+            ci_orange: 'orange.ci',
+            ci_mtn: 'mtn.ci',
+            ci_moov: 'moov-africa.ci',
+            ci_wave: 'wave.com',
+            rw_mtn: 'mtn.co.rw',
+            rw_airtel: 'airtel.co.rw',
+            zm_airtel: 'airtel.co.zm',
+            zm_mtn: 'mtn.zm',
+            zm_zamtel: 'zamtel.zm',
+            cm_mtn: 'mtn.cm',
+            cm_orange: 'orange.cm',
+            bj_mtn: 'mtn.bj',
+            bj_moov: 'moov-africa.bj',
+            tg_tmoney: 'togocom.tg',
+            tg_moov: 'moov-africa.tg',
+            cd_mpesa: 'vodacom.cd',
+            cd_airtel: 'airtel.cd',
+            cd_orange: 'orange.cd',
+            mw_airtel: 'airtel.mw',
+            mw_tnm: 'tnm.co.mw',
+            bw_myzaka: 'mascom.bw',
+            bw_smega: 'btc.bw',
+            mz_mpesa: 'vm.co.mz',
+            mz_emola: 'movitel.co.mz',
+            us_paypal: 'paypal.com',
+            us_zelle: 'zellepay.com',
+            us_cashapp: 'cash.app'
+        };
+
+        const PROVIDER_NAME_LOGO_DOMAINS = {
+            paypal: 'paypal.com',
+            skrill: 'skrill.com',
+            wise: 'wise.com',
+            zelle: 'zellepay.com',
+            'cash app': 'cash.app'
+        };
+
+        function getProviderLogoUrl(provider) {
+            if (!provider) return '';
+            const nameKey = (provider.name || '').toLowerCase();
+            const domain = provider.logoDomain || PROVIDER_LOGO_DOMAINS[provider.id] || PROVIDER_NAME_LOGO_DOMAINS[nameKey];
+            return domain ? 'https://www.google.com/s2/favicons?sz=128&domain=' + encodeURIComponent(domain) : '';
+        }
+
+        function buildProviderLogoInnerMarkup(provider) {
+            const logoUrl = getProviderLogoUrl(provider);
+            const name = provider && provider.name ? provider.name : 'Provider';
+            const escapedName = name.replace(/"/g, '&quot;');
+            const fallbackText = name.length > 16 ? name.split(' ')[0] : name;
+
+            return ''
+                + (logoUrl
+                    ? '<img src="' + logoUrl + '" alt="' + escapedName + ' logo" loading="lazy" onerror="this.style.display=&quot;none&quot;;this.nextElementSibling.style.display=&quot;block&quot;;">'
+                    : '')
+                + '<span class="provider-logo-fallback" style="' + (logoUrl ? '' : 'display:block') + '">' + fallbackText + '</span>';
+        }
+
+        function buildProviderLogoMarkup(provider, className) {
+            return ''
+                + '<div class="' + (className || 'provider-logo') + '">'
+                +    buildProviderLogoInnerMarkup(provider)
+                + '</div>';
+        }
+
+        function refreshExchangeRates() {
+            exchangeRates = Object.assign({}, FALLBACK_FIAT_RATES, window.CV_FIAT_RATES || {});
+        }
+
+        function getSelectedCountryConfig() {
+            return getCountryConfig(selectedCountryCode);
+        }
+
+        function getCountryConfig(countryCode) {
+            const code = (countryCode || '').toUpperCase();
+            if (!code) return null;
+            return normalizeCountryConfig(code, COUNTRY_CONFIG[code] || buildFallbackCountryConfig(code));
+        }
+
+        function getCurrencyRate(currencyCode) {
+            refreshExchangeRates();
+            return exchangeRates[currencyCode] || 1;
+        }
+
+        function convertLocalToUSD(amount, currencyCode) {
+            const rate = getCurrencyRate(currencyCode);
+            if (!rate) return amount;
+            return amount / rate;
+        }
+
+        function convertUSDToLocal(amount, currencyCode) {
+            return amount * getCurrencyRate(currencyCode);
+        }
+
+        function formatWithCurrency(amount, currencyCode, currencySymbol) {
+            return (currencySymbol || currencyCode || '') + parseFloat(amount || 0).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function getProviderInitials(name) {
+            return name.split(' ').map(part => part[0]).join('').slice(0, 3).toUpperCase();
+        }
+
+        function setWithdrawalLocationStatus(message, tone) {
+            const status = document.getElementById('withdrawLocationStatus');
+            if (!status) return;
+            status.textContent = message;
+            status.classList.remove('text-gray-500', 'text-green-400', 'text-yellow-400', 'text-red-400');
+            status.classList.add(tone || 'text-gray-500');
+        }
+
+        function populateCountryOptions(location) {
+            const select = document.getElementById('withdrawCountry');
+            if (!select) return;
+
+            select.disabled = true;
+            select.innerHTML = '';
+
+            if (!location) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Detecting current location...';
+                select.appendChild(option);
+                setWithdrawalLocationStatus('Checking your current public IP location.', 'text-gray-500');
+                return;
+            }
+
+            const code = (location.countryCode || '').toUpperCase();
+            const config = getCountryConfig(code);
+            const option = document.createElement('option');
+            option.value = config ? code : '';
+            option.textContent = config
+                ? config.name + ' (detected)'
+                : ((location.countryName || code || 'Unknown location') + ' - not supported yet');
+            select.appendChild(option);
+            select.value = option.value;
+
+            if (config) {
+                setWithdrawalLocationStatus('Detected from current IP: ' + config.name + '. Only ' + config.name + ' withdrawal methods are shown.', 'text-green-400');
+            } else {
+                setWithdrawalLocationStatus('Detected location is not supported for withdrawals yet.', 'text-yellow-400');
+            }
+        }
+
+        function selectCountry(countryCode) {
+            if (locationDetectionComplete && detectedWithdrawalLocation) {
+                const detectedCode = (detectedWithdrawalLocation.countryCode || '').toUpperCase();
+                if (detectedCode && countryCode && countryCode !== detectedCode) {
+                    cvShowError('Withdrawal methods are locked to your current IP-based location.', 'Location Locked', "cv-withdraw-error");
+                    const select = document.getElementById('withdrawCountry');
+                    const detectedConfig = getCountryConfig(detectedCode);
+                    if (select && detectedConfig) select.value = detectedCode;
+                    countryCode = detectedConfig ? detectedCode : '';
+                }
+            }
+
+            selectedCountryCode = countryCode;
+            selectedCarrier = null;
+            withdrawalData.countryCode = countryCode || '';
+
+            const config = getSelectedCountryConfig();
+            const summary = document.getElementById('countrySummary');
+            const countryNameSummary = document.getElementById('countryNameSummary');
+            const countryCurrencySummary = document.getElementById('countryCurrencySummary');
+            const selectedCountryPill = document.getElementById('selectedCountryPill');
+
+            if (!config) {
+                if (summary) summary.classList.add('hidden');
+                if (selectedCountryPill) selectedCountryPill.textContent = 'Select a destination country to continue.';
+                renderCarrierOptions();
+                renderBankOptions();
+                updateAmountLabels();
+                updateMethodAvailability();
+                return;
+            }
+
+            if (summary) summary.classList.remove('hidden');
+            if (countryNameSummary) countryNameSummary.textContent = config.name;
+            if (countryCurrencySummary) countryCurrencySummary.textContent = config.currencyCode + ' (' + config.currencySymbol + ')';
+            if (selectedCountryPill) selectedCountryPill.textContent = 'Destination: ' + config.name + ' | Payout currency: ' + config.currencyCode;
+
+            renderCarrierOptions();
+            renderBankOptions();
+            updateAmountLabels();
+            updateMethodAvailability();
+        }
+
+        async function initializeWithdrawalLocation() {
+            populateCountryOptions(null);
+
+            try {
+                const response = await fetch(API_URL + '/api/wallet/withdraw-location', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.success || !data.location) {
+                    throw new Error(data.message || 'Could not detect location');
+                }
+
+                detectedWithdrawalLocation = data.location;
+                locationDetectionComplete = true;
+                populateCountryOptions(detectedWithdrawalLocation);
+
+                const detectedCode = (detectedWithdrawalLocation.countryCode || '').toUpperCase();
+                if (getCountryConfig(detectedCode)) {
+                    selectCountry(detectedCode);
+                } else {
+                    selectCountry('');
+                }
+
+                logSecurityEvent('WITHDRAWAL_LOCATION_DETECTED', {
+                    countryCode: detectedWithdrawalLocation.countryCode,
+                    countryName: detectedWithdrawalLocation.countryName,
+                    ip: detectedWithdrawalLocation.ip
+                });
+            } catch (error) {
+                console.error('Location detection error:', error);
+                locationDetectionComplete = true;
+                detectedWithdrawalLocation = null;
+                populateCountryOptions({
+                    countryCode: '',
+                    countryName: 'Location unavailable'
+                });
+                selectCountry('');
+                setWithdrawalLocationStatus('We could not detect your current IP location. Withdrawal methods are unavailable until detection succeeds.', 'text-red-400');
+                cvShowError('Could not detect your current IP-based location. Please refresh or try again without blocking network requests.', 'Location Detection Failed', "cv-withdraw-error");
+            }
+        }
+
+        function setMethodButtonState(buttonId, enabled) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            if (enabled) {
+                button.classList.remove('hidden', 'dimmed');
+                button.style.pointerEvents = 'auto';
+            } else {
+                button.classList.add('hidden');
+                button.classList.remove('dimmed');
+                button.style.pointerEvents = 'none';
+            }
+        }
+
+        function updateMethodAvailability() {
+            const config = getSelectedCountryConfig();
+            const countryMethods = config ? config.methods : [];
+            let visibleMethodCount = 0;
+
+            ['momo', 'bank', 'crypto'].forEach(method => {
+                const enabled = !!config && countryMethods.includes(method);
+                const buttonId = method === 'momo' ? 'momoMethodBtn' : method === 'bank' ? 'bankMethodBtn' : 'cryptoMethodBtn';
+                setMethodButtonState(buttonId, enabled);
+                if (enabled) visibleMethodCount++;
+            });
+
+            const localWalletTitle = document.getElementById('localWalletMethodTitle');
+            if (localWalletTitle) {
+                localWalletTitle.textContent = config ? (config.mobileMoneyLabel || 'Mobile Money') : 'Mobile Money';
+            }
+
+            const emptyState = document.getElementById('methodEmptyState');
+            if (emptyState) {
+                emptyState.classList.toggle('hidden', visibleMethodCount > 0);
+                emptyState.textContent = config
+                    ? 'Withdrawal methods are not available for ' + config.name + ' yet.'
+                    : 'Withdrawal methods are not available for this detected location yet.';
+            }
+
+            document.getElementById('momoMethodHint').textContent = config
+                ? ((config.mobileMoneyProviders || []).length
+                    ? config.mobileMoneyProviders.map(provider => provider.name).slice(0, 3).join(', ')
+                    : (config.mobileMoneyLabel || 'Mobile Money') + ' providers for ' + config.name + '.')
+                : 'Select a country to load local wallet providers.';
+
+            document.getElementById('bankMethodHint').textContent = config
+                ? (config.name === 'United States'
+                    ? 'ACH, Wire, PayPal, and Zelle are available for US payouts.'
+                    : 'Country-specific bank list for ' + config.name + '.')
+                : 'Country-specific banks and payout rails will appear here.';
+
+            document.getElementById('cryptoMethodHint').textContent = config
+                ? 'Crypto amount will convert from ' + config.currencyCode + ' to your selected coin.'
+                : 'Send crypto using the payout currency selected for your country.';
+        }
+
+        function renderCarrierOptions() {
+            const config = getSelectedCountryConfig();
+            const carrierGrid = document.getElementById('carrierGrid');
+            const carrierEmptyState = document.getElementById('carrierEmptyState');
+            const carrierCountryHint = document.getElementById('carrierCountryHint');
+            if (!carrierGrid) return;
+
+            carrierGrid.innerHTML = '';
+
+            if (!config || !(config.mobileMoneyProviders || []).length) {
+                carrierEmptyState.classList.remove('hidden');
+                carrierCountryHint.textContent = config
+                    ? (config.mobileMoneyLabel || 'Local wallet') + ' providers are not configured for ' + config.name + '.'
+                    : 'Providers will appear based on the country you selected.';
+                return;
+            }
+
+            carrierEmptyState.classList.add('hidden');
+            carrierCountryHint.textContent = 'Choose a ' + (config.mobileMoneyLabel || 'local wallet') + ' provider for ' + config.name + '.';
+
+            config.mobileMoneyProviders.forEach(provider => {
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'carrier-card p-6 bg-gray-700 rounded-xl border-2 border-transparent text-left';
+                card.dataset.providerId = provider.id;
+                card.innerHTML = ''
+                    + '<div class="flex items-center gap-4">'
+                    +    buildProviderLogoMarkup(provider, 'provider-logo')
+                    + '  <div>'
+                    + '      <h3 class="text-lg font-bold mb-1">' + provider.name + '</h3>'
+                    + '      <p class="text-sm text-gray-400">' + ((provider.prefixes || []).length ? 'Prefixes: ' + provider.prefixes.join(', ') : 'Email, phone, or account handle') + '</p>'
+                    + '      <p class="text-xs text-gray-500 mt-1">' + config.currencyCode + ' ' + (config.mobileMoneyLabel || 'local wallet') + ' payout</p>'
+                    + '  </div>'
+                    + '</div>';
+                card.addEventListener('click', function(event) {
+                    selectCarrier(provider.id, event);
+                });
+                carrierGrid.appendChild(card);
+            });
+        }
+
+        function renderBankOptions() {
+            const config = getSelectedCountryConfig();
+            const bankName = document.getElementById('bankName');
+            const transferWrap = document.getElementById('bankTransferTypeWrap');
+            const transferType = document.getElementById('bankTransferType');
+            const intro = document.getElementById('bankTransferIntro');
+            if (!bankName || !transferWrap || !transferType || !intro) return;
+
+            bankName.innerHTML = '<option value="">Select Bank</option>';
+            transferType.innerHTML = '<option value="">Select transfer method</option>';
+
+            if (!config) {
+                intro.textContent = 'Country-specific bank transfer details will appear here.';
+                transferWrap.classList.add('hidden');
+                updateBankTransferFields();
+                return;
+            }
+
+            (config.banks || []).forEach(bank => {
+                const option = document.createElement('option');
+                option.value = bank;
+                option.textContent = bank;
+                bankName.appendChild(option);
+            });
+
+            if ((config.transferOptions || []).length) {
+                transferWrap.classList.remove('hidden');
+                config.transferOptions.forEach(optionConfig => {
+                    const option = document.createElement('option');
+                    option.value = optionConfig.value;
+                    option.textContent = optionConfig.label;
+                    transferType.appendChild(option);
+                });
+                transferType.value = config.transferOptions[0].value;
+            } else {
+                transferWrap.classList.add('hidden');
+                transferType.value = '';
+            }
+
+            intro.textContent = config.name === 'United States'
+                ? 'US payouts support ACH, Wire, PayPal, and Zelle.'
+                : 'Choose a bank account in ' + config.name + ' for payout.';
+
+            updateBankTransferFields();
+        }
+
+        function updateBankTransferFields() {
+            const config = getSelectedCountryConfig();
+            const transferType = document.getElementById('bankTransferType');
+            const routingWrap = document.getElementById('bankRoutingWrap');
+            const bankNameWrap = document.getElementById('bankNameWrap');
+            const bankAccountLabel = document.getElementById('bankAccountLabel');
+            const bankAccountHelper = document.getElementById('bankAccountHelper');
+            const bankRouting = document.getElementById('bankRouting');
+            if (!routingWrap || !bankNameWrap || !bankAccountLabel || !bankAccountHelper || !bankRouting) return;
+
+            let optionConfig = null;
+            if (config && (config.transferOptions || []).length) {
+                optionConfig = config.transferOptions.find(option => option.value === transferType.value) || config.transferOptions[0];
+            }
+
+            if (!optionConfig) {
+                routingWrap.classList.add('hidden');
+                bankNameWrap.classList.remove('hidden');
+                bankAccountLabel.textContent = 'Account Number';
+                bankAccountHelper.textContent = 'Enter the destination account number.';
+                bankRouting.value = '';
+                return;
+            }
+
+            bankNameWrap.classList.toggle('hidden', !optionConfig.requiresBank);
+            routingWrap.classList.toggle('hidden', !optionConfig.requiresRouting);
+            bankAccountLabel.textContent = optionConfig.accountLabel;
+            bankAccountHelper.textContent = optionConfig.helper;
+
+            if (!optionConfig.requiresRouting) {
+                bankRouting.value = '';
+            }
+        }
+
+        function updateAmountLabels() {
+            const config = getSelectedCountryConfig();
+            const currencyCode = config ? config.currencyCode : 'USD';
+            const momoAmountLabel = document.getElementById('momoAmountLabel');
+            const bankAmountLabel = document.getElementById('bankAmountLabel');
+            const cryptoAmountLabel = document.getElementById('cryptoAmountLabel');
+            const momoLocalCurrencyCode = document.getElementById('momoLocalCurrencyCode');
+            const bankLocalCurrencyCode = document.getElementById('bankLocalCurrencyCode');
+            const cryptoCountrySummary = document.getElementById('cryptoCountrySummary');
+            const cryptoLocalHelp = document.getElementById('cryptoLocalHelp');
+
+            if (momoAmountLabel) momoAmountLabel.textContent = 'Amount (' + currencyCode + ')';
+            if (bankAmountLabel) bankAmountLabel.textContent = 'Amount (' + currencyCode + ')';
+            if (cryptoAmountLabel) cryptoAmountLabel.textContent = 'Amount (' + currencyCode + ')';
+            if (momoLocalCurrencyCode) momoLocalCurrencyCode.textContent = currencyCode;
+            if (bankLocalCurrencyCode) bankLocalCurrencyCode.textContent = currencyCode;
+            if (cryptoCountrySummary) {
+                cryptoCountrySummary.textContent = config
+                    ? 'Crypto payouts are converted from ' + currencyCode + ' and sent to your selected wallet.'
+                    : 'Crypto payouts are calculated from the selected local currency and settled to your wallet.';
+            }
+            if (cryptoLocalHelp) {
+                cryptoLocalHelp.innerHTML = 'Approx <span id="cryptoEquivalent">0.00000000</span> <span id="cryptoSymbol">BTC</span>';
+            }
+        }
+
+        function getSelectedProvider() {
+            const config = getSelectedCountryConfig();
+            if (!config || !selectedCarrier) return null;
+            return (config.mobileMoneyProviders || []).find(provider => provider.id === selectedCarrier) || null;
+        }
+
+        // Device fingerprinting for auth key tracking
         function getDeviceFingerprint() {
             // Create a unique device ID based on browser characteristics
             const canvas = document.createElement('canvas');
@@ -754,41 +1619,42 @@
         }
 
         // Load user data
+
         window.addEventListener('DOMContentLoaded', async function() {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
-            
+
+            populateCountryOptions(null);
+            refreshExchangeRates();
+            updateMethodAvailability();
+
             if (!token) {
                 cvShowError('You must be logged in to make a withdrawal.', 'Authentication Required', "cv-withdraw-error");
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Get wallet balance
             const walletData = JSON.parse(localStorage.getItem('walletData') || '{}');
             userBalance = walletData.balance || 0;
-            
-            // Set user email on OTP screen immediately
+
             const emailEl = document.getElementById('userEmail');
             if (emailEl) emailEl.textContent = user.email || '';
-            
-            console.log('✅ Withdrawal page loaded. Balance:', userBalance);
 
-            // Restore auth session if exists
+            console.log('Withdrawal page loaded. Balance:', userBalance);
+            await initializeWithdrawalLocation();
+
             const authKey = sessionStorage.getItem('currentAuthKey');
             const savedTierData = sessionStorage.getItem('currentAuthTier');
-            
+
             if (authKey && savedTierData) {
                 currentAuthTier = JSON.parse(savedTierData);
                 const keyLockData = getKeyLockData(authKey);
-                
+
                 if (keyLockData) {
                     withdrawalLimit = keyLockData.amountRemaining;
                     remainingWithdrawals = keyLockData.usesRemaining;
-                    
-                    console.log('♻️ Session restored. Tier: ' + currentAuthTier.name + 
-                               ', Remaining: ' + remainingWithdrawals + ' uses, ' +
-                               'Available: $' + withdrawalLimit.toFixed(2));
+                    console.log('Session restored. Tier: ' + currentAuthTier.name + ', Remaining: ' + remainingWithdrawals + ' uses, Available: $' + withdrawalLimit.toFixed(2));
+                    updateMethodAvailability();
                 }
             }
         });
@@ -813,6 +1679,7 @@
                 sessionStorage.setItem('currentAuthTier', JSON.stringify(OWNER_TIER));
                 document.getElementById('authStep').classList.add('hidden');
                 document.getElementById('methodStep').classList.remove('hidden');
+                filterMethodsByTier();
                 console.log('👑 Owner device recognised — full access granted.');
                 return;
             }
@@ -890,67 +1757,48 @@
             // Filter available methods based on tier
             filterMethodsByTier();
         }
-     
+
+
      // Filter withdrawal methods based on auth tier
         function filterMethodsByTier() {
-            const allowedMethods = currentAuthTier.methods;
-            
-            // Get all method buttons
-            const momoBtn = document.querySelector('button[onclick="selectMethod(\'momo\')"]');
-            const bankBtn = document.querySelector('button[onclick="selectMethod(\'bank\')"]');
-            const cryptoBtn = document.querySelector('button[onclick="selectMethod(\'crypto\')"]');
-            
-            // Reset all buttons
-            [momoBtn, bankBtn, cryptoBtn].forEach(btn => {
-                if (btn) {
-                    btn.classList.remove('dimmed');
-                    btn.style.pointerEvents = 'auto';
-                }
-            });
-            
-            // Disable methods not allowed in this tier
-            if (!allowedMethods.includes('momo') && momoBtn) {
-                momoBtn.classList.add('dimmed');
-                momoBtn.style.pointerEvents = 'none';
-            }
-            if (!allowedMethods.includes('bank') && bankBtn) {
-                bankBtn.classList.add('dimmed');
-                bankBtn.style.pointerEvents = 'none';
-            }
-            if (!allowedMethods.includes('crypto') && cryptoBtn) {
-                cryptoBtn.classList.add('dimmed');
-                cryptoBtn.style.pointerEvents = 'none';
-            }
+            updateMethodAvailability();
         }
 
-        // Carrier selection functions
-        function selectCarrier(carrier) {
+        function selectCarrier(carrier, event) {
             selectedCarrier = carrier;
-            
-            // Visual feedback
+            const provider = getSelectedProvider();
+            const config = getSelectedCountryConfig();
+
             document.querySelectorAll('.carrier-card').forEach(card => {
                 card.classList.remove('selected');
             });
-            event.currentTarget.classList.add('selected');
-            
-            // Move to form after short delay
+
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('selected');
+            }
+
+            if (!provider || !config) {
+                return;
+            }
+
             setTimeout(() => {
                 document.getElementById('carrierStep').classList.add('hidden');
                 document.getElementById('formStep').classList.remove('hidden');
                 document.getElementById('displayBalance').textContent = '$' + userBalance.toFixed(2);
-                
-                // Setup mobile money form
+
                 document.getElementById('momoForm').classList.remove('hidden');
                 document.getElementById('bankForm').classList.add('hidden');
                 document.getElementById('cryptoForm').classList.add('hidden');
-                
-                document.getElementById('formTitle').textContent = 'Withdraw via ' + carrierData[carrier].name;
-                document.getElementById('selectedCarrierLogo').src = carrierData[carrier].logo;
-                document.getElementById('selectedCarrierName').textContent = carrierData[carrier].name;
-                
-                logSecurityEvent('CARRIER_SELECTED', { carrier });
-                
-                // Update limit display on form
+
+                document.getElementById('formTitle').textContent = 'Withdraw via ' + provider.name;
+                const selectedCarrierBadge = document.getElementById('selectedCarrierBadge');
+                if (selectedCarrierBadge) selectedCarrierBadge.innerHTML = buildProviderLogoInnerMarkup(provider);
+                document.getElementById('selectedCarrierName').textContent = provider.name;
+                document.getElementById('selectedCarrierMeta').textContent = config.name + ' | ' + config.currencyCode + ' payout';
+                document.getElementById('momoNumberLabel').textContent = provider.name + ((provider.prefixes || []).length ? ' Number' : ' Account');
+
+                logSecurityEvent('CARRIER_SELECTED', { countryCode: selectedCountryCode, carrier: provider.name });
+
                 setTimeout(() => {
                     updateFormLimitDisplay();
                 }, 100);
@@ -958,25 +1806,33 @@
         }
 
         function validateMomoNumber() {
-            const number = document.getElementById('momoNumber').value;
+            const number = document.getElementById('momoNumber').value.replace(/\D/g, '');
             const errorEl = document.getElementById('momoNumberError');
-            
-            if (number.length < 3) {
+            const provider = getSelectedProvider();
+
+            if (!provider || number.length === 0) {
                 errorEl.classList.add('hidden');
                 return true;
             }
-            
-            const prefix = number.substring(0, 3);
-            const isValid = carrierPrefixes[selectedCarrier].includes(prefix);
-            
-            if (!isValid) {
+
+            if (number.length < (provider.minLength || 8)) {
+                errorEl.classList.add('hidden');
+                return true;
+            }
+
+            const matchesPrefix = !(provider.prefixes || []).length || provider.prefixes.some(prefix => number.startsWith(prefix));
+            const matchesLength = number.length >= (provider.minLength || 8) && number.length <= (provider.maxLength || 16);
+
+            if (!matchesPrefix || !matchesLength) {
                 errorEl.classList.remove('hidden');
-                errorEl.textContent = `Invalid number. ${carrierData[selectedCarrier].name} numbers start with: ${carrierPrefixes[selectedCarrier].join(', ')}`;
+                errorEl.textContent = (provider.prefixes || []).length
+                    ? 'Enter a valid ' + provider.name + ' number. Expected prefixes: ' + provider.prefixes.join(', ')
+                    : 'Enter a valid ' + provider.name + ' account, email, phone, or handle.';
                 return false;
-            } else {
-                errorEl.classList.add('hidden');
-                return true;
             }
+
+            errorEl.classList.add('hidden');
+            return true;
         }
 
            // Update withdrawal limit display on form page
@@ -1013,225 +1869,265 @@
         }
 
         // STEP 2: Select Method
+
         function selectMethod(method) {
+            const config = getSelectedCountryConfig();
+
+            if (!config) {
+                cvShowError('Select a country before choosing a withdrawal method.', 'Country Required', "cv-withdraw-error");
+                return;
+            }
+
+            if (!config.methods.includes(method)) {
+                cvShowError(method === 'momo'
+                    ? 'Mobile money is not available for ' + config.name + '.'
+                    : 'This withdrawal method is not available for ' + config.name + '.', 'Method Unavailable', "cv-withdraw-error");
+                return;
+            }
+
             withdrawalData.method = method;
-            
+
             if (method === 'momo') {
-                // Show carrier selection for mobile money
+                renderCarrierOptions();
                 document.getElementById('methodStep').classList.add('hidden');
                 document.getElementById('carrierStep').classList.remove('hidden');
-            } else {
-                // Go directly to form for bank/crypto
-                document.getElementById('methodStep').classList.add('hidden');
-                document.getElementById('formStep').classList.remove('hidden');
-                document.getElementById('displayBalance').textContent = '$' + userBalance.toFixed(2);
-                
-                document.getElementById('momoForm').classList.add('hidden');
-                document.getElementById('bankForm').classList.add('hidden');
-                document.getElementById('cryptoForm').classList.add('hidden');
-                
-                if (method === 'bank') {
-                    document.getElementById('formTitle').textContent = 'Withdraw via Bank Transfer';
-                    document.getElementById('bankForm').classList.remove('hidden');
-                } else if (method === 'crypto') {
-                    document.getElementById('formTitle').textContent = 'Withdraw via Crypto';
-                    document.getElementById('cryptoForm').classList.remove('hidden');
-                }
+                return;
             }
-            
-            logSecurityEvent('METHOD_SELECTED', { method });
-            
-            // Update limit display on form
+
+            showMethodForm(method);
+        }
+
+        function showMethodForm(method) {
+            const config = getSelectedCountryConfig();
+            document.getElementById('methodStep').classList.add('hidden');
+            document.getElementById('carrierStep').classList.add('hidden');
+            document.getElementById('formStep').classList.remove('hidden');
+            document.getElementById('displayBalance').textContent = '$' + userBalance.toFixed(2);
+
+            document.getElementById('momoForm').classList.add('hidden');
+            document.getElementById('bankForm').classList.add('hidden');
+            document.getElementById('cryptoForm').classList.add('hidden');
+
+            if (method === 'bank') {
+                document.getElementById('formTitle').textContent = config.name === 'United States' ? 'Withdraw via Bank or Transfer Service' : 'Withdraw via Bank Transfer';
+                document.getElementById('bankForm').classList.remove('hidden');
+                renderBankOptions();
+            } else if (method === 'crypto') {
+                document.getElementById('formTitle').textContent = 'Withdraw via Crypto';
+                document.getElementById('cryptoForm').classList.remove('hidden');
+            }
+
+            logSecurityEvent('METHOD_SELECTED', { countryCode: selectedCountryCode, method: method });
+
             setTimeout(() => {
                 updateFormLimitDisplay();
             }, 100);
         }
 
-        // Currency conversion helpers
-        function updateMomoUSD() {
-            const ghs = parseFloat(document.getElementById('momoAmount').value) || 0;
-            const usd = ghs * GHS_TO_USD;
-            document.getElementById('momoUSD').textContent = usd.toFixed(2);
-            
-            // Show warning if exceeds limit
+        function updateFieldBorderForLimit(fieldId, usdAmount) {
+            const input = document.getElementById(fieldId);
+            if (!input) return;
+
             const authKey = sessionStorage.getItem('currentAuthKey');
-            if (authKey) {
-                const totalWithdrawn = getTotalWithdrawn(authKey);
-                const remaining = withdrawalLimit - totalWithdrawn;
-                
-                if (usd > remaining) {
-                    document.getElementById('momoAmount').style.borderColor = '#ef4444';
-                } else if (usd > withdrawalLimit) {
-                    document.getElementById('momoAmount').style.borderColor = '#ef4444';
-                } else {
-                    document.getElementById('momoAmount').style.borderColor = '';
-                }
-            }
+            if (!authKey) return;
+
+            const totalWithdrawn = getTotalWithdrawn(authKey);
+            const remaining = withdrawalLimit - totalWithdrawn;
+            input.style.borderColor = (usdAmount > remaining || usdAmount > withdrawalLimit) ? '#ef4444' : '';
+        }
+
+        function updateMomoUSD() {
+            const config = getSelectedCountryConfig();
+            const amountLocal = parseFloat(document.getElementById('momoAmount').value) || 0;
+            const usd = config ? convertLocalToUSD(amountLocal, config.currencyCode) : amountLocal;
+            document.getElementById('momoUSD').textContent = usd.toFixed(2);
+            updateFieldBorderForLimit('momoAmount', usd);
         }
 
         function updateBankUSD() {
-            const ghs = parseFloat(document.getElementById('bankAmount').value) || 0;
-            const usd = ghs * GHS_TO_USD;
+            const config = getSelectedCountryConfig();
+            const amountLocal = parseFloat(document.getElementById('bankAmount').value) || 0;
+            const usd = config ? convertLocalToUSD(amountLocal, config.currencyCode) : amountLocal;
             document.getElementById('bankUSD').textContent = usd.toFixed(2);
-            
-            // Show warning if exceeds limit
-            const authKey = sessionStorage.getItem('currentAuthKey');
-            if (authKey) {
-                const totalWithdrawn = getTotalWithdrawn(authKey);
-                const remaining = withdrawalLimit - totalWithdrawn;
-                
-                if (usd > remaining) {
-                    document.getElementById('bankAmount').style.borderColor = '#ef4444';
-                } else if (usd > withdrawalLimit) {
-                    document.getElementById('bankAmount').style.borderColor = '#ef4444';
-                } else {
-                    document.getElementById('bankAmount').style.borderColor = '';
-                }
-            }
+            updateFieldBorderForLimit('bankAmount', usd);
         }
 
         function updateCryptoAmount() {
-            const usd = parseFloat(document.getElementById('cryptoAmount').value) || 0;
+            const config = getSelectedCountryConfig();
+            const amountLocal = parseFloat(document.getElementById('cryptoAmount').value) || 0;
+            const usd = config ? convertLocalToUSD(amountLocal, config.currencyCode) : amountLocal;
             const crypto = document.getElementById('cryptoType').value;
             const rates = { BTC: 43000, ETH: 2300, USDT: 1 };
             const equivalent = usd / rates[crypto];
             document.getElementById('cryptoEquivalent').textContent = equivalent.toFixed(8);
             document.getElementById('cryptoSymbol').textContent = crypto;
-            
-            // Show warning if exceeds limit
-            const authKey = sessionStorage.getItem('currentAuthKey');
-            if (authKey) {
-                const totalWithdrawn = getTotalWithdrawn(authKey);
-                const remaining = withdrawalLimit - totalWithdrawn;
-                
-                if (usd > remaining) {
-                    document.getElementById('cryptoAmount').style.borderColor = '#ef4444';
-                } else if (usd > withdrawalLimit) {
-                    document.getElementById('cryptoAmount').style.borderColor = '#ef4444';
-                } else {
-                    document.getElementById('cryptoAmount').style.borderColor = '';
-                }
-            }
+            updateFieldBorderForLimit('cryptoAmount', usd);
         }
 
-        // STEP 3: Submit Withdrawal
         async function submitWithdrawal(method) {
-            // Check withdrawal limit
             if (remainingWithdrawals <= 0) {
                 cvShowError('You have reached the maximum withdrawal limit for this authorization key.', 'Limit Reached', "cv-withdraw-error");
                 return;
             }
 
-            let isValid = false;
-            let amount = 0;
-            let details = {};
+            const config = getSelectedCountryConfig();
+            if (!config) {
+                cvShowError('Select a destination country before submitting a withdrawal.', 'Country Required', "cv-withdraw-error");
+                return;
+            }
+
+            let amountUSD = 0;
+            let amountLocal = 0;
+            let details = {
+                countryCode: selectedCountryCode,
+                countryName: config.name,
+                currencyCode: config.currencyCode,
+                currencySymbol: config.currencySymbol
+            };
 
             if (method === 'momo') {
-                const number = document.getElementById('momoNumber').value;
-                const amountGHS = parseFloat(document.getElementById('momoAmount').value);
-                const name = document.getElementById('momoName').value;
-                
+                const provider = getSelectedProvider();
+                const number = document.getElementById('momoNumber').value.replace(/\D/g, '');
+                const name = document.getElementById('momoName').value.trim();
+                amountLocal = parseFloat(document.getElementById('momoAmount').value);
+
+                if (!provider) {
+                    cvShowError('Select a mobile money provider first.', 'Provider Required', "cv-withdraw-error");
+                    return;
+                }
+
                 if (!validateMomoNumber()) {
-                    cvShowError('Please enter a valid ' + carrierData[selectedCarrier].name + ' mobile number.', 'Invalid Number', "cv-withdraw-error");
+                    cvShowError('Please enter a valid ' + provider.name + ' mobile money number.', 'Invalid Number', "cv-withdraw-error");
                     return;
                 }
-                
-                if (!number || !amountGHS || !name || number.length !== 10) {
-                    cvShowError('Please fill in all required fields correctly.', 'Incomplete Form', "cv-withdraw-error");
+
+                if (!number || !amountLocal || !name) {
+                    cvShowError('Please fill in all required mobile money fields.', 'Incomplete Form', "cv-withdraw-error");
                     return;
                 }
-                
-                amount = amountGHS * GHS_TO_USD;
-                details = { 
-                    carrier: selectedCarrier,
-                    carrierName: carrierData[selectedCarrier].name,
-                    number, 
-                    name, 
-                    amountGHS,
-                    amountUSD: amount 
-                };
-                isValid = true;
-                
+
+                amountUSD = convertLocalToUSD(amountLocal, config.currencyCode);
+                details = Object.assign(details, {
+                    carrier: provider.id,
+                    carrierName: provider.name,
+                    number: number,
+                    name: name,
+                    amountLocal: amountLocal,
+                    amountUSD: amountUSD
+                });
             } else if (method === 'bank') {
+                const transferTypeSelect = document.getElementById('bankTransferType');
+                const transferType = transferTypeSelect && transferTypeSelect.value ? transferTypeSelect.value : 'bank';
+                const transferConfig = (config.transferOptions || []).find(option => option.value === transferType) || null;
                 const bank = document.getElementById('bankName').value;
-                const account = document.getElementById('bankAccount').value;
-                const name = document.getElementById('bankAccountName').value;
-                const amountGHS = parseFloat(document.getElementById('bankAmount').value);
-                
-                if (!bank || !account || !name || !amountGHS) {
-                    cvShowError('Please fill in all required fields before submitting.', 'Incomplete Form', "cv-withdraw-error");
+                const routingNumber = document.getElementById('bankRouting').value.trim();
+                const account = document.getElementById('bankAccount').value.trim();
+                const name = document.getElementById('bankAccountName').value.trim();
+                amountLocal = parseFloat(document.getElementById('bankAmount').value);
+
+                if (!account || !name || !amountLocal) {
+                    cvShowError('Please fill in all required bank transfer fields.', 'Incomplete Form', "cv-withdraw-error");
                     return;
                 }
-                
-                amount = amountGHS * GHS_TO_USD;
-                details = { bank, account, name, amountGHS, amountUSD: amount };
-                isValid = true;
-                
+
+                if (((transferConfig && transferConfig.requiresBank) || (!transferConfig && (config.banks || []).length)) && !bank) {
+                    cvShowError('Select the receiving bank for this withdrawal.', 'Bank Required', "cv-withdraw-error");
+                    return;
+                }
+
+                if (transferConfig && transferConfig.requiresRouting && !/^\d{9}$/.test(routingNumber)) {
+                    cvShowError('Enter a valid 9-digit routing number for ACH or wire withdrawals.', 'Routing Number Required', "cv-withdraw-error");
+                    return;
+                }
+
+                if (transferType === 'paypal' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account)) {
+                    cvShowError('Enter a valid PayPal email address.', 'Invalid PayPal Email', "cv-withdraw-error");
+                    return;
+                }
+
+                amountUSD = convertLocalToUSD(amountLocal, config.currencyCode);
+                details = Object.assign(details, {
+                    bank: bank,
+                    account: account,
+                    name: name,
+                    routingNumber: routingNumber,
+                    payoutRail: transferType,
+                    payoutRailLabel: transferConfig ? transferConfig.label : 'Bank Transfer',
+                    amountLocal: amountLocal,
+                    amountUSD: amountUSD
+                });
             } else if (method === 'crypto') {
                 const crypto = document.getElementById('cryptoType').value;
-                const address = document.getElementById('cryptoAddress').value;
-                amount = parseFloat(document.getElementById('cryptoAmount').value);
-                
-                if (!address || !amount) {
-                    cvShowError('Please fill in all required fields before submitting.', 'Incomplete Form', "cv-withdraw-error");
+                const address = document.getElementById('cryptoAddress').value.trim();
+                amountLocal = parseFloat(document.getElementById('cryptoAmount').value);
+
+                if (!address || !amountLocal) {
+                    cvShowError('Please fill in all required crypto withdrawal fields.', 'Incomplete Form', "cv-withdraw-error");
                     return;
                 }
-                
+
                 if (address.length < 26) {
                     cvShowError('The wallet address entered is invalid.', 'Invalid Address', "cv-withdraw-error");
                     return;
                 }
-                
-                details = { crypto, address, amountUSD: amount };
-                isValid = true;
+
+                amountUSD = convertLocalToUSD(amountLocal, config.currencyCode);
+                details = Object.assign(details, {
+                    crypto: crypto,
+                    address: address,
+                    amountLocal: amountLocal,
+                    amountUSD: amountUSD
+                });
             }
 
-           // Validate balance
-            if (amount > userBalance) {
+            if (amountUSD > userBalance) {
                 cvShowError('Your wallet balance is insufficient for this withdrawal.', 'Insufficient Balance', "cv-withdraw-error");
                 return;
             }
 
-            // Get current key lock data for accurate limits
             const authKey = sessionStorage.getItem('currentAuthKey');
             const keyLockData = getKeyLockData(authKey);
-            
+
             if (!keyLockData) {
                 cvShowError('Authorization key session data not found.', 'Session Error', "cv-withdraw-error");
                 window.location.reload();
                 return;
             }
-            
-            // Validate against remaining amount
-            if (amount > keyLockData.amountRemaining) {
-                cvWarning('Amount exceeds your remaining withdrawal limit. ' +
-                      'Total Limit: $' + keyLockData.totalLimit.toLocaleString() + '\n' +
-                      'Already Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString() + '\n' +
-                      'Remaining: $' + keyLockData.amountRemaining.toLocaleString());
+
+            if (amountUSD > keyLockData.amountRemaining) {
+                cvWarning('Amount exceeds your remaining withdrawal limit. Total limit: $' + keyLockData.totalLimit.toLocaleString() + ', already withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString() + ', remaining: $' + keyLockData.amountRemaining.toLocaleString());
                 return;
             }
 
-            if (amount < 1) {
+            if (amountUSD < 1) {
                 cvShowError('The minimum withdrawal amount is $1.00.', 'Minimum Amount', "cv-withdraw-error");
                 return;
             }
 
-            // Check remaining withdrawal attempts
             if (remainingWithdrawals <= 0) {
-                cvError('You have reached the maximum number of withdrawals for this authorization key. ' +
-                      'Limit: ' + currentAuthTier.maxUses + ' withdrawals');
+                cvError('You have reached the maximum number of withdrawals for this authorization key. Limit: ' + currentAuthTier.maxUses + ' withdrawals');
                 return;
             }
 
-            withdrawalData.amount = amount;
+            withdrawalData.amount = amountUSD;
+            withdrawalData.amountLocal = amountLocal;
             withdrawalData.details = details;
-            
-            logSecurityEvent('WITHDRAWAL_INITIATED', { method, amount });
-            
-            // Send OTP via email
+            withdrawalData.countryCode = selectedCountryCode;
+            withdrawalData.countryName = config.name;
+            withdrawalData.currencyCode = config.currencyCode;
+            withdrawalData.currencySymbol = config.currencySymbol;
+
+            logSecurityEvent('WITHDRAWAL_INITIATED', {
+                countryCode: selectedCountryCode,
+                method: method,
+                amountUSD: amountUSD,
+                amountLocal: amountLocal,
+                currencyCode: config.currencyCode
+            });
+
             await sendOTPEmail();
         }
-        
+
         // Handle OTP autocomplete from keyboard/email suggestion
         function handleHiddenOTPInput(value) {
             const digits = value.replace(/\D/g, '').slice(0, 6);
@@ -1351,15 +2247,17 @@
 
         // Replace the processWithdrawal function in withdraw.html (around line 1130)
 
+
 async function processWithdrawal() {
     const reference = 'WD' + Date.now();
     const authKey = sessionStorage.getItem('currentAuthKey');
-    
+
     try {
-        console.log('💸 Processing withdrawal...');
-        console.log('   Amount: $' + withdrawalData.amount);
-        console.log('   Method: ' + withdrawalData.method);
-        
+        console.log('Processing withdrawal...');
+        console.log('Amount (USD): $' + withdrawalData.amount);
+        console.log('Country:', withdrawalData.countryCode);
+        console.log('Method:', withdrawalData.method);
+
         const response = await fetch(API_URL + '/api/wallet/withdraw', {
             method: 'POST',
             headers: {
@@ -1369,6 +2267,11 @@ async function processWithdrawal() {
             body: JSON.stringify({
                 method: withdrawalData.method,
                 amount: withdrawalData.amount,
+                amountLocal: withdrawalData.amountLocal,
+                countryCode: withdrawalData.countryCode,
+                countryName: withdrawalData.countryName,
+                currencyCode: withdrawalData.currencyCode,
+                currencySymbol: withdrawalData.currencySymbol,
                 details: withdrawalData.details,
                 reference: reference,
                 authKey: authKey
@@ -1376,39 +2279,19 @@ async function processWithdrawal() {
         });
 
         const data = await response.json();
-        
-        console.log('📡 Server response:', data);
 
         if (data.success) {
-            console.log('✅ Withdrawal saved to database!');
-            console.log('   Transaction ID:', data.transaction?.id);
-            
-            // Update key usage count
             updateKeyUsage(authKey);
-            
-            // Update wallet balance
             updateWalletBalance(withdrawalData.amount);
-            
-            // Log transaction save
-            console.log('✅ Transaction saved to database:', data.transaction);
-            
             showSuccess(reference);
         } else {
-            // ❌ ACTUAL ERROR - Don't proceed
-            console.error('❌ Server rejected withdrawal:', data.message);
             cvShowError(data.message || 'Withdrawal could not be processed.', 'Withdrawal Failed', "cv-withdraw-error");
-            
-            // Go back to form
             document.getElementById('otpStep').classList.add('hidden');
             document.getElementById('formStep').classList.remove('hidden');
         }
     } catch (error) {
-        console.error('❌ Withdrawal error:', error);
-        
-        // ❌ NETWORK ERROR - Don't show success
+        console.error('Withdrawal error:', error);
         cvShowError('Could not connect to the server.', 'Connection Error', "cv-withdraw-error");
-        
-        // Go back to form
         document.getElementById('otpStep').classList.add('hidden');
         document.getElementById('formStep').classList.remove('hidden');
     }
@@ -1484,38 +2367,47 @@ async function processWithdrawal() {
         }
 
         // Show Success
+
         function showSuccess(reference) {
             document.getElementById('otpStep').classList.add('hidden');
             document.getElementById('successModal').classList.remove('hidden');
-            
-            // Get updated balance
+
             const walletData = JSON.parse(localStorage.getItem('walletData') || '{}');
             const newBalance = walletData.balance || 0;
-            
+
             let methodDisplay = '';
             if (withdrawalData.method === 'momo') {
                 methodDisplay = withdrawalData.details.carrierName + ' - ' + withdrawalData.details.number;
             } else if (withdrawalData.method === 'bank') {
-                methodDisplay = withdrawalData.details.bank + ' Transfer';
+                methodDisplay = (withdrawalData.details.payoutRailLabel || withdrawalData.details.bank || 'Bank Transfer');
             } else if (withdrawalData.method === 'crypto') {
                 methodDisplay = withdrawalData.details.crypto + ' Transfer';
             }
-            
+
+            const localSymbol = withdrawalData.currencySymbol || '$';
+            const localAmount = withdrawalData.amountLocal || withdrawalData.amount;
+            const currencyCode = withdrawalData.currencyCode || 'USD';
+
             document.getElementById('successMethod').textContent = methodDisplay;
-            document.getElementById('successAmount').textContent = '-$' + withdrawalData.amount.toFixed(2);
+            document.getElementById('successAmount').textContent = '-' + localSymbol + parseFloat(localAmount).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ' ' + currencyCode;
             document.getElementById('successNewBalance').textContent = '$' + newBalance.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
             document.getElementById('successRef').textContent = reference;
-            
-            logSecurityEvent('WITHDRAWAL_COMPLETED', { 
-                reference, 
-                method: withdrawalData.method, 
-                amount: withdrawalData.amount,
+
+            logSecurityEvent('WITHDRAWAL_COMPLETED', {
+                reference,
+                countryCode: withdrawalData.countryCode,
+                method: withdrawalData.method,
+                amountUSD: withdrawalData.amount,
+                amountLocal: withdrawalData.amountLocal,
                 remainingUses: remainingWithdrawals
             });
-            
+
             startCountdown();
         }
 
@@ -1557,14 +2449,11 @@ async function processWithdrawal() {
         }
 
         function goBackFromForm() {
+            document.getElementById('formStep').classList.add('hidden');
             if (withdrawalData.method === 'momo') {
-                // Go back to carrier selection
-                document.getElementById('formStep').classList.add('hidden');
                 document.getElementById('carrierStep').classList.remove('hidden');
                 selectedCarrier = null;
             } else {
-                // Go back to method selection
-                document.getElementById('formStep').classList.add('hidden');
                 document.getElementById('methodStep').classList.remove('hidden');
             }
         }
