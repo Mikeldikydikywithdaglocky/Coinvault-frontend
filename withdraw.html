@@ -2629,11 +2629,12 @@ function cvSuccess(msg, title) {
                 const data = await response.json();
 
                 if (data.success) {
+                    const otpEmail = data.email || email || 'your account email';
                     // Always set email on OTP screen
                     const emailEl = document.getElementById('userEmail');
-                    if (emailEl) emailEl.textContent = email;
+                    if (emailEl) emailEl.textContent = otpEmail;
 
-                    cvSuccess('A 6-digit code has been sent to ' + email, 'OTP Sent');
+                    cvSuccess('A 6-digit code has been sent to ' + otpEmail, 'OTP Sent');
 
                     // Only transition screens on first send, not resend
                     if (!isResend) {
@@ -2642,7 +2643,7 @@ function cvSuccess(msg, title) {
                         focusOTPInput();
                     }
                 } else {
-                    cvShowError('Failed to send OTP. Please try again.', 'Error', "cv-withdraw-error");
+                    cvShowError(data.message || 'Failed to send OTP. Please try again.', 'Error', "cv-withdraw-error");
                 }
             } catch (error) {
                 cvShowError('Could not send OTP. Please check your connection.', 'Error', "cv-withdraw-error");
