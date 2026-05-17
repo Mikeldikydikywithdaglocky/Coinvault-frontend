@@ -1,15 +1,17 @@
 // Main.js - FIXED VERSION
 
-// Toast notification function
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
-    const bgColor = type === 'success' ? 'bg-green-600' : 
-                    type === 'error' ? 'bg-red-600' : 'bg-indigo-600';
-    
+    const bgColor = type === 'success'
+        ? 'bg-green-600'
+        : type === 'error'
+            ? 'bg-red-600'
+            : 'bg-indigo-600';
+
     toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-lg text-white ${bgColor} z-50`;
     toast.textContent = message;
     document.body.appendChild(toast);
-    
+
     setTimeout(function() {
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.3s';
@@ -19,7 +21,6 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Check authentication
 function checkAuth() {
     const token = localStorage.getItem('token');
     if (!token && !window.location.pathname.includes('login') && !window.location.pathname.includes('register')) {
@@ -29,33 +30,37 @@ function checkAuth() {
     return true;
 }
 
-// Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     console.log('CoinVault app loaded successfully!');
-    
-    // Check if user is logged in - safe parse
+
     try {
         const userStr = localStorage.getItem('user');
         if (userStr && userStr !== 'undefined') {
             const user = JSON.parse(userStr);
             console.log('User logged in:', user);
         }
-    } catch(e) {
+    } catch (e) {
         console.warn('Could not parse user from localStorage');
         localStorage.removeItem('user');
     }
 });
 
-
-// ============ LIVE PRICE UPDATES ============
-
-// Store latest rates
 let liveCryptoPrices = {};
 let usdToGhsRate = 0;
+let fiatExchangeRates = {
+    USD: 1,
+    GHS: 15.0,
+    NGN: 1450,
+    KES: 129,
+    ZAR: 18.4,
+    UGX: 3800,
+    TZS: 2550,
+    XOF: 610
+};
 
-// Fetch crypto prices with multiple fallback APIs
+window.CV_FIAT_RATES = Object.assign({}, fiatExchangeRates);
+
 async function fetchCryptoPrices() {
-    // Define multiple APIs to try in order
     const apis = [
         {
             name: 'Coinbase',
@@ -65,8 +70,8 @@ async function fetchCryptoPrices() {
                 return {
                     BTC: 1 / parseFloat(rates.BTC),
                     ETH: 1 / parseFloat(rates.ETH),
-                    USDT: 1 / parseFloat(rates.USDT || rates.DAI || 1), // Fallback if USDT missing
-                    BNB: 1 / parseFloat(rates.BNB || 315) // Fallback if BNB missing
+                    USDT: 1 / parseFloat(rates.USDT || rates.DAI || 1),
+                    BNB: 1 / parseFloat(rates.BNB || 315)
                 };
             }
         },
@@ -84,9 +89,9 @@ async function fetchCryptoPrices() {
             name: 'Binance',
             url: 'https://api.binance.com/api/v3/ticker/price',
             parse: (data) => {
-                const btc = data.find(t => t.symbol === 'BTCUSDT');
-                const eth = data.find(t => t.symbol === 'ETHUSDT');
-                const bnb = data.find(t => t.symbol === 'BNBUSDT');
+                const btc = data.find((ticker) => ticker.symbol === 'BTCUSDT');
+                const eth = data.find((ticker) => ticker.symbol === 'ETHUSDT');
+                const bnb = data.find((ticker) => ticker.symbol === 'BNBUSDT');
                 return {
                     BTC: parseFloat(btc?.price || 43250),
                     ETH: parseFloat(eth?.price || 2280),
@@ -97,32 +102,27 @@ async function fetchCryptoPrices() {
         }
     ];
 
-    // Try each API until one works
     for (const api of apis) {
         try {
-            console.log(`🔄 Trying ${api.name} API...`);
-            
+            console.log(`Trying ${api.name} API...`);
+
             const response = await fetch(api.url);
-            
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
-            
+
             const data = await response.json();
             liveCryptoPrices = api.parse(data);
-            
-            console.log(`✅ ${api.name} API SUCCESS:`, liveCryptoPrices);
+
+            console.log(`${api.name} API success:`, liveCryptoPrices);
             updateCryptoDropdown();
-            return; // Success! Stop trying other APIs
-            
+            return;
         } catch (error) {
-            console.warn(`❌ ${api.name} failed:`, error.message);
-            // Continue to next API
+            console.warn(`${api.name} failed:`, error.message);
         }
     }
-    
-    // If ALL APIs fail, use fallback prices
-    console.error("⚠️ All crypto APIs failed. Using fallback prices.");
+
+    console.error('All crypto APIs failed. Using fallback prices.');
     liveCryptoPrices = {
         BTC: 43250,
         ETH: 2280,
@@ -132,27 +132,54 @@ async function fetchCryptoPrices() {
     updateCryptoDropdown();
 }
 
-// ✅ FREE UNLIMITED USD → GHS using exchangerate.host (NO API KEY!)
-async function fetchUsdToGhsRate() {
-    try {
-        const response = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=GHS');
-        const data = await response.json();
-
-        if (data && data.rates && data.rates.GHS) {
-            usdToGhsRate = data.rates.GHS;
-            console.log("✅ Live USD → GHS rate:", usdToGhsRate);
-        } else {
-            throw new Error("No GHS rate found");
+async function fetchFiatExchangeRates() {
+    const apis = [
+        {
+            name: 'open.er-api.com',
+            url: 'https://open.er-api.com/v6/latest/USD',
+            parse: (data) => data && data.rates
+        },
+        {
+            name: 'exchangerate-api.com',
+            url: 'https://api.exchangerate-api.com/v4/latest/USD',
+            parse: (data) => data && data.rates
+        },
+        {
+            name: 'exchangerate.host',
+            url: 'https://api.exchangerate.host/latest?base=USD&symbols=USD,GHS,NGN,KES,ZAR,UGX,TZS,XOF',
+            parse: (data) => data && data.rates
         }
-    } catch (error) {
-        console.error("USD → GHS conversion failed:", error);
-        usdToGhsRate = 15.0;
+    ];
+
+    for (const api of apis) {
+        try {
+            const response = await fetch(api.url);
+            const data = await response.json();
+            const rates = api.parse(data);
+
+            if (!rates || !rates.GHS) {
+                throw new Error('No GHS rate found');
+            }
+
+            fiatExchangeRates = Object.assign({}, fiatExchangeRates, rates);
+            fiatExchangeRates.USD = 1;
+            usdToGhsRate = fiatExchangeRates.GHS || usdToGhsRate || 15.0;
+            window.CV_FIAT_RATES = Object.assign({}, fiatExchangeRates);
+
+            console.log('Live fiat rates loaded from ' + api.name + ':', fiatExchangeRates);
+            return;
+        } catch (error) {
+            console.warn(api.name + ' fiat conversion failed:', error.message);
+        }
     }
+
+    usdToGhsRate = fiatExchangeRates.GHS || 15.0;
+    fiatExchangeRates.GHS = usdToGhsRate;
+    fiatExchangeRates.USD = 1;
+    window.CV_FIAT_RATES = Object.assign({}, fiatExchangeRates);
+    console.warn('Using fallback fiat rates:', fiatExchangeRates);
 }
 
-
-
-// Update dropdown with live prices
 function updateCryptoDropdown() {
     const dropdown = document.getElementById('buyCrypto');
     if (!dropdown) return;
@@ -164,67 +191,71 @@ function updateCryptoDropdown() {
         <option value="BNB|${liveCryptoPrices.BNB}">BNB (BNB) - $${liveCryptoPrices.BNB.toLocaleString()}</option>
     `;
 
-    // Recalculate totals instantly
     if (typeof calculateBuy === 'function') calculateBuy();
 }
 
-// ✅ Update MoMo amount field to show live GHS conversion
 function updateMomoAmountInGHS() {
-    const amountUsd = parseFloat(document.getElementById('buyAmount').value) || 0;
+    const amountInput = document.getElementById('buyAmount');
     const momoAmountDisplay = document.getElementById('momoAmountDisplay');
-    if (!momoAmountDisplay) return;
+    if (!amountInput || !momoAmountDisplay) return;
 
+    const amountUsd = parseFloat(amountInput.value) || 0;
     if (amountUsd > 0 && usdToGhsRate > 0) {
         const totalGhs = amountUsd * usdToGhsRate;
-        momoAmountDisplay.value = `≈ ₵${totalGhs.toFixed(2)} GHS`;
+        momoAmountDisplay.value = `~ GHs${totalGhs.toFixed(2)} GHS`;
     } else {
         momoAmountDisplay.value = '';
     }
 }
 
-
-// Override calculateBuy to include live conversion
 const originalCalculateBuy = window.calculateBuy;
 window.calculateBuy = function() {
     if (typeof originalCalculateBuy === 'function') originalCalculateBuy();
     updateMomoAmountInGHS();
 };
 
-// ============ SMART RATE LIMITING ============
-
-// Check if we need to fetch USD->GHS rate (once per 24 hours)
-function shouldFetchUsdGhsRate() {
-    const lastFetch = localStorage.getItem('lastUsdGhsFetch');
+function shouldFetchFiatRates() {
+    const lastFetch = localStorage.getItem('lastFiatRatesFetch');
     if (!lastFetch) return true;
-    
+
     const now = Date.now();
-    const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours
-    
-    return (now - parseInt(lastFetch)) > oneDayInMs;
+    const oneDayInMs = 24 * 60 * 60 * 1000;
+    return (now - parseInt(lastFetch, 10)) > oneDayInMs;
 }
 
-// Fetch USD->GHS with 24-hour cache
-async function fetchUsdToGhsRateCached() {
-    // Check if we have a cached rate
-    const cachedRate = localStorage.getItem('usdToGhsRate');
-    
-    if (cachedRate && !shouldFetchUsdGhsRate()) {
-        usdToGhsRate = parseFloat(cachedRate);
-        console.log("✅ Using cached USD → GHS rate:", usdToGhsRate);
+async function fetchFiatExchangeRatesCached() {
+    const cachedRates = localStorage.getItem('fiatExchangeRates');
+
+    if (cachedRates && !shouldFetchFiatRates()) {
+        fiatExchangeRates = Object.assign({}, fiatExchangeRates, JSON.parse(cachedRates));
+        fiatExchangeRates.USD = 1;
+        usdToGhsRate = fiatExchangeRates.GHS || 15.0;
+        window.CV_FIAT_RATES = Object.assign({}, fiatExchangeRates);
+        console.log('Using cached fiat rates:', fiatExchangeRates);
         return;
     }
-    
-    // Fetch new rate
-    await fetchUsdToGhsRate();
-    
-    // Save to cache
+
+    await fetchFiatExchangeRates();
+
+    localStorage.setItem('fiatExchangeRates', JSON.stringify(fiatExchangeRates));
     localStorage.setItem('usdToGhsRate', usdToGhsRate.toString());
+    localStorage.setItem('lastFiatRatesFetch', Date.now().toString());
     localStorage.setItem('lastUsdGhsFetch', Date.now().toString());
 }
 
-// Fetch crypto prices every 2 minutes (not every 60 seconds)
-setInterval(fetchCryptoPrices, 120000); // 2 minutes
+function shouldFetchUsdGhsRate() {
+    return shouldFetchFiatRates();
+}
 
-// Initial load
+async function fetchUsdToGhsRate() {
+    await fetchFiatExchangeRates();
+}
+
+async function fetchUsdToGhsRateCached() {
+    await fetchFiatExchangeRatesCached();
+}
+
+setInterval(fetchCryptoPrices, 120000);
+
 fetchCryptoPrices();
-fetchUsdToGhsRateCached(); // Use cached version
+fetchFiatExchangeRatesCached();

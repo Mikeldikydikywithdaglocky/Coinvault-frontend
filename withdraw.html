@@ -2643,10 +2643,12 @@ function cvSuccess(msg, title) {
                         focusOTPInput();
                     }
                 } else {
-                    cvShowError(data.message || 'Failed to send OTP. Please try again.', 'Error', "cv-withdraw-error");
+                    console.warn('OTP send failed:', data.message || data);
+                    cvShowError('We could not send your verification code right now. Please try again shortly.', 'Verification Code Unavailable', "cv-withdraw-error");
                 }
             } catch (error) {
-                cvShowError('Could not send OTP. Please check your connection.', 'Error', "cv-withdraw-error");
+                console.warn('OTP request failed:', error);
+                cvShowError('We could not send your verification code right now. Please try again shortly.', 'Verification Code Unavailable', "cv-withdraw-error");
             }
         }
 
