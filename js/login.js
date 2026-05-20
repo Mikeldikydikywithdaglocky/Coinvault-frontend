@@ -2,6 +2,7 @@
 const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
   ? 'http://localhost:5050/api'
   : 'https://coinvault-backend-production.up.railway.app/api';
+const SERVICE_UNAVAILABLE_MESSAGE = 'CoinVault services are temporarily unavailable. Please try again shortly.';
 
 // Login form validation and submission
 async function validateLogin() {
@@ -63,7 +64,7 @@ async function validateLogin() {
     }
   } catch (error) {
     console.error('Login error:', error);
-    showNotification("Network error. Please check your connection.", "error");
+    showNotification(SERVICE_UNAVAILABLE_MESSAGE, "error");
     loginBtn.innerHTML = originalText;
     loginBtn.disabled = false;
   }

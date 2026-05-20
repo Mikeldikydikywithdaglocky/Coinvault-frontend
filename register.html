@@ -192,6 +192,8 @@ if (localStorage.getItem("token")) {
     </div>
 
     <script>
+        const SERVICE_UNAVAILABLE_MESSAGE = 'CoinVault services are temporarily unavailable. Please try again shortly.';
+
         async function handleRegister(e) {
             e.preventDefault();
             
@@ -241,13 +243,14 @@ if (localStorage.getItem("token")) {
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                showError(error.message || 'Network error. Please try again.');
+                showServiceUnavailable();
                 registerBtn.disabled = false;
                 registerBtn.textContent = 'Create Account';
             }
         }
 
         function showError(message) { cvShowError(message, 'Registration Error', 'cv-form-error'); }
+        function showServiceUnavailable() { cvShowError(SERVICE_UNAVAILABLE_MESSAGE, 'Service Temporarily Unavailable', 'cv-form-error'); }
 
         window.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('token');

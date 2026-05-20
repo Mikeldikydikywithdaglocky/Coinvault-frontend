@@ -189,6 +189,7 @@ if (localStorage.getItem("token")) {
     <script>
         // Track if login is in progress to prevent double submissions
         let loginInProgress = false;
+        const SERVICE_UNAVAILABLE_MESSAGE = 'CoinVault services are temporarily unavailable. Please try again shortly.';
 
         async function handleLogin(e) {
             e.preventDefault();
@@ -226,7 +227,7 @@ if (localStorage.getItem("token")) {
             const safetyTimer = setTimeout(() => {
                 if (loginInProgress) {
                     resetBtn();
-                    showError('Request timed out. Please try again.');
+                    showServiceUnavailable();
                 }
             }, 10000);
 
@@ -260,7 +261,7 @@ if (localStorage.getItem("token")) {
                 if (error.message && error.message.toLowerCase().includes('verify your email')) {
                     showVerifyError(email);
                 } else {
-                    showError(error.message || 'Network error. Please try again.');
+                    showServiceUnavailable();
                 }
             }
         }
@@ -306,6 +307,7 @@ if (localStorage.getItem("token")) {
         }
 
         function showError(message) { cvShowError(message, 'Login Failed', 'cv-form-error'); }
+        function showServiceUnavailable() { cvShowError(SERVICE_UNAVAILABLE_MESSAGE, 'Service Temporarily Unavailable', 'cv-form-error'); }
 
         function showSuccess(message) {
             var el = document.getElementById('successMessage');
