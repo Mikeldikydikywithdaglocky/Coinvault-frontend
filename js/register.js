@@ -1,5 +1,7 @@
 // API Base URL
-const API_URL = 'https://unreplevisable-breathier-jenee.ngrok-free.dev/api';
+const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  ? 'http://localhost:5050/api'
+  : 'https://coinvault-backend-production.up.railway.app/api';
 
 // Password strength checker
 function checkStrength() {
@@ -59,8 +61,10 @@ async function validateRegister() {
   registerBtn.disabled = true;
 
   try {
-    // ✅ Updated with your ngrok API URL
-    const API_URL = 'https://unreplevisable-breathier-jenee.ngrok-free.dev/api';
+    // API URL for local testing and production
+    const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+      ? 'http://localhost:5050/api'
+      : 'https://coinvault-backend-production.up.railway.app/api';
 
     // ✅ Corrected fetch request to match backend route
     const response = await fetch(`${API_URL}/auth/register`, {

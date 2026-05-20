@@ -1,7 +1,9 @@
 
 
 // Dashboard.js - UPDATED with Dynamic Assets
-const API_URL = 'https://api.coinvaultnet.com';
+const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+    ? 'http://localhost:5050/api'
+    : 'https://coinvault-backend-production.up.railway.app/api';
 
 // Check authentication
 function checkDashboardAuth() {

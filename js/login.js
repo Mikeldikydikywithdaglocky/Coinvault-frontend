@@ -1,5 +1,7 @@
 // API Base URL
-const API_URL = 'https://https://unreplevisable-breathier-jenee.ngrok-free.dev/api';
+const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  ? 'http://localhost:5050/api'
+  : 'https://coinvault-backend-production.up.railway.app/api';
 
 // Login form validation and submission
 async function validateLogin() {

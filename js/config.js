@@ -2,9 +2,13 @@
 // Place this file in your frontend/js/ folder
 
 const CONFIG = {
-  // API Base URL - automatically uses ngrok URL
-  // js/config.js - line 3
-API_URL: 'https://api.coinvaultnet.com/api',
+  API_URLS: [
+    'https://api.coinvaultnet.com/api',
+    'https://coinvault-backend-production.up.railway.app/api'
+  ],
+  get API_URL() {
+    return this.API_URLS[0];
+  },
   
   // Network Configuration
   NETWORK: 'bitcoin', // 'bitcoin' or 'testnet'
@@ -28,7 +32,6 @@ API_URL: 'https://api.coinvaultnet.com/api',
   
   // Make API Request Helper
   async apiRequest(endpoint, options = {}) {
-    const url = `${this.API_URL}${endpoint}`;
     const includeAuth = options.auth !== false; // Default to true
     
     const config = {
@@ -42,38 +45,51 @@ API_URL: 'https://api.coinvaultnet.com/api',
     if (options.body) {
       config.body = JSON.stringify(options.body);
     }
-    
-    try {
-      console.log(`🔄 API Request: ${config.method} ${url}`);
-      
-      const response = await fetch(url, config);
-      
-      console.log(`📡 Response Status: ${response.status}`);
-      
-      // Check if response is JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error(`Server returned non-JSON response. Status: ${response.status}`);
+
+    let lastError = null;
+
+    for (const baseUrl of this.API_URLS) {
+      const url = `${baseUrl}${endpoint}`;
+
+      try {
+        console.log(`API Request: ${config.method} ${url}`);
+
+        const response = await fetch(url, config);
+
+        console.log(`Response Status: ${response.status}`);
+
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error(`Server returned non-JSON response. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || `Request failed with status ${response.status}`);
+        }
+
+        console.log('API Success:', data);
+        return data;
+      } catch (error) {
+        lastError = error;
+        console.warn(`API host failed (${baseUrl}):`, error.message);
+
+        const networkFailure =
+          error.message.includes('NetworkError') ||
+          error.message.includes('fetch') ||
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('non-JSON response');
+
+        if (!networkFailure) {
+          throw error;
+        }
       }
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || `Request failed with status ${response.status}`);
-      }
-      
-      console.log(`✅ API Success:`, data);
-      return data;
-    } catch (error) {
-      console.error('❌ API Request Error:', error);
-      
-      // Better error messages
-      if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
-        throw new Error('Cannot connect to server. Please check your internet connection.');
-      }
-      
-      throw error;
     }
+
+    console.error('API Request Error:', lastError);
+    throw new Error('Cannot connect to server. Please check your internet connection.');
   },
   
   // Format Bitcoin Address for Display
