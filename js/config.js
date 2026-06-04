@@ -67,7 +67,10 @@ const CONFIG = {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || `Request failed with status ${response.status}`);
+          const requestError = new Error(data.message || `Request failed with status ${response.status}`);
+          requestError.status = response.status;
+          requestError.baseUrl = baseUrl;
+          throw requestError;
         }
 
         console.log('API Success:', data);
@@ -81,14 +84,18 @@ const CONFIG = {
           error.message.includes('fetch') ||
           error.message.includes('Failed to fetch') ||
           error.message.includes('non-JSON response');
+        const authHostMismatch = endpoint === '/auth/login' && error.status === 401;
 
-        if (!networkFailure) {
+        if (!networkFailure && !authHostMismatch) {
           throw error;
         }
       }
     }
 
     console.error('API Request Error:', lastError);
+    if (lastError && lastError.status) {
+      throw lastError;
+    }
     throw new Error('Cannot connect to server. Please check your internet connection.');
   },
   

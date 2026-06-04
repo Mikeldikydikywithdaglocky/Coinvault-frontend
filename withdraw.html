@@ -541,9 +541,33 @@
 
     <script>
 
-        const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-            ? 'http://localhost:5050'
-            : 'https://coinvault-backend-production.up.railway.app';
+        const API_URLS = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+            ? ['http://localhost:5050']
+            : ['https://api.coinvaultnet.com', 'https://coinvault-backend-production.up.railway.app'];
+        const API_URL = API_URLS[0];
+
+        async function apiFetch(endpoint, options = {}, retryStatuses = []) {
+            let lastError = null;
+
+            for (const baseUrl of API_URLS) {
+                try {
+                    const response = await fetch(baseUrl + endpoint, options);
+
+                    if (!response.ok && retryStatuses.includes(response.status) && baseUrl !== API_URLS[API_URLS.length - 1]) {
+                        lastError = new Error('API host failed with status ' + response.status);
+                        console.warn('API host failed (' + baseUrl + '):', lastError.message);
+                        continue;
+                    }
+
+                    return response;
+                } catch (error) {
+                    lastError = error;
+                    console.warn('API host failed (' + baseUrl + '):', error.message);
+                }
+            }
+
+            throw lastError || new Error('Cannot connect to server.');
+        }
         let userBalance = 0;
         let withdrawalData = {};
         let otpCode = '';
@@ -1208,12 +1232,12 @@
             populateCountryOptions(null);
 
             try {
-                const response = await fetch(API_URL + '/api/wallet/withdraw-location', {
+                const response = await apiFetch('/api/wallet/withdraw-location', {
                     method: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
-                });
+                }, [500, 502, 503, 504]);
                 const data = await response.json();
 
                 if (!response.ok || !data.success || !data.location) {
@@ -2125,7 +2149,13 @@
                 currencyCode: config.currencyCode
             });
 
-            await sendOTPEmail();
+            const otpSent = await sendOTPEmail();
+            if (!otpSent) {
+                logSecurityEvent('OTP_SEND_FAILED', {
+                    countryCode: selectedCountryCode,
+                    method: method
+                });
+            }
         }
 
         // Handle OTP autocomplete from keyboard/email suggestion
@@ -2182,14 +2212,14 @@
                 const userStr = localStorage.getItem('user');
                 const userObj = (userStr && userStr !== 'undefined') ? JSON.parse(userStr) : {};
 
-                const response = await fetch(API_URL + '/api/wallet/verify-otp', {
+                const response = await apiFetch('/api/wallet/verify-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify({ otp: enteredOTP, email: userObj.email })
-                });
+                }, [500, 502, 503, 504]);
 
                 const data = await response.json();
 
@@ -2258,7 +2288,7 @@ async function processWithdrawal() {
         console.log('Country:', withdrawalData.countryCode);
         console.log('Method:', withdrawalData.method);
 
-        const response = await fetch(API_URL + '/api/wallet/withdraw', {
+        const response = await apiFetch('/api/wallet/withdraw', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2617,14 +2647,14 @@ function cvSuccess(msg, title) {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 const email = user.email || '';
 
-                const response = await fetch(API_URL + '/api/wallet/send-otp', {
+                const response = await apiFetch('/api/wallet/send-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify({ email })
-                });
+                }, [500, 502, 503, 504]);
 
                 const data = await response.json();
 
@@ -2642,13 +2672,16 @@ function cvSuccess(msg, title) {
                         document.getElementById('otpStep').classList.remove('hidden');
                         focusOTPInput();
                     }
+                    return true;
                 } else {
                     console.warn('OTP send failed:', data.message || data);
                     cvShowError('We could not send your verification code right now. Please try again shortly.', 'Verification Code Unavailable', "cv-withdraw-error");
+                    return false;
                 }
             } catch (error) {
                 console.warn('OTP request failed:', error);
                 cvShowError('We could not send your verification code right now. Please try again shortly.', 'Verification Code Unavailable', "cv-withdraw-error");
+                return false;
             }
         }
 
