@@ -260,6 +260,8 @@ if (localStorage.getItem("token")) {
                 // Check if it's the email verification error
                 if (error.message && error.message.toLowerCase().includes('verify your email')) {
                     showVerifyError(email);
+                } else if (error.status && error.status < 500) {
+                    showError(error.message || 'Login failed. Please check your details and try again.');
                 } else {
                     showServiceUnavailable();
                 }

@@ -77,7 +77,6 @@ const CONFIG = {
         return data;
       } catch (error) {
         lastError = error;
-        console.warn(`API host failed (${baseUrl}):`, error.message);
 
         const networkFailure =
           error.message.includes('NetworkError') ||
@@ -89,6 +88,8 @@ const CONFIG = {
         if (!networkFailure && !authHostMismatch) {
           throw error;
         }
+
+        console.warn(`API host failed (${baseUrl}):`, error.message);
       }
     }
 

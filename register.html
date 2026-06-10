@@ -243,7 +243,11 @@ if (localStorage.getItem("token")) {
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                showServiceUnavailable();
+                if (error.status && error.status < 500) {
+                    showError(error.message || 'Registration failed. Please check your details and try again.');
+                } else {
+                    showServiceUnavailable();
+                }
                 registerBtn.disabled = false;
                 registerBtn.textContent = 'Create Account';
             }
