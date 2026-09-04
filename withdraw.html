@@ -2664,7 +2664,8 @@ function cvSuccess(msg, title) {
                     const emailEl = document.getElementById('userEmail');
                     if (emailEl) emailEl.textContent = otpEmail;
 
-                    cvSuccess('A 6-digit code has been sent to ' + otpEmail, 'OTP Sent');
+                    const expiryText = data.expiresInMinutes ? ' It expires in ' + data.expiresInMinutes + ' minutes.' : '';
+                    cvSuccess('A 6-digit code has been sent to ' + otpEmail + '.' + expiryText, 'Code Sent');
 
                     // Only transition screens on first send, not resend
                     if (!isResend) {
