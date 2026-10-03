@@ -1,233 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <script src="js/auth.js"></script>
-
 <script>
 if (localStorage.getItem("token")) {
   window.location.replace("index.html");
 }
 </script>
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In — CoinVault Secure Crypto Wallet</title>
-    <!-- Favicon -->
+    <title>Sign In - CoinVault Secure Crypto Wallet</title>
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Coinvault" />
-<link rel="manifest" href="/site.webmanifest" />
-
-    <!-- Primary SEO -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Coinvault" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="description" content="Sign in to your CoinVault account. Access your Bitcoin wallet and digital assets protected by Web3-grade encryption, two-factor email authentication, and advanced fraud detection.">
     <meta name="keywords" content="coinvault login, crypto wallet login, bitcoin wallet sign in, secure crypto login, web3 wallet access">
     <meta name="author" content="CoinVault">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://www.coinvaultnet.com/login.html">
-
-    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.coinvaultnet.com/login.html">
-    <meta property="og:title" content="Sign In — CoinVault Secure Crypto Wallet">
+    <meta property="og:title" content="Sign In - CoinVault Secure Crypto Wallet">
     <meta property="og:description" content="Access your CoinVault account. Your assets are protected by Web3-grade encryption and multi-layer authentication.">
     <meta property="og:site_name" content="CoinVault">
-
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Sign In — CoinVault">
+    <meta name="twitter:title" content="Sign In - CoinVault">
     <meta name="twitter:description" content="Access your CoinVault account. Web3-grade security for your digital assets.">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/auth-pages.css">
     <script src="js/config.js"></script>
-    <style>
-
-/* ===== INLINE ERROR BANNER ===== */
-.cv-inline-error {
-    display: none;
-    align-items: flex-start;
-    gap: 0.625rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.625rem;
-    border: 1px solid #7f1d1d;
-    background: #1c0a0a;
-    color: #fca5a5;
-    font-size: 0.8125rem;
-    line-height: 1.5;
-    margin-bottom: 1rem;
-    animation: cvBannerIn 0.2s ease forwards;
-}
-.cv-inline-error.visible {
-    display: flex;
-}
-.cv-inline-error svg {
-    flex-shrink: 0;
-    margin-top: 1px;
-}
-.cv-inline-error-body { flex: 1; }
-.cv-inline-error-title {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: #ef4444;
-    margin-bottom: 0.125rem;
-}
-.cv-inline-error-msg { color: #fca5a5; }
-.cv-inline-error-close {
-    background: none;
-    border: none;
-    color: #9ca3af;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0;
-    line-height: 1;
-    flex-shrink: 0;
-    min-height: unset;
-    transition: color 0.15s;
-}
-.cv-inline-error-close:hover { color: #f87171; }
-@keyframes cvBannerIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Resend link */
-.resend-link {
-    color: #22c55e;
-    cursor: pointer;
-    font-weight: 600;
-    text-decoration: underline;
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: inherit;
-    font-family: inherit;
-    line-height: inherit;
-    transition: color 0.15s;
-}
-.resend-link:hover { color: #16a34a; }
-.resend-link:disabled { color: #6b7280; cursor: not-allowed; text-decoration: none; }
-
-    @keyframes cvSlideOut {
-        from { opacity: 1; transform: translateY(0); }
-        to   { opacity: 0; transform: translateY(110%); }
-    }
-
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full mx-4">
-        <div class="text-center mb-6">
-            <div class="flex justify-center mb-4">
-                <div class="w-16 h-16 bg-indigo-600 bg-opacity-20 rounded-2xl flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-            </div>
-            <h1 class="text-2xl md:text-3xl font-bold mb-2">Welcome Back</h1>
-            <p class="text-gray-400">Login to your CoinVault account</p>
-        </div>
+<body class="auth-page switch-auth-page">
+    <main class="switch-auth-shell" aria-label="CoinVault authentication">
+        <section class="switch-auth-card" id="authCard">
+            <div class="desktop-dots" aria-hidden="true"><span></span><span></span><span></span></div>
 
-        <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <!-- Email -->
-                <div class="mb-6">
-                    <label class="block text-sm text-gray-400 mb-2">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        required
-                        placeholder="Enter your email"
-                        class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                </div>
+            <div class="combo-bg" aria-hidden="true"></div>
 
-                <!-- Password -->
-                <div class="mb-6">
-                    <label class="block text-sm text-gray-400 mb-2">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        required
-                        placeholder="Enter your password"
-                        class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                </div>
+            <section class="combo-hero hero-login" aria-label="Sign in prompt">
+                <span class="combo-logo"><img src="favicon.svg" alt=""></span>
+                <h2>Welcome back</h2>
+                <p>Return to your protected CoinVault wallet, balances, and withdrawal workflow.</p>
+                <button class="combo-switch" type="button" data-auth-mode="login">Sign in</button>
+            </section>
 
-                <!-- Error Message -->
-                <div id="cv-form-error" class="cv-inline-error" role="alert">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <div class="cv-inline-error-body">
-                        <div class="cv-inline-error-title" id="cv-form-error-title">Error</div>
-                        <div class="cv-inline-error-msg" id="cv-form-error-msg"></div>
+            <section class="combo-hero hero-register" aria-label="Create account prompt">
+                <span class="combo-logo"><img src="favicon.svg" alt=""></span>
+                <h2>Hello there</h2>
+                <p>Begin your CoinVault journey with email-link verification and secure account access.</p>
+                <button class="combo-switch" type="button" data-auth-mode="register">Create account</button>
+            </section>
+
+            <form id="loginForm" class="combo-form form-login" onsubmit="handleLogin(event)">
+                <div class="combo-form-head">
+                    <span class="combo-mini-logo"><img src="favicon.svg" alt="CoinVault logo"></span>
+                    <div>
+                        <h1>Sign in</h1>
+                        <p>Access your secure wallet dashboard.</p>
                     </div>
-                    <button class="cv-inline-error-close" onclick="cvHideError('cv-form-error')">&times;</button>
                 </div>
 
-                <!-- Success Message -->
-                <div id="successMessage" class="hidden mb-4 p-3 bg-green-900 bg-opacity-40 border border-green-700 rounded-xl text-green-400 text-sm"></div>
+                <div class="social-auth" aria-label="Social sign in options">
+                    <button class="social-auth-btn" type="button" data-oauth-provider="google">
+                        <span class="social-mark google-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5c-.3 1.4-1.1 2.7-2.3 3.5v2.9h3.8c2.2-2 3.5-5 3.5-8.5Z"/><path fill="#34A853" d="M12 24c3.2 0 5.9-1 7.9-3.2l-3.8-2.9c-1.1.7-2.4 1.1-4.1 1.1-3.1 0-5.7-2.1-6.6-4.9H1.5v3C3.5 21.1 7.5 24 12 24Z"/><path fill="#FBBC05" d="M5.4 14.1c-.2-.7-.4-1.4-.4-2.1s.1-1.5.4-2.1v-3H1.5C.6 8.4 0 10.1 0 12s.6 3.6 1.5 5.1l3.9-3Z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.5 0 3.5 2.9 1.5 6.9l3.9 3C6.3 6.9 8.9 4.8 12 4.8Z"/></svg>
+                        </span>
+                        <span>Google</span>
+                    </button>
+                    <button class="social-auth-btn" type="button" data-oauth-provider="facebook">
+                        <span class="social-mark facebook-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.1C24 5.4 18.6 0 12 0S0 5.4 0 12.1c0 6 4.4 11 10.1 11.9v-8.4h-3v-3.5h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9v2.3h3.4l-.5 3.5h-2.8V24c5.7-.9 10.1-5.9 10.1-11.9Z"/><path fill="#fff" d="m16.6 15.6.5-3.5h-3.4V9.8c0-1 .5-1.9 2-1.9h1.5v-3s-1.4-.2-2.7-.2c-2.8 0-4.5 1.7-4.5 4.7v2.7H7v3.5h3V24c.6.1 1.2.1 1.9.1s1.3 0 1.9-.1v-8.4h2.8Z"/></svg>
+                        </span>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="social-auth-btn" type="button" data-oauth-provider="apple">
+                        <span class="social-mark apple-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path fill="#111827" d="M17.1 12.7c0-2.8 2.3-4.1 2.4-4.2-1.3-1.9-3.3-2.1-4-2.2-1.7-.2-3.3 1-4.2 1-.9 0-2.2-1-3.6-.9-1.9 0-3.6 1.1-4.5 2.8-1.9 3.3-.5 8.1 1.4 10.8.9 1.3 2 2.8 3.4 2.7 1.4-.1 1.9-.9 3.5-.9 1.7 0 2.1.9 3.6.9 1.5 0 2.4-1.3 3.3-2.7 1-1.5 1.5-3 1.5-3.1-.1-.1-2.8-1.1-2.8-4.2ZM14.4 4.5c.8-1 1.3-2.3 1.1-3.6-1.1 0-2.4.7-3.2 1.7-.7.8-1.3 2.2-1.2 3.5 1.3.1 2.5-.6 3.3-1.6Z"/></svg>
+                        </span>
+                        <span>Apple</span>
+                    </button>
+                </div>
 
-                <!-- Login Button -->
-                <button 
-                    type="submit" 
-                    id="loginBtn"
-                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-xl font-bold transition mb-4"
-                >
-                    Login
-                </button>
+                <div class="auth-divider"><span>or use email</span></div>
 
-                <!-- Register Link -->
-                <p class="text-center text-gray-400 text-sm">
-                    Don't have an account? 
-                    <a href="register.html" class="text-indigo-400 hover:text-indigo-300">Register here</a>
-                </p>
+                <div class="auth-field">
+                    <label for="loginEmail">Email address</label>
+                    <div class="auth-input-wrap">
+                        <input type="email" id="loginEmail" required placeholder="you@example.com" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="loginPassword">Password</label>
+                    <div class="auth-input-wrap">
+                        <input type="password" id="loginPassword" required placeholder="Enter your password" autocomplete="current-password">
+                        <button class="password-toggle" type="button" data-toggle-password="loginPassword">Show</button>
+                    </div>
+                </div>
+
+                <div class="auth-row">
+                    <label class="auth-check"><input type="checkbox" id="rememberDevice">Remember this device</label>
+                    <button class="auth-link switch-inline" type="button" data-auth-mode="register">Create account</button>
+                </div>
+
+                <div id="login-error" class="cv-inline-error" role="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b4233a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <div class="cv-inline-error-body">
+                        <div class="cv-inline-error-title" id="login-error-title">Error</div>
+                        <div class="cv-inline-error-msg" id="login-error-msg"></div>
+                    </div>
+                    <button type="button" class="cv-inline-error-close" onclick="cvHideError('login-error')">&times;</button>
+                </div>
+
+                <div id="login-success" class="auth-success hidden"></div>
+
+                <button type="submit" id="loginBtn" class="auth-submit">Sign in securely</button>
             </form>
-        </div>
-    </div>
+
+            <form id="registerForm" class="combo-form form-register" onsubmit="handleRegister(event)">
+                <div class="combo-form-head">
+                    <span class="combo-mini-logo"><img src="favicon.svg" alt="CoinVault logo"></span>
+                    <div>
+                        <h1>Create account</h1>
+                        <p>We will send a verification link to your email.</p>
+                    </div>
+                </div>
+
+                <div class="social-auth compact-social" aria-label="Social account options">
+                    <button class="social-auth-btn" type="button" data-oauth-provider="google">
+                        <span class="social-mark google-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5c-.3 1.4-1.1 2.7-2.3 3.5v2.9h3.8c2.2-2 3.5-5 3.5-8.5Z"/><path fill="#34A853" d="M12 24c3.2 0 5.9-1 7.9-3.2l-3.8-2.9c-1.1.7-2.4 1.1-4.1 1.1-3.1 0-5.7-2.1-6.6-4.9H1.5v3C3.5 21.1 7.5 24 12 24Z"/><path fill="#FBBC05" d="M5.4 14.1c-.2-.7-.4-1.4-.4-2.1s.1-1.5.4-2.1v-3H1.5C.6 8.4 0 10.1 0 12s.6 3.6 1.5 5.1l3.9-3Z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.5 0 3.5 2.9 1.5 6.9l3.9 3C6.3 6.9 8.9 4.8 12 4.8Z"/></svg>
+                        </span>
+                        <span>Google</span>
+                    </button>
+                    <button class="social-auth-btn" type="button" data-oauth-provider="facebook">
+                        <span class="social-mark facebook-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.1C24 5.4 18.6 0 12 0S0 5.4 0 12.1c0 6 4.4 11 10.1 11.9v-8.4h-3v-3.5h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9v2.3h3.4l-.5 3.5h-2.8V24c5.7-.9 10.1-5.9 10.1-11.9Z"/><path fill="#fff" d="m16.6 15.6.5-3.5h-3.4V9.8c0-1 .5-1.9 2-1.9h1.5v-3s-1.4-.2-2.7-.2c-2.8 0-4.5 1.7-4.5 4.7v2.7H7v3.5h3V24c.6.1 1.2.1 1.9.1s1.3 0 1.9-.1v-8.4h2.8Z"/></svg>
+                        </span>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="social-auth-btn" type="button" data-oauth-provider="apple">
+                        <span class="social-mark apple-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path fill="#111827" d="M17.1 12.7c0-2.8 2.3-4.1 2.4-4.2-1.3-1.9-3.3-2.1-4-2.2-1.7-.2-3.3 1-4.2 1-.9 0-2.2-1-3.6-.9-1.9 0-3.6 1.1-4.5 2.8-1.9 3.3-.5 8.1 1.4 10.8.9 1.3 2 2.8 3.4 2.7 1.4-.1 1.9-.9 3.5-.9 1.7 0 2.1.9 3.6.9 1.5 0 2.4-1.3 3.3-2.7 1-1.5 1.5-3 1.5-3.1-.1-.1-2.8-1.1-2.8-4.2ZM14.4 4.5c.8-1 1.3-2.3 1.1-3.6-1.1 0-2.4.7-3.2 1.7-.7.8-1.3 2.2-1.2 3.5 1.3.1 2.5-.6 3.3-1.6Z"/></svg>
+                        </span>
+                        <span>Apple</span>
+                    </button>
+                </div>
+
+                <div class="auth-divider"><span>or register with email</span></div>
+
+                <div class="auth-field">
+                    <label for="registerName">Full name</label>
+                    <div class="auth-input-wrap">
+                        <input type="text" id="registerName" required placeholder="Enter your full name" autocomplete="name">
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="registerEmail">Email address</label>
+                    <div class="auth-input-wrap">
+                        <input type="email" id="registerEmail" required placeholder="you@example.com" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="registerPassword">Password</label>
+                    <div class="auth-input-wrap">
+                        <input type="password" id="registerPassword" required minlength="6" placeholder="Minimum 6 characters" autocomplete="new-password">
+                        <button class="password-toggle" type="button" data-toggle-password="registerPassword">Show</button>
+                    </div>
+                    <div class="strength-meter" id="strengthMeter" data-strength="weak" aria-hidden="true"><span></span><span></span><span></span></div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="registerConfirmPassword">Confirm password</label>
+                    <div class="auth-input-wrap">
+                        <input type="password" id="registerConfirmPassword" required placeholder="Confirm your password" autocomplete="new-password">
+                        <button class="password-toggle" type="button" data-toggle-password="registerConfirmPassword">Show</button>
+                    </div>
+                </div>
+
+                <div class="auth-row">
+                    <span class="auth-footnote compact-copy">Already verified?</span>
+                    <button class="auth-link switch-inline" type="button" data-auth-mode="login">Sign in</button>
+                </div>
+
+                <div id="register-error" class="cv-inline-error" role="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b4233a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <div class="cv-inline-error-body">
+                        <div class="cv-inline-error-title" id="register-error-title">Error</div>
+                        <div class="cv-inline-error-msg" id="register-error-msg"></div>
+                    </div>
+                    <button type="button" class="cv-inline-error-close" onclick="cvHideError('register-error')">&times;</button>
+                </div>
+
+                <button type="submit" id="registerBtn" class="auth-submit">Create secure account</button>
+            </form>
+        </section>
+    </main>
 
     <script>
-        // Track if login is in progress to prevent double submissions
         let loginInProgress = false;
         const SERVICE_UNAVAILABLE_MESSAGE = 'CoinVault services are temporarily unavailable. Please try again shortly.';
 
-        async function handleLogin(e) {
-            e.preventDefault();
+        function setAuthMode(mode) {
+            const card = document.getElementById('authCard');
+            const isRegister = mode === 'register';
+            card.classList.toggle('register', isRegister);
+            document.body.classList.toggle('register-mode', isRegister);
+            cvHideError('login-error');
+            cvHideError('register-error');
+        }
 
-            // Prevent double submission
-            if (loginInProgress) return;
+        document.querySelectorAll('[data-auth-mode]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                setAuthMode(button.getAttribute('data-auth-mode'));
+            });
+        });
 
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
+        document.querySelectorAll('[data-oauth-provider]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                startOAuth(button.getAttribute('data-oauth-provider'));
+            });
+        });
 
-            // Hide previous messages
-            cvHideError('cv-form-error');
-            document.getElementById('successMessage').classList.add('hidden');
+        function setButtonText(button, text) {
+            if (button) button.textContent = text;
+        }
 
-            // Validation
-            if (!email || !password) {
-                showError('Please fill in all fields');
+        function getOAuthApiUrl() {
+            var isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+            if (isLocal) return 'http://localhost:5050/api';
+            return CONFIG.API_URL;
+        }
+
+        function startOAuth(provider) {
+            if (!CONFIG || !CONFIG.API_URL) {
+                showLoginUnavailable();
                 return;
             }
 
-            // Helper to reset button state
+            var returnTo = `${window.location.origin}${window.location.pathname}`;
+            window.location.href = `${getOAuthApiUrl()}/auth/oauth/${encodeURIComponent(provider)}?returnTo=${encodeURIComponent(returnTo)}`;
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            if (loginInProgress) return;
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+
+            cvHideError('login-error');
+            document.getElementById('login-success').classList.add('hidden');
+
+            if (!email || !password) {
+                showLoginError('Please enter your email and password.');
+                return;
+            }
+
             function resetBtn() {
                 loginInProgress = false;
                 loginBtn.disabled = false;
-                loginBtn.textContent = 'Login';
+                setButtonText(loginBtn, 'Sign in securely');
             }
 
-            // Lock button
             loginInProgress = true;
             loginBtn.disabled = true;
-            loginBtn.textContent = 'Logging in...';
+            setButtonText(loginBtn, 'Signing in...');
 
-            // Safety timeout — reset after 10 seconds no matter what
             const safetyTimer = setTimeout(() => {
                 if (loginInProgress) {
                     resetBtn();
-                    showServiceUnavailable();
+                    showLoginUnavailable();
                 }
             }, 10000);
 
@@ -243,44 +292,101 @@ if (localStorage.getItem("token")) {
                 if (data.success) {
                     localStorage.setItem('token', data.token);
                     if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
-                    showSuccess('Login successful! Redirecting...');
+                    showLoginSuccess('Sign in successful. Redirecting to your wallet...');
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 1000);
                 } else {
                     resetBtn();
-                    showError(data.message || 'Login failed');
+                    showLoginError(data.message || 'We could not sign you in. Please check your details and try again.');
                 }
             } catch (error) {
                 clearTimeout(safetyTimer);
                 console.error('Login error:', error);
-
                 resetBtn();
 
-                // Check if it's the email verification error
                 if (error.message && error.message.toLowerCase().includes('verify your email')) {
                     showVerifyError(email);
                 } else if (error.status && error.status < 500) {
-                    showError(error.message || 'Login failed. Please check your details and try again.');
+                    showLoginError(error.message || 'We could not sign you in. Please check your details and try again.');
                 } else {
-                    showServiceUnavailable();
+                    showLoginUnavailable();
                 }
             }
         }
 
-        // Show special error with resend link
-        function showVerifyError(email) {
-            var banner = document.getElementById('cv-form-error');
-            var titleEl = document.getElementById('cv-form-error-title');
-            var msgEl = document.getElementById('cv-form-error-msg');
+        async function handleRegister(e) {
+            e.preventDefault();
 
-            titleEl.textContent = 'Email Not Verified';
-            msgEl.innerHTML = 'Please verify your email before logging in. Didn\'t receive it? <button class="resend-link" id="resendBtn" onclick="resendVerification(\'' + email + '\')">Resend</button>';
-            banner.classList.add('visible');
-            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const registerBtn = document.getElementById('registerBtn');
+
+            cvHideError('register-error');
+
+            if (!name || !email || !password || !confirmPassword) {
+                showRegisterError('Please fill in all fields.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showRegisterError('Password must be at least 6 characters.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showRegisterError('Passwords do not match.');
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Creating account...';
+
+            try {
+                const data = await CONFIG.apiRequest('/auth/register', {
+                    method: 'POST',
+                    body: { fullName: name, email, password },
+                    auth: false
+                });
+
+                if (data.success) {
+                    window.location.href = `check-email.html?email=${encodeURIComponent(email)}`;
+                } else {
+                    showRegisterError(data.message || 'Registration failed. Please check your details and try again.');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Create secure account';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                if (error.status && error.status < 500) {
+                    showRegisterError(error.message || 'Registration failed. Please check your details and try again.');
+                } else {
+                    cvShowError(SERVICE_UNAVAILABLE_MESSAGE, 'Service temporarily unavailable', 'register-error');
+                }
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Create secure account';
+            }
         }
 
-        // Resend verification email
+        function showVerifyError(email) {
+            var banner = document.getElementById('login-error');
+            var titleEl = document.getElementById('login-error-title');
+            var msgEl = document.getElementById('login-error-msg');
+
+            titleEl.textContent = 'Email not verified';
+            msgEl.innerHTML = 'Please verify your email with the link we sent before signing in. <button type="button" class="resend-link" id="resendBtn">Resend verification link</button>';
+            banner.classList.add('visible');
+
+            var resendBtn = document.getElementById('resendBtn');
+            if (resendBtn) {
+                resendBtn.addEventListener('click', function() {
+                    resendVerification(email);
+                });
+            }
+        }
+
         async function resendVerification(email) {
             var btn = document.getElementById('resendBtn');
             if (!btn) return;
@@ -289,77 +395,115 @@ if (localStorage.getItem("token")) {
             btn.textContent = 'Sending...';
 
             try {
-                const data = await CONFIG.apiRequest('/auth/resend-verification', {
+                await CONFIG.apiRequest('/auth/resend-verification', {
                     method: 'POST',
                     body: { email },
                     auth: false
                 });
 
-                // Hide error banner
-                cvHideError('cv-form-error');
-
-                // Show success
-                showSuccess('✅ Verification email sent! Please check your inbox.');
-
+                cvHideError('login-error');
+                showLoginSuccess('Verification link sent. Please check your inbox.');
             } catch (error) {
                 btn.disabled = false;
-                btn.textContent = 'Resend';
-                showError(error.message || 'Failed to resend. Please try again.');
+                btn.textContent = 'Resend verification link';
+                showLoginError(error.message || 'We could not resend the verification link. Please try again shortly.');
             }
         }
 
-        function showError(message) { cvShowError(message, 'Login Failed', 'cv-form-error'); }
-        function showServiceUnavailable() { cvShowError(SERVICE_UNAVAILABLE_MESSAGE, 'Service Temporarily Unavailable', 'cv-form-error'); }
+        function showLoginError(message) { cvShowError(message, 'Sign in failed', 'login-error'); }
+        function showRegisterError(message) { cvShowError(message, 'Registration error', 'register-error'); }
+        function showLoginUnavailable() { cvShowError(SERVICE_UNAVAILABLE_MESSAGE, 'Service temporarily unavailable', 'login-error'); }
 
-        function showSuccess(message) {
-            var el = document.getElementById('successMessage');
-            if (el) { 
-                el.textContent = message; 
-                el.classList.remove('hidden'); 
+        function showLoginSuccess(message) {
+            var el = document.getElementById('login-success');
+            if (el) {
+                el.textContent = message;
+                el.classList.remove('hidden');
+                el.classList.add('visible');
             }
+        }
+
+        function updateStrength() {
+            var password = document.getElementById('registerPassword').value;
+            var meter = document.getElementById('strengthMeter');
+            var score = 0;
+            if (password.length >= 6) score += 1;
+            if (password.length >= 10 || /[A-Z]/.test(password)) score += 1;
+            if (/\d/.test(password) && /[^A-Za-z0-9]/.test(password)) score += 1;
+            meter.setAttribute('data-strength', score >= 3 ? 'strong' : score >= 2 ? 'medium' : 'weak');
+        }
+
+        document.getElementById('registerPassword').addEventListener('input', updateStrength);
+
+        document.querySelectorAll('[data-toggle-password]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var input = document.getElementById(button.getAttribute('data-toggle-password'));
+                if (!input) return;
+                var isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                button.textContent = isPassword ? 'Hide' : 'Show';
+            });
+        });
+
+        function cvShowError(message, title, containerId) {
+            var banner = document.getElementById(containerId);
+            if (!banner) return;
+            var titleEl = banner.querySelector('.cv-inline-error-title');
+            var msgEl = banner.querySelector('.cv-inline-error-msg');
+            if (titleEl) titleEl.textContent = title || 'Error';
+            if (msgEl) msgEl.textContent = message;
+            banner.classList.add('visible');
+        }
+
+        function cvHideError(containerId) {
+            var banner = document.getElementById(containerId);
+            if (banner) banner.classList.remove('visible');
+        }
+
+        function decodeBase64Url(value) {
+            var base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+            var padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+            return atob(padded);
+        }
+
+        function handleOAuthReturn() {
+            if (!window.location.hash || !window.location.hash.includes('oauth=')) return false;
+
+            var params = new URLSearchParams(window.location.hash.substring(1));
+            var status = params.get('oauth');
+
+            if (status === 'success') {
+                var token = params.get('token');
+                var userValue = params.get('user');
+
+                if (token) {
+                    localStorage.setItem('token', token);
+                    if (userValue) {
+                        localStorage.setItem('user', decodeBase64Url(userValue));
+                    }
+                    window.history.replaceState(null, document.title, window.location.pathname);
+                    window.location.href = 'index.html';
+                    return true;
+                }
+            }
+
+            window.history.replaceState(null, document.title, window.location.pathname);
+            showLoginError(params.get('message') || 'Social sign in could not be completed. Please try again.');
+            return true;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            if (handleOAuthReturn()) return;
+
             const token = localStorage.getItem('token');
             if (token) {
                 window.location.href = 'index.html';
             }
+
+            if (new URLSearchParams(window.location.search).get('mode') === 'register') {
+                setAuthMode('register');
+            }
         });
     </script>
-
-<script>
-// ===== INLINE ERROR BANNER SYSTEM =====
-function cvShowError(message, title, containerId) {
-    var bannerId = containerId || 'cv-form-error';
-    var banner = document.getElementById(bannerId);
-    if (!banner) {
-        banner = document.createElement('div');
-        banner.id = bannerId;
-        banner.className = 'cv-inline-error';
-        banner.innerHTML =
-            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
-            '<div class="cv-inline-error-body"><div class="cv-inline-error-title" id="' + bannerId + '-title"></div><div class="cv-inline-error-msg" id="' + bannerId + '-msg"></div></div>' +
-            '<button class="cv-inline-error-close" onclick="cvHideError(\'' + bannerId + '\')">&times;</button>';
-        var form = document.querySelector('form') || document.querySelector('.bg-gray-800') || document.body;
-        form.insertBefore(banner, form.firstChild);
-    }
-    var titleEl = banner.querySelector('.cv-inline-error-title') || document.getElementById(bannerId + '-title');
-    var msgEl   = banner.querySelector('.cv-inline-error-msg')   || document.getElementById(bannerId + '-msg');
-    if (titleEl) titleEl.textContent = title || 'Error';
-    if (msgEl)   msgEl.textContent   = message;
-    banner.classList.add('visible');
-    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function cvHideError(containerId) {
-    var bannerId = containerId || 'cv-form-error';
-    var banner = document.getElementById(bannerId);
-    if (banner) banner.classList.remove('visible');
-}
-
-function cvError(msg, title, cid)   { cvShowError(msg, title || 'Error', cid); }
-function cvWarning(msg, title, cid) { cvShowError(msg, title || 'Warning', cid); }
-function cvInfo(msg, title, cid)    { cvShowError(msg, title || 'Notice', cid); }
-</script>
 </body>
 </html>
