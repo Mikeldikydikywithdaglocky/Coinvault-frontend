@@ -5,56 +5,56 @@ const CRYPTO_LIST = [
     {
         symbol: 'BTC',
         name: 'Bitcoin',
-        logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+        logo: 'assets/crypto/btc.svg',
         coingeckoId: 'bitcoin',
         color: '#F7931A'
     },
     {
         symbol: 'ETH',
         name: 'Ethereum',
-        logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+        logo: 'assets/crypto/eth.svg',
         coingeckoId: 'ethereum',
         color: '#627EEA'
     },
     {
         symbol: 'USDT',
         name: 'Tether',
-        logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+        logo: 'assets/crypto/usdt.svg',
         coingeckoId: 'tether',
         color: '#26A17B'
     },
     {
         symbol: 'BNB',
         name: 'BNB',
-        logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+        logo: 'assets/crypto/bnb.svg',
         coingeckoId: 'binancecoin',
         color: '#F3BA2F'
     },
     {
         symbol: 'SOL',
         name: 'Solana',
-        logo: 'https://cryptologos.cc/logos/solana-sol-logo.png',
+        logo: 'assets/crypto/sol.svg',
         coingeckoId: 'solana',
         color: '#14F195'
     },
     {
         symbol: 'XRP',
         name: 'Ripple',
-        logo: 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+        logo: 'assets/crypto/xrp.svg',
         coingeckoId: 'ripple',
         color: '#23292F'
     },
     {
         symbol: 'ADA',
         name: 'Cardano',
-        logo: 'https://cryptologos.cc/logos/cardano-ada-logo.png',
+        logo: 'assets/crypto/ada.svg',
         coingeckoId: 'cardano',
         color: '#0033AD'
     },
     {
         symbol: 'DOGE',
         name: 'Dogecoin',
-        logo: 'https://cryptologos.cc/logos/dogecoin-doge-logo.png',
+        logo: 'assets/crypto/doge.svg',
         coingeckoId: 'dogecoin',
         color: '#C2A633'
     }

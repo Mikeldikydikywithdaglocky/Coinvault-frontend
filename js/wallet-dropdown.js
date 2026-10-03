@@ -55,6 +55,7 @@ function toggleConnectionMenu(event) {
 }
 
 console.log('✅ wallet-dropdown.js loaded');
+/* Legacy setup notes, not executable JavaScript.
 ```
 
 ---
@@ -97,3 +98,4 @@ index.html
    ✅ Dropdown button initialized
    ⚠️ No token found - running in DEMO mode
    ✅ Dashboard initialization complete
+*/

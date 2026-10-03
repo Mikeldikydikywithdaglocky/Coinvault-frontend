@@ -15,10 +15,13 @@
 <meta name="apple-mobile-web-app-title" content="Coinvault" />
 <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="js/vendor/tailwind-3.4.17.js"></script>
+    <script src="js/vendor/feather.min.js"></script>
+    <script src="js/vendor/qrcode.min.js"></script>
     <script src="js/crypto-data.js"></script>
+    <link rel="stylesheet" href="css/account-workspace.css">
+    <script src="js/account-shell.js" defer></script>
+    <script src="js/account-workflows.js" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
 <nav class="bg-gray-800 border-b border-gray-700 px-4 py-4 sticky top-0 z-40 relative" style="backdrop-filter: blur(10px);">
@@ -63,27 +66,27 @@
             <div class="bg-gray-800 rounded-2xl p-6 mb-6">
                 <label class="block text-sm text-gray-400 mb-3">Select Cryptocurrency</label>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <button onclick="selectCrypto('BTC', 'Bitcoin', 'https://cryptologos.cc/logos/bitcoin-btc-logo.png')" 
+                    <button onclick="selectCrypto('BTC', 'Bitcoin', 'assets/crypto/btc.svg')"
                             class="crypto-btn bg-gray-700 hover:bg-gray-600 p-4 rounded-xl transition active" data-crypto="BTC">
-                        <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" class="w-10 h-10 mx-auto mb-2 rounded-full">
+                        <img src="assets/crypto/btc.svg" class="w-10 h-10 mx-auto mb-2 rounded-full">
                         <div class="text-sm font-medium">Bitcoin</div>
                         <div class="text-xs text-gray-400">BTC</div>
                     </button>
-                    <button onclick="selectCrypto('ETH', 'Ethereum', 'https://cryptologos.cc/logos/ethereum-eth-logo.png')" 
+                    <button onclick="selectCrypto('ETH', 'Ethereum', 'assets/crypto/eth.svg')"
                             class="crypto-btn bg-gray-700 hover:bg-gray-600 p-4 rounded-xl transition" data-crypto="ETH">
-                        <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" class="w-10 h-10 mx-auto mb-2 rounded-full">
+                        <img src="assets/crypto/eth.svg" class="w-10 h-10 mx-auto mb-2 rounded-full">
                         <div class="text-sm font-medium">Ethereum</div>
                         <div class="text-xs text-gray-400">ETH</div>
                     </button>
-                    <button onclick="selectCrypto('USDT', 'Tether', 'https://cryptologos.cc/logos/tether-usdt-logo.png')" 
+                    <button onclick="selectCrypto('USDT', 'Tether', 'assets/crypto/usdt.svg')"
                             class="crypto-btn bg-gray-700 hover:bg-gray-600 p-4 rounded-xl transition" data-crypto="USDT">
-                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="w-10 h-10 mx-auto mb-2 rounded-full">
+                        <img src="assets/crypto/usdt.svg" class="w-10 h-10 mx-auto mb-2 rounded-full">
                         <div class="text-sm font-medium">Tether</div>
                         <div class="text-xs text-gray-400">USDT</div>
                     </button>
-                    <button onclick="selectCrypto('BNB', 'BNB', 'https://cryptologos.cc/logos/bnb-bnb-logo.png')" 
+                    <button onclick="selectCrypto('BNB', 'BNB', 'assets/crypto/bnb.svg')"
                             class="crypto-btn bg-gray-700 hover:bg-gray-600 p-4 rounded-xl transition" data-crypto="BNB">
-                        <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" class="w-10 h-10 mx-auto mb-2 rounded-full">
+                        <img src="assets/crypto/bnb.svg" class="w-10 h-10 mx-auto mb-2 rounded-full">
                         <div class="text-sm font-medium">BNB</div>
                         <div class="text-xs text-gray-400">BNB</div>
                     </button>
@@ -100,13 +103,13 @@
                 <!-- Wallet Address -->
                 <div class="text-center mb-6">
                     <div class="flex items-center gap-2 mb-2 justify-center">
-                        <img id="currentCryptoImg" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" class="w-6 h-6 rounded-full">
+                        <img id="currentCryptoImg" src="assets/crypto/btc.svg" class="w-6 h-6 rounded-full">
                         <span id="currentCryptoName" class="font-medium">Bitcoin</span>
                         <span class="text-gray-400">Network</span>
                     </div>
                     <p class="text-sm text-gray-400 mb-4">Your Wallet Address</p>
                     <div class="bg-gray-700 rounded-xl p-4 mb-3">
-                        <p id="walletAddress" class="font-mono text-sm break-all">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
+                        <p id="walletAddress" class="font-mono text-sm break-all">Loading your wallet address...</p>
                     </div>
                     
                     <!-- Action Buttons -->

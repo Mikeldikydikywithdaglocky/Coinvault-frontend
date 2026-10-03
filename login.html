@@ -220,8 +220,6 @@ if (localStorage.getItem("token")) {
         }
 
         function getOAuthApiUrl() {
-            var isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-            if (isLocal) return 'http://localhost:5050/api';
             return CONFIG.API_URL;
         }
 

@@ -1,10 +1,10 @@
 // Send.js - Send crypto functionality with validation
 
 const cryptos = [
-    { symbol: 'BTC', name: 'Bitcoin', image: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png', balance: 0.0523, price: 43250, gasFee: 0.00001 },
-    { symbol: 'ETH', name: 'Ethereum', image: 'https://cryptologos.cc/logos/ethereum-eth-logo.png', balance: 1.245, price: 2280, gasFee: 0.002 },
-    { symbol: 'USDT', name: 'Tether', image: 'https://cryptologos.cc/logos/tether-usdt-logo.png', balance: 5000, price: 1, gasFee: 1 },
-    { symbol: 'BNB', name: 'BNB', image: 'https://cryptologos.cc/logos/bnb-bnb-logo.png', balance: 10.5, price: 315, gasFee: 0.0005 }
+    { symbol: 'BTC', name: 'Bitcoin', image: 'assets/crypto/btc.svg', balance: 0, price: 0, gasFee: 0.00001 },
+    { symbol: 'ETH', name: 'Ethereum', image: 'assets/crypto/eth.svg', balance: 0, price: 0, gasFee: 0.002 },
+    { symbol: 'USDT', name: 'Tether', image: 'assets/crypto/usdt.svg', balance: 0, price: 0, gasFee: 1 },
+    { symbol: 'BNB', name: 'BNB', image: 'assets/crypto/bnb.svg', balance: 0, price: 0, gasFee: 0.0005 }
 ];
 
 let selectedCrypto = cryptos[0];
@@ -200,37 +200,8 @@ function closeConfirmModal() {
 
 // Execute send
 async function executeSend() {
-    const address = document.getElementById('recipientAddress').value;
-    const amount = parseFloat(document.getElementById('sendAmount').value);
-    const gasFee = selectedCrypto.gasFee;
-    
-    // Close modal
     closeConfirmModal();
-    
-    // Show loading
-    const btn = document.getElementById('sendBtn');
-    btn.textContent = 'Processing...';
-    btn.disabled = true;
-    
-    // Simulate transaction
-    await new Promise(resolve => setTimeout(resolve, 2500));
-    
-    // Update balance
-    selectedCrypto.balance -= (amount + gasFee);
-    document.getElementById('cryptoBalance').textContent = selectedCrypto.balance.toFixed(8);
-    
-    // Add to recent sends
-    addRecentSend(address, amount);
-    
-    // Show success notification
-    showNotification(`Successfully sent ${amount} ${selectedCrypto.symbol} to ${address.substring(0, 10)}...`, 'success');
-    
-    // Reset form
-    document.getElementById('recipientAddress').value = '';
-    document.getElementById('sendAmount').value = '';
-    document.getElementById('txDetails').classList.add('hidden');
-    btn.textContent = 'Review Transaction';
-    btn.disabled = true;
+    window.CVAccount.toast('Sending is not available yet. No funds have been transferred.');
 }
 
 // Add recent send

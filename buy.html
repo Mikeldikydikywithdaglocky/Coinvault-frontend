@@ -15,9 +15,9 @@
 <meta name="apple-mobile-web-app-title" content="Coinvault" />
 <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/vendor/tailwind-3.4.17.js"></script>
     <script src="js/config.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="js/vendor/feather.min.js"></script>
 <style>
 
 /* ===== INLINE ERROR BANNER ===== */
@@ -75,6 +75,9 @@
     }
 }
 </style>
+    <link rel="stylesheet" href="css/account-workspace.css">
+    <script src="js/account-shell.js" defer></script>
+    <script src="js/account-workflows.js" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
     <!-- NAVBAR -->
@@ -121,10 +124,10 @@
                 <div class="mb-6">
                     <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
                     <select id="buyCrypto" onchange="updateBuyPrice()" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none">
-                        <option value="BTC|43250">Bitcoin (BTC) - $43,250</option>
-                        <option value="ETH|2280">Ethereum (ETH) - $2,280</option>
-                        <option value="USDT|1">Tether (USDT) - $1.00</option>
-                        <option value="BNB|315">BNB (BNB) - $315</option>
+                        <option value="BTC|0">Bitcoin (BTC) - Loading price...</option>
+                        <option value="ETH|0">Ethereum (ETH) - Loading price...</option>
+                        <option value="USDT|0">Tether (USDT) - Loading price...</option>
+                        <option value="BNB|0">BNB (BNB) - Loading price...</option>
                     </select>
                 </div>
 
@@ -291,108 +294,46 @@
     <script src="js/main.js"></script>
 <script>
   const API_BASE = window.location.hostname.includes('localhost') 
-    ? 'http://localhost:5050'
+    ? 'http://localhost:5051'
     : 'https://runner-should-funeral-requests.trycloudflare.com';
 
   // Live crypto prices
   let livePrices = {
-    BTC: 43250,
-    ETH: 2280,
-    USDT: 1,
-    BNB: 315
+    BTC: 0,
+    ETH: 0,
+    USDT: 0,
+    BNB: 0
   };
 
- // Fetch live prices from multiple APIs with fallback
+ // Use observed quotes only; unavailable prices are not guessed.
 async function fetchLivePrices() {
-    const apis = [
-        {
-            name: 'Coinbase',
-            url: 'https://api.coinbase.com/v2/exchange-rates?currency=USD',
-            parse: (data) => {
-                const rates = data.data.rates;
-                return {
-                    BTC: 1 / parseFloat(rates.BTC),
-                    ETH: 1 / parseFloat(rates.ETH),
-                    USDT: 1 / parseFloat(rates.USDT || 1),
-                    BNB: 1 / parseFloat(rates.BNB || 315)
-                };
-            }
-        },
-        {
-            name: 'CryptoCompare',
-            url: 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,USDT,BNB&tsyms=USD',
-            parse: (data) => ({
-                BTC: data.BTC?.USD || 43250,
-                ETH: data.ETH?.USD || 2280,
-                USDT: data.USDT?.USD || 1,
-                BNB: data.BNB?.USD || 315
-            })
-        },
-        {
-            name: 'Binance',
-            url: 'https://api.binance.com/api/v3/ticker/price',
-            parse: (data) => {
-                const btc = data.find(t => t.symbol === 'BTCUSDT');
-                const eth = data.find(t => t.symbol === 'ETHUSDT');
-                const bnb = data.find(t => t.symbol === 'BNBUSDT');
-                return {
-                    BTC: parseFloat(btc?.price || 43250),
-                    ETH: parseFloat(eth?.price || 2280),
-                    USDT: 1,
-                    BNB: parseFloat(bnb?.price || 315)
-                };
-            }
-        }
-    ];
-
-    for (const api of apis) {
-        try {
-            console.log(`🔄 Trying ${api.name}...`);
-            const response = await fetch(api.url);
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const data = await response.json();
-            const prices = api.parse(data);
-            
-            livePrices.BTC = prices.BTC;
-            livePrices.ETH = prices.ETH;
-            livePrices.USDT = prices.USDT;
-            livePrices.BNB = prices.BNB;
-            
-            console.log('✅ Live prices loaded:', livePrices);
-            updatePriceOptions();
-            return; // Success!
-            
-        } catch (error) {
-            console.warn(`❌ ${api.name} failed:`, error.message);
-        }
-    }
-    
-    console.log('⚠️ All APIs failed. Using fallback prices');
-    updatePriceOptions(); // Use default prices already set
+    const quotes = await CVAccount.loadQuotes();
+    for (const symbol of Object.keys(livePrices)) livePrices[symbol] = quotes[symbol] || 0;
+    updatePriceOptions();
 }
 
   // Update select options with live prices
   function updatePriceOptions() {
     const select = document.getElementById('buyCrypto');
-    select.innerHTML = `
-      <option value="BTC|${livePrices.BTC}">Bitcoin (BTC) - $${livePrices.BTC.toLocaleString()}</option>
-      <option value="ETH|${livePrices.ETH}">Ethereum (ETH) - $${livePrices.ETH.toLocaleString()}</option>
-      <option value="USDT|${livePrices.USDT}">Tether (USDT) - $${livePrices.USDT.toFixed(2)}</option>
-      <option value="BNB|${livePrices.BNB}">BNB (BNB) - $${livePrices.BNB.toLocaleString()}</option>
-    `;
+    select.replaceChildren();
+    for (const [symbol,name] of [['BTC','Bitcoin'],['ETH','Ethereum'],['USDT','Tether'],['BNB','BNB']]) {
+      const option = document.createElement('option'); option.value = `${symbol}|${livePrices[symbol]}`;
+      option.textContent = `${name} (${symbol}) - ${livePrices[symbol] > 0 ? CVAccount.money(livePrices[symbol]) : 'Price unavailable'}`;
+      option.disabled = !(livePrices[symbol] > 0); select.append(option);
+    }
+    if (select.selectedIndex < 0) select.selectedIndex = 0;
+    calculateBuy();
   }
 
   // BUY CALCULATION
   function calculateBuy() {
     const amount = parseFloat(document.getElementById('buyAmount').value) || 0;
     const [symbol, price] = document.getElementById('buyCrypto').value.split('|');
-    const cryptoAmount = amount / parseFloat(price);
+    const cryptoAmount = parseFloat(price) > 0 ? amount / parseFloat(price) : null;
     const fee = amount * 0.02;
     const total = amount + fee;
 
-    document.getElementById('cryptoAmount').textContent = cryptoAmount.toFixed(8);
+    document.getElementById('cryptoAmount').textContent = cryptoAmount === null ? '--' : cryptoAmount.toFixed(8);
     document.getElementById('cryptoSymbol').textContent = symbol;
     document.getElementById('priceDisplay').textContent = '$' + amount.toFixed(2);
     document.getElementById('feeDisplay').textContent = '$' + fee.toFixed(2);
@@ -491,7 +432,7 @@ async function fetchLivePrices() {
   }
 
   // Initialize
-  fetchLivePrices();
+  document.addEventListener('DOMContentLoaded', fetchLivePrices);
   feather.replace();
 </script>
 

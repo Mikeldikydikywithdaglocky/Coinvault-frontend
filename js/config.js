@@ -2,10 +2,15 @@
 // Place this file in your frontend/js/ folder
 
 const CONFIG = {
-  API_URLS: [
-    'https://api.coinvaultnet.com/api',
-    'https://coinvault-backend-production.up.railway.app/api'
-  ],
+  get API_URLS() {
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    return ['localhost', '127.0.0.1', '[::1]'].includes(hostname)
+      ? ['http://localhost:5051/api']
+      : [
+          'https://api.coinvaultnet.com/api',
+          'https://coinvault-backend-production.up.railway.app/api'
+        ];
+  },
   get API_URL() {
     return this.API_URLS[0];
   },

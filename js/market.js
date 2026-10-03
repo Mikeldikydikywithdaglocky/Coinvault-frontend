@@ -54,16 +54,17 @@ async function fetchCryptoData() {
         }
     }
     
-    // All APIs failed - use fallback
-    console.error('⚠️ All APIs failed. Using fallback data.');
-    allCryptos = getFallbackCryptoData();
-    displayCryptos(allCryptos);
-    updateMarketStats(allCryptos);
+    // A failed request must not present invented market figures as cached prices.
+    allCryptos = [];
+    for (const id of ['totalMarketCap','totalVolume','btcDominance']) {
+        const node = document.getElementById(id);
+        if (node) node.textContent = '--';
+    }
     isLoading = false;
     
     tableBody.innerHTML = `
         <tr><td colspan="7" class="text-center py-8">
-            <div class="text-yellow-400 mb-2">⚠️ Using cached data</div>
+            <div class="text-gray-400 mb-2">Market data is temporarily unavailable.</div>
             <button onclick="fetchCryptoData()" class="bg-indigo-600 px-4 py-2 rounded mt-2">Retry</button>
         </td></tr>
     `;

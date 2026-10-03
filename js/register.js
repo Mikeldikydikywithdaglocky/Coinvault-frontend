@@ -1,6 +1,6 @@
 // API Base URL
 const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-  ? 'http://localhost:5050/api'
+  ? 'http://localhost:5051/api'
   : 'https://coinvault-backend-production.up.railway.app/api';
 const SERVICE_UNAVAILABLE_MESSAGE = 'CoinVault services are temporarily unavailable. Please try again shortly.';
 
@@ -64,7 +64,7 @@ async function validateRegister() {
   try {
     // API URL for local testing and production
     const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-      ? 'http://localhost:5050/api'
+      ? 'http://localhost:5051/api'
       : 'https://coinvault-backend-production.up.railway.app/api';
 
     // ✅ Corrected fetch request to match backend route

@@ -15,8 +15,8 @@
 <meta name="apple-mobile-web-app-title" content="Coinvault" />
 <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="js/vendor/tailwind-3.4.17.js"></script>
+    <script src="js/vendor/feather.min.js"></script>
 <style>
 
 /* ===== INLINE ERROR BANNER ===== */
@@ -74,6 +74,9 @@
     }
 }
 </style>
+    <link rel="stylesheet" href="css/account-workspace.css">
+    <script src="js/account-shell.js" defer></script>
+    <script src="js/account-workflows.js" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
 <nav class="bg-gray-800 border-b border-gray-700 px-4 py-4 sticky top-0 z-40 relative" style="backdrop-filter: blur(10px);">
@@ -119,10 +122,10 @@
                 <div class="mb-6">
                     <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
                     <select id="sellCrypto" onchange="updateSellPrice()" class="w-full bg-gray-700 px-4 py-3 rounded-xl outline-none">
-                        <option value="BTC|43250|0.0523">Bitcoin (BTC) - Balance: 0.0523</option>
-                        <option value="ETH|2280|1.245">Ethereum (ETH) - Balance: 1.245</option>
-                        <option value="USDT|1|5000">Tether (USDT) - Balance: 5000</option>
-                        <option value="BNB|315|10.5">BNB (BNB) - Balance: 10.5</option>
+                        <option value="BTC|0|0">Bitcoin (BTC) - Loading balance...</option>
+                        <option value="ETH|0|0">Ethereum (ETH) - Loading balance...</option>
+                        <option value="USDT|0|0">Tether (USDT) - Loading balance...</option>
+                        <option value="BNB|0|0">BNB (BNB) - Loading balance...</option>
                     </select>
                 </div>
 
@@ -209,31 +212,12 @@ function loadWalletData() {
 
 // Get balance for a specific crypto symbol
 function getBalance(symbol) {
-    const walletInfo = loadWalletData();
-    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
-        return 0;
-    }
-    
-    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
-    return asset ? asset.balance : 0;
+    return window.CVAccount?.state.loaded && !CVAccount.state.error ? CVAccount.currentWallets().flatMap(wallet => wallet.assets || []).filter(asset => asset.symbol === symbol).reduce((sum,asset) => sum + Number(asset.balance),0) : 0;
 }
 
 // Get price for a specific crypto symbol
 function getPrice(symbol) {
-    const walletInfo = loadWalletData();
-    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
-        // Fallback prices
-        const fallbackPrices = {
-            'BTC': 87000,
-            'ETH': 2800,
-            'USDT': 1,
-            'BNB': 330
-        };
-        return fallbackPrices[symbol] || 0;
-    }
-    
-    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
-    return asset ? asset.price : 0;
+    return window.CVAccount?.state.quotes[symbol] || 0;
 }
 
 // Update sell dropdown with real balances

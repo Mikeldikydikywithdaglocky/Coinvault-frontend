@@ -1,14 +1,14 @@
 // Swap.js - Token swap functionality
 
 const popularTokens = [
-    { symbol: 'BTC', name: 'Bitcoin', image: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png', price: 43250 },
-    { symbol: 'ETH', name: 'Ethereum', image: 'https://cryptologos.cc/logos/ethereum-eth-logo.png', price: 2280 },
-    { symbol: 'USDT', name: 'Tether', image: 'https://cryptologos.cc/logos/tether-usdt-logo.png', price: 1 },
-    { symbol: 'BNB', name: 'BNB', image: 'https://cryptologos.cc/logos/bnb-bnb-logo.png', price: 315 },
-    { symbol: 'SOL', name: 'Solana', image: 'https://cryptologos.cc/logos/solana-sol-logo.png', price: 98 },
-    { symbol: 'XRP', name: 'Ripple', image: 'https://cryptologos.cc/logos/xrp-xrp-logo.png', price: 0.52 },
-    { symbol: 'ADA', name: 'Cardano', image: 'https://cryptologos.cc/logos/cardano-ada-logo.png', price: 0.45 },
-    { symbol: 'DOGE', name: 'Dogecoin', image: 'https://cryptologos.cc/logos/dogecoin-doge-logo.png', price: 0.09 }
+    { symbol: 'BTC', name: 'Bitcoin', image: 'assets/crypto/btc.svg', price: 43250 },
+    { symbol: 'ETH', name: 'Ethereum', image: 'assets/crypto/eth.svg', price: 2280 },
+    { symbol: 'USDT', name: 'Tether', image: 'assets/crypto/usdt.svg', price: 1 },
+    { symbol: 'BNB', name: 'BNB', image: 'assets/crypto/bnb.svg', price: 315 },
+    { symbol: 'SOL', name: 'Solana', image: 'assets/crypto/sol.svg', price: 98 },
+    { symbol: 'XRP', name: 'Ripple', image: 'assets/crypto/xrp.svg', price: 0.52 },
+    { symbol: 'ADA', name: 'Cardano', image: 'assets/crypto/ada.svg', price: 0.45 },
+    { symbol: 'DOGE', name: 'Dogecoin', image: 'assets/crypto/doge.svg', price: 0.09 }
 ];
 
 let currentSelection = 'from';
@@ -17,14 +17,14 @@ let selectedToToken = popularTokens[1];
 
 // Load user balances
 const userBalances = {
-    'BTC': 0.0523,
-    'ETH': 1.245,
-    'USDT': 5000,
-    'BNB': 10.5,
-    'SOL': 25,
-    'XRP': 1000,
-    'ADA': 5000,
-    'DOGE': 10000
+    'BTC': 0,
+    'ETH': 0,
+    'USDT': 0,
+    'BNB': 0,
+    'SOL': 0,
+    'XRP': 0,
+    'ADA': 0,
+    'DOGE': 0
 };
 
 // Initialize
@@ -44,6 +44,13 @@ function calculateSwap() {
     const fromAmount = parseFloat(document.getElementById('fromAmount').value) || 0;
     const fromPrice = selectedFromToken.price;
     const toPrice = selectedToToken.price;
+    if (!(fromPrice > 0) || !(toPrice > 0)) {
+        document.getElementById('toAmount').value = '';
+        document.getElementById('swapBtn').textContent = 'Quote unavailable';
+        document.getElementById('swapBtn').disabled = true;
+        document.getElementById('swapDetails').classList.add('hidden');
+        return;
+    }
     
     if (fromAmount <= 0) {
         document.getElementById('swapBtn').textContent = 'Enter amount';
@@ -167,44 +174,7 @@ function selectToken(symbol) {
 
 // Execute swap
 async function executeSwap() {
-    const fromAmount = parseFloat(document.getElementById('fromAmount').value);
-    const toAmount = parseFloat(document.getElementById('toAmount').value);
-    
-    if (!fromAmount || fromAmount <= 0) {
-        alert('Please enter a valid amount');
-        return;
-    }
-    
-    if (fromAmount > (userBalances[selectedFromToken.symbol] || 0)) {
-        alert('Insufficient balance');
-        return;
-    }
-    
-    // Show loading
-    const btn = document.getElementById('swapBtn');
-    btn.textContent = 'Swapping...';
-    btn.disabled = true;
-    
-    // Simulate swap delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Update balances
-    userBalances[selectedFromToken.symbol] -= fromAmount;
-    userBalances[selectedToToken.symbol] = (userBalances[selectedToToken.symbol] || 0) + toAmount;
-    
-    // Add to recent swaps
-    addRecentSwap(fromAmount, toAmount);
-    
-    // Show success
-    showNotification(`Successfully swapped ${fromAmount} ${selectedFromToken.symbol} for ${toAmount.toFixed(6)} ${selectedToToken.symbol}`, 'success');
-    
-    // Reset form
-    document.getElementById('fromAmount').value = '';
-    document.getElementById('toAmount').value = '';
-    updateBalances();
-    document.getElementById('swapDetails').classList.add('hidden');
-    btn.textContent = 'Enter amount';
-    btn.disabled = true;
+    window.CVAccount.toast('Swaps are not available yet. No funds have been exchanged.');
 }
 
 // Add recent swap

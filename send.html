@@ -15,8 +15,8 @@
 <meta name="apple-mobile-web-app-title" content="Coinvault" />
 <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="js/vendor/tailwind-3.4.17.js"></script>
+    <script src="js/vendor/feather.min.js"></script>
     <script src="js/crypto-data.js"></script>
 <style>
 /* ===== INLINE ERROR BANNER ===== */
@@ -67,6 +67,9 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 </style>
+    <link rel="stylesheet" href="css/account-workspace.css">
+    <script src="js/account-shell.js" defer></script>
+    <script src="js/account-workflows.js" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
 <!-- COPY THIS NAVBAR TO: market.html, swap.html, nfts.html, buy.html, sell.html, send.html, receive.html -->
@@ -115,10 +118,10 @@
                     <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
                     <button onclick="showCryptoSelect()" class="w-full flex items-center justify-between bg-gray-700 hover:bg-gray-600 p-4 rounded-xl transition">
                         <div class="flex items-center gap-3">
-                            <img id="selectedCryptoImg" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" class="w-8 h-8 rounded-full">
+                            <img id="selectedCryptoImg" src="assets/crypto/btc.svg" class="w-8 h-8 rounded-full">
                             <div class="text-left">
                                 <div class="font-medium" id="selectedCrypto">Bitcoin</div>
-                                <div class="text-sm text-gray-400">Balance: <span id="cryptoBalance">0.0523</span> <span id="cryptoSymbol">BTC</span></div>
+                                <div class="text-sm text-gray-400">Balance: <span id="cryptoBalance">--</span> <span id="cryptoSymbol">BTC</span></div>
                             </div>
                         </div>
                         <i data-feather="chevron-down"></i>
@@ -315,30 +318,12 @@ function loadWalletData() {
 
 // Get balance for specific crypto
 function getBalance(symbol) {
-    const walletInfo = loadWalletData();
-    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
-        return 0;
-    }
-    
-    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
-    return asset ? asset.balance : 0;
+    return window.CVAccount?.state.loaded && !CVAccount.state.error ? CVAccount.currentWallets().flatMap(wallet => wallet.assets || []).filter(asset => asset.symbol === symbol).reduce((sum,asset) => sum + Number(asset.balance),0) : 0;
 }
 
 // Get price for specific crypto
 function getPrice(symbol) {
-    const walletInfo = loadWalletData();
-    if (!walletInfo || !walletInfo.data || !walletInfo.data.assets) {
-        const fallbackPrices = {
-            'BTC': 43250,
-            'ETH': 2280,
-            'USDT': 1,
-            'BNB': 315
-        };
-        return fallbackPrices[symbol] || 0;
-    }
-    
-    const asset = walletInfo.data.assets.find(a => a.symbol === symbol);
-    return asset ? asset.price : 0;
+    return window.CVAccount?.state.quotes[symbol] || 0;
 }
 
 // Override the cryptos array from send.js with real balances

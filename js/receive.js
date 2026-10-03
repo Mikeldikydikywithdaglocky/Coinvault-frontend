@@ -1,144 +1,35 @@
-// Receive.js - QR code generation and address management
-
-const walletAddresses = {
-    'BTC': '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
-    'ETH': '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-    'USDT': '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-    'BNB': 'bnb1grpf0955h0ykzq3ar5nmum7y6gdfl6lxfn46h2'
-};
-
+// Addresses and QR codes are sourced only from the authenticated account.
 let currentCrypto = 'BTC';
-let qrcode = null;
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    generateQRCode('BTC');
-    feather.replace();
-});
-
-// Select cryptocurrency
-function selectCrypto(symbol, name, image) {
+let receiveAddress = '';
+function updateReceiveAddress() {
+    const A = window.CVAccount;
+    if (!A) return;
+    const wallet = A.currentWallets()[0];
+    receiveAddress = A.state.loaded && !A.state.error && currentCrypto === 'BTC' ? wallet?.address || '' : '';
+    document.getElementById('walletAddress').textContent = receiveAddress || (A.state.error ? 'Address unavailable. Please try again.' : currentCrypto !== 'BTC' ? 'No wallet connected for this network.' : 'Connect a Bitcoin wallet to receive.');
+    const container = document.getElementById('qrcode'); container.replaceChildren();
+    container.parentElement.hidden = !receiveAddress;
+    if (receiveAddress && window.QRCode) new QRCode(container, { text: receiveAddress, width: 200, height: 200, colorDark: '#111827', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+    document.querySelectorAll('button[onclick="copyAddress()"],button[onclick="shareAddress()"]').forEach(button => button.disabled = !receiveAddress);
+}
+function selectCrypto(symbol, name) {
     currentCrypto = symbol;
-    
-    // Update active state
-    document.querySelectorAll('.crypto-btn').forEach(btn => {
-        btn.classList.remove('active', 'ring-2', 'ring-indigo-500');
-    });
-    document.querySelector(`[data-crypto="${symbol}"]`).classList.add('active', 'ring-2', 'ring-indigo-500');
-    
-    // Update UI
+    document.querySelectorAll('.crypto-btn').forEach(button => { const active = button.dataset.crypto === symbol; button.classList.toggle('active', active); button.classList.toggle('ring-2', active); button.classList.toggle('ring-indigo-500', active); button.setAttribute('aria-pressed', String(active)); });
     document.getElementById('currentCryptoName').textContent = name;
-    document.getElementById('currentCryptoImg').src = image;
-    document.getElementById('walletAddress').textContent = walletAddresses[symbol];
+    document.getElementById('currentCryptoImg').src = `assets/crypto/${symbol.toLowerCase()}.svg`;
     document.getElementById('warningCrypto').textContent = `${name} (${symbol})`;
-    document.getElementById('copyBtnText').textContent = 'Copy Address';
-    
-    // Generate new QR code
-    generateQRCode(symbol);
-    feather.replace();
+    document.getElementById('copyBtnText').textContent = 'Copy Address'; updateReceiveAddress();
 }
-
-// Generate QR code
-function generateQRCode(symbol) {
-    const container = document.getElementById('qrcode');
-    container.innerHTML = ''; // Clear previous QR code
-    
-    const address = walletAddresses[symbol];
-    
-    qrcode = new QRCode(container, {
-        text: address,
-        width: 200,
-        height: 200,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H
-    });
-}
-
-// Copy address to clipboard
 async function copyAddress() {
-    const address = walletAddresses[currentCrypto];
-    const btn = document.getElementById('copyBtnText');
-    
-    try {
-        await navigator.clipboard.writeText(address);
-        btn.textContent = 'Copied!';
-        
-        // Show success notification
-        showNotification('Address copied to clipboard', 'success');
-        
-        // Reset button text after 2 seconds
-        setTimeout(() => {
-            btn.textContent = 'Copy Address';
-        }, 2000);
-    } catch (err) {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = address;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            btn.textContent = 'Copied!';
-            showNotification('Address copied to clipboard', 'success');
-            setTimeout(() => {
-                btn.textContent = 'Copy Address';
-            }, 2000);
-        } catch (err) {
-            showNotification('Failed to copy address', 'error');
-        }
-        
-        document.body.removeChild(textArea);
-    }
+    if (!receiveAddress) return;
+    await window.CVAccount.copy(receiveAddress);
 }
-
-// Share address
 async function shareAddress() {
-    const address = walletAddresses[currentCrypto];
-    const cryptoNames = {
-        'BTC': 'Bitcoin',
-        'ETH': 'Ethereum',
-        'USDT': 'Tether',
-        'BNB': 'BNB'
-    };
-    
-    const shareData = {
-        title: `Receive ${cryptoNames[currentCrypto]}`,
-        text: `Send ${cryptoNames[currentCrypto]} to this address:\n${address}`,
-    };
-    
-    // Check if Web Share API is supported
-    if (navigator.share) {
-        try {
-            await navigator.share(shareData);
-            showNotification('Shared successfully', 'success');
-        } catch (err) {
-            if (err.name !== 'AbortError') {
-                console.error('Error sharing:', err);
-            }
-        }
-    } else {
-        // Fallback: copy to clipboard
-        copyAddress();
-        showNotification('Sharing not supported. Address copied instead!', 'success');
-    }
+    if (!receiveAddress) return;
+    if (!navigator.share) return copyAddress();
+    try { await navigator.share({ title: 'Receive Bitcoin', text: `Bitcoin (BTC) address: ${receiveAddress}` }); }
+    catch (error) { if (error.name !== 'AbortError') window.CVAccount.toast('Unable to share this address.'); }
 }
-
-// Show notification
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
-        type === 'success' ? 'bg-green-600' : 'bg-red-600'
-    }`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transition = 'opacity 0.3s';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
+document.addEventListener('cv:data', updateReceiveAddress);
+document.addEventListener('cv:walletchange', updateReceiveAddress);
+document.addEventListener('DOMContentLoaded', updateReceiveAddress);

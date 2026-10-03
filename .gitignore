@@ -1,0 +1,7 @@
+# Local credentials are not public website assets.
+.env
+.env.*
+!.env.example
+.local-test-account.json
+mongodb+srv*.txt
+node_modules/

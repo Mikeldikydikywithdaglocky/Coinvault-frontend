@@ -4,280 +4,98 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Email Verification - CoinVault</title>
-<!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Coinvault" />
 <link rel="manifest" href="/site.webmanifest" />
-<style>
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-    background: #020617;
-    color: white;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
-
-/* STARFIELD */
-.star {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    opacity: 0.4;
-    animation: twinkle 4s infinite alternate;
-}
-@keyframes twinkle {
-    0% { opacity: 0.2; }
-    100% { opacity: 0.6; }
-}
-
-/* COMETS */
-.comet {
-    position: absolute;
-    width: 2px;
-    height: 18px;
-    background: linear-gradient(rgba(255,255,255,0.25), transparent);
-    opacity: 0.25;
-    transform: rotate(-35deg);
-    animation: fall linear forwards;
-}
-@keyframes fall {
-    0% { transform: translateX(100vw) translateY(-100px) rotate(-35deg); opacity: 0; }
-    20% { opacity: 0.3; }
-    100% { transform: translateX(-200px) translateY(120vh) rotate(-35deg); opacity: 0; }
-}
-
-/* CARD */
-.card {
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(14px);
-    padding: 45px;
-    border-radius: 18px;
-    width: 420px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(59,130,246,0.08);
-    position: relative;
-    z-index: 10;
-}
-
-h2 { margin-top: 0; font-weight: 600; }
-
-#message {
-    margin-top: 12px;
-    line-height: 1.6;
-    opacity: 0.9;
-}
-
-/* BADGE */
-.badge {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: #22c55e;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    margin: auto;
-    margin-bottom: 18px;
-    box-shadow: 0 0 30px rgba(34,197,94,0.7), 0 0 60px rgba(34,197,94,0.3);
-}
-
-/* ERROR BADGE */
-.error-badge {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: #ef4444;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    margin: auto;
-    margin-bottom: 18px;
-    box-shadow: 0 0 30px rgba(239,68,68,0.7), 0 0 60px rgba(239,68,68,0.3);
-}
-
-/* LOADER */
-.loader {
-    border: 3px solid rgba(255,255,255,0.1);
-    border-top: 3px solid #22c55e;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    margin: 25px auto;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* BUTTON */
-.btn {
-    margin-top: 20px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    border: none;
-    padding: 13px 28px;
-    border-radius: 8px;
-    color: white;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    display: none;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-    transition: transform 0.2s;
-}
-.btn:hover { transform: translateY(-1px); }
-
-.btn-secondary {
-    margin-top: 12px;
-    background: transparent;
-    border: 1px solid #4b5563;
-    padding: 10px 24px;
-    border-radius: 8px;
-    color: #9ca3af;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    display: none;
-}
-.btn-secondary:hover { border-color: #6b7280; color: white; }
-
-/* CONFETTI */
-.confetti {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    animation: confettiFall 3s linear forwards;
-}
-@keyframes confettiFall {
-    0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-}
-</style>
+<link rel="stylesheet" href="css/auth-pages.css">
+<script src="js/config.js"></script>
 </head>
-<body>
+<body class="auth-page">
+<main class="auth-center-shell">
+    <section class="auth-card compact" aria-label="Email verification status">
+        <div class="auth-icon" id="brandIcon">
+            <img src="favicon.svg" alt="CoinVault logo">
+        </div>
 
-<div class="card">
-    <div class="error-badge" id="errorBadge">✕</div>
-    <div class="badge" id="badge">✓</div>
+        <div class="verify-badge hidden" id="badge">OK</div>
+        <div class="verify-badge error hidden" id="errorBadge">!</div>
 
-    <h2 id="title">Email Verification</h2>
-    <p id="message">Verifying your email...</p>
+        <div class="auth-card-head" style="text-align:center">
+            <h2 id="title">Email verification</h2>
+            <p id="message">Verifying your email link...</p>
+        </div>
 
-    <div class="loader" id="loader"></div>
+        <div class="loader" id="loader"></div>
 
-    <button class="btn" id="dashboardBtn" onclick="window.location.href='index.html'">Go to Dashboard</button>
-    <button class="btn-secondary" id="loginBtn" onclick="window.location.href='login.html'">Back to Login</button>
-</div>
+        <div class="auth-actions">
+            <a class="auth-submit hidden" id="dashboardBtn" href="index.html">Go to dashboard</a>
+            <a class="auth-secondary hidden" id="loginBtn" href="login.html">Back to sign in</a>
+        </div>
+    </section>
+</main>
 
 <script>
-// STARFIELD
-for (let i = 0; i < 80; i++) {
-    const star = document.createElement("div");
-    star.className = "star";
-    star.style.top = Math.random() * 100 + "%";
-    star.style.left = Math.random() * 100 + "%";
-    document.body.appendChild(star);
+function hideBrandIcon() {
+    document.getElementById("brandIcon").style.display = "none";
 }
 
-// COMETS
-function spawnComet() {
-    const comet = document.createElement("div");
-    comet.className = "comet";
-    comet.style.top = Math.random() * 40 + "%";
-    comet.style.animationDuration = (4 + Math.random() * 4) + "s";
-    document.body.appendChild(comet);
-    setTimeout(() => comet.remove(), 7000);
-}
-setInterval(spawnComet, 1500);
-
-// CONFETTI
-function confettiBurst() {
-    for (let i = 0; i < 60; i++) {
-        const confetti = document.createElement("div");
-        confetti.className = "confetti";
-        confetti.style.left = Math.random() * 100 + "%";
-        confetti.style.background = ["#22c55e","#3b82f6","#facc15","#ef4444"][Math.floor(Math.random() * 4)];
-        confetti.style.animationDuration = (2 + Math.random() * 2) + "s";
-        document.body.appendChild(confetti);
-        setTimeout(() => confetti.remove(), 4000);
-    }
-}
-
-// SHOW SUCCESS STATE
 function showSuccess() {
+    hideBrandIcon();
     document.getElementById("loader").style.display = "none";
-    document.getElementById("badge").style.display = "flex";
-    document.getElementById("title").textContent = "Email Verified!";
+    document.getElementById("badge").classList.remove("hidden");
+    document.getElementById("title").textContent = "Email verified";
     document.getElementById("message").innerHTML =
-        "<strong>Congratulations!</strong><br>Your account has been successfully verified.<br><br>Redirecting to your dashboard...";
-    document.getElementById("dashboardBtn").style.display = "inline-block";
-    confettiBurst();
+        "<strong>Your CoinVault account is ready.</strong><br>You are being redirected to your dashboard.";
+    document.getElementById("dashboardBtn").classList.remove("hidden");
 }
 
-// SHOW ERROR STATE
 function showError(msg) {
+    hideBrandIcon();
     document.getElementById("loader").style.display = "none";
-    document.getElementById("errorBadge").style.display = "flex";
-    document.getElementById("title").textContent = "Verification Failed";
+    document.getElementById("errorBadge").classList.remove("hidden");
+    document.getElementById("title").textContent = "Verification failed";
     document.getElementById("message").textContent = msg;
-    document.getElementById("loginBtn").style.display = "inline-block";
+    document.getElementById("loginBtn").classList.remove("hidden");
 }
 
-// VERIFY EMAIL
 async function verifyEmail() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
 
     if (!token) {
-        showError("Invalid verification link. Please request a new one.");
+        showError("This verification link is invalid. Please request a new one.");
         return;
     }
 
     try {
-        const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-            ? 'http://localhost:5050/api'
-            : 'https://coinvault-backend-production.up.railway.app/api';
-
-        const res = await fetch(`${API_URL}/auth/verify-email`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token })
+        const data = await CONFIG.apiRequest('/auth/verify-email', {
+            method: 'POST',
+            body: { token },
+            auth: false
         });
 
-        const data = await res.json();
-
         if (data.success) {
-            // Save token so user is logged in
             if (data.token) {
                 localStorage.setItem("token", data.token);
             }
 
             showSuccess();
 
-            // Auto redirect after 3 seconds
             setTimeout(() => {
                 window.location.href = "index.html";
             }, 3000);
-
         } else {
             showError(data.message || "Verification failed. The link may have expired.");
         }
-
     } catch (error) {
-        showError("Could not connect to server. Please try again.");
+        showError(error.message || "Could not verify your email right now. Please try again.");
     }
 }
 
-// Run on page load
 verifyEmail();
 </script>
-
 </body>
 </html>
