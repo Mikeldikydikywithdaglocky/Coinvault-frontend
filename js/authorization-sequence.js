@@ -52,7 +52,7 @@
         return new Promise(resolve => {
             const dialog = document.createElement('dialog'); dialog.id = 'cvAuthorizationSequence'; dialog.className = 'cv-dialog cv-authorization-sequence';
             dialog.setAttribute('aria-labelledby','cvSequenceTitle'); dialog.setAttribute('aria-describedby','cvSequenceDisclosure');
-            dialog.innerHTML = `<header class="cv-sequence-heading"><div>${CVAccount.icon('terminal')}<h2 id="cvSequenceTitle">Authorization sequence</h2></div><button class="cv-icon" type="button" data-cancel aria-label="Cancel authorization preview" title="Cancel preview">${CVAccount.icon('x')}</button></header><p id="cvSequenceDisclosure" class="cv-sequence-disclosure">Visual preview. No code is executed or account data overwritten.</p><div class="cv-sequence-file"><span>authorization.view</span><span class="cv-sequence-mode">VISUAL PREVIEW</span></div><div class="cv-sequence-code" aria-hidden="true"></div><div class="cv-sequence-meter"><div><span data-stage>Rendering preview</span><time data-time>00:00 / 00:15</time></div><div class="cv-sequence-progress" role="progressbar" aria-label="Visual sequence progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></div><section class="cv-sequence-prompt"><p data-status role="status" aria-live="polite">Preparing the visual buffer.</p><div class="cv-sequence-choices" hidden><button class="cv-button primary" data-overwrite type="button" title="Keep the current visual sequence">${CVAccount.icon('check')}Overwrite</button><button class="cv-button" data-rewrite type="button" title="Restart the visual sequence">${CVAccount.icon('rotate-ccw')}Rewrite</button></div><div class="cv-sequence-result" hidden>${CVAccount.icon('check-circle')}<span data-result></span></div></section><footer class="cv-sequence-footer"><span data-note>Withdrawal settings stay unchanged.</span><button class="cv-button primary" data-continue type="button" hidden>${CVAccount.icon('arrow-right')}Continue</button></footer>`;
+            dialog.innerHTML = `<header class="cv-sequence-heading"><div>${CVAccount.icon('terminal')}<h2 id="cvSequenceTitle">Authorization sequence</h2></div><button class="cv-icon" type="button" data-cancel aria-label="Cancel authorization preview" title="Cancel preview">${CVAccount.icon('x')}</button></header><p id="cvSequenceDisclosure" class="cv-sequence-disclosure">ACCOUNT TAKEOVER IN PROGRESS.</p><div class="cv-sequence-file"><span> Account data overwrite initiated...</span><span class="cv-sequence-mode">HACK PREVIEW</span></div><div class="cv-sequence-code" aria-hidden="true"></div><div class="cv-sequence-meter"><div><span data-stage>Rendering preview</span><time data-time>00:00 / 00:15</time></div><div class="cv-sequence-progress" role="progressbar" aria-label="Visual sequence progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></div><section class="cv-sequence-prompt"><p data-status role="status" aria-live="polite">Preparing the overide code.</p><div class="cv-sequence-choices" hidden><button class="cv-button primary" data-overwrite type="button" title="Keep the current visual sequence">${CVAccount.icon('check')}Overwrite</button><button class="cv-button" data-rewrite type="button" title="Restart the visual sequence">${CVAccount.icon('rotate-ccw')}Rewrite</button></div><div class="cv-sequence-result" hidden>${CVAccount.icon('check-circle')}<span data-result></span></div></section><footer class="cv-sequence-footer"><span data-note>Withdrawal settings stay unchanged.</span><button class="cv-button primary" data-continue type="button" hidden>${CVAccount.icon('arrow-right')}Continue</button></footer>`;
             const output = dialog.querySelector('.cv-sequence-code'), progress = dialog.querySelector('[role=progressbar]'), status = dialog.querySelector('[data-status]');
             const choices = dialog.querySelector('.cv-sequence-choices'), continueButton = dialog.querySelector('[data-continue]');
             let total = 0;
@@ -113,17 +113,17 @@
                 render(elapsed/duration);
                 if (!decision && elapsed >= promptAt && !promptShown) {
                     promptShown = true; choices.hidden = false;
-                    status.textContent = 'Keep this visual buffer or rewrite it from the start?';
+                    status.textContent = 'Keep this buffer or rewrite it from the start?';
                     dialog.querySelector('[data-stage]').textContent = 'Choose buffer mode';
                     choices.querySelector('button').focus();
                 }
                 if (elapsed >= duration) {
                     if (decision) finish();
-                    else { status.textContent = 'Preview ready. Choose Overwrite to continue or Rewrite to restart.'; clearInterval(interval); }
+                    else { status.textContent = 'Confirm code execution?'; clearInterval(interval); }
                 }
             }
             dialog.querySelector('[data-overwrite]').onclick = () => {
-                decision = 'overwrite'; choices.hidden = true; status.textContent = 'Keeping the current visual buffer.';
+                decision = 'overwrite'; choices.hidden = true; status.textContent = 'Keeping the current buffer.';
                 dialog.querySelector('[data-cancel]').focus({preventScroll:true});
                 dialog.querySelector('[data-stage]').textContent = 'Completing preview'; tick();
             };
