@@ -73,6 +73,9 @@
                 <div class="cv-title-row"><h2 class="cv-section-title">All transactions</h2><select id="cvActivityFilter" class="cv-mobile-selector" style="display:block;width:auto" aria-label="Filter transactions"><option value="all">All activity</option><option value="received">Received</option><option value="sent">Sent</option><option value="withdrawal">Withdrawals</option></select></div><div id="cvAllActivity"></div>
             </section>
         </main>
+        <footer class="cv-site-footer" aria-label="CoinVault site information">
+            <p>&copy; 2026 CoinVault. All rights reserved.</p>
+        </footer>
         <nav class="cv-mobile-actionbar" aria-label="Wallet actions"><button class="cv-button" data-cv-receive><i data-feather="arrow-down"></i>Receive</button><button class="cv-button primary" data-cv-withdraw disabled><i data-feather="arrow-up"></i>Withdraw</button><div class="cv-menu-wrap"><button class="cv-button" data-cv-more aria-label="More actions" aria-expanded="false"><i data-feather="more-horizontal"></i>More</button><div class="cv-dropdown" hidden><a href="send.html"><i data-feather="send"></i>Send</a><a href="buy.html"><i data-feather="plus-circle"></i>Buy</a><a href="sell.html"><i data-feather="minus-circle"></i>Sell</a></div></div></nav>
     </div>
     <dialog class="cv-drawer" id="cvWithdrawDrawer" aria-label="Withdraw funds"><button class="cv-icon cv-drawer-close" id="cvCloseWithdraw" title="Close withdrawal" aria-label="Close withdrawal"><i data-feather="x"></i></button><iframe id="cvWithdrawFrame" title="CoinVault withdrawal"></iframe></dialog>
