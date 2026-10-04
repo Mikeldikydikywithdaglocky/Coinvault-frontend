@@ -10,6 +10,23 @@
         const country = document.getElementById('withdrawCountry');
         const wrapper = document.createElement('div'); wrapper.style.position = 'relative'; country.before(wrapper); wrapper.append(country);
         const lock = document.createElement('span'); lock.className = 'cv-country-lock'; lock.innerHTML = CVAccount.icon('lock'); wrapper.append(lock);
+        const bankSelect = document.getElementById('bankName');
+        const bankWrapper = document.createElement('div'); bankWrapper.className = 'cv-bank-select';
+        const bankLogo = document.createElement('span'); bankLogo.className = 'cv-bank-logo'; bankLogo.id = 'cvBankLogo';
+        bankSelect.before(bankWrapper); bankWrapper.append(bankLogo,bankSelect);
+        const updateBankLogo = () => {
+            const url = CVPaymentLogos.bankLogo(bankSelect.value,selectedCountryCode);
+            bankLogo.replaceChildren();
+            if (url) {
+                const image = document.createElement('img'); image.src = url; image.alt = bankSelect.value + ' logo';
+                image.onerror = () => { bankLogo.innerHTML = CVAccount.icon('home'); CVAccount.icons(); };
+                bankLogo.append(image);
+            } else bankLogo.innerHTML = CVAccount.icon('home');
+        };
+        bankSelect.addEventListener('change',updateBankLogo);
+        new MutationObserver(updateBankLogo).observe(bankSelect,{childList:true});
+        document.addEventListener('cv:withdraw-selection',updateBankLogo);
+        updateBankLogo();
         for (const id of ['momoSubmitBtn','bankSubmitBtn','cryptoSubmitBtn']) document.getElementById(id).innerHTML = `${CVAccount.icon('arrow-up')}<span>Review withdrawal</span>`;
         if (panel) mountContext(main,wrapper);
         const forms = [['momoForm','momoAmount','momoNumber'],['bankForm','bankAmount','bankAccount'],['cryptoForm','cryptoAmount','cryptoAddress']];
@@ -58,6 +75,9 @@
             updateAvailable(); update();
         }
         document.querySelectorAll('label').forEach(label => { if (!label.htmlFor) { const input = label.parentElement.querySelector('input[id],select[id]'); if (input) label.htmlFor = input.id; } });
+        brandPicker(bankSelect,'bank',name => CVPaymentLogos.bankLogo(name,selectedCountryCode));
+        const providerSelect = document.getElementById('cvProviderSelect');
+        if (providerSelect) brandPicker(providerSelect,'provider',id => CVPaymentLogos.providerLogo(getSelectedCountryConfig()?.mobileMoneyProviders.find(provider => provider.id === id)));
         window.CVWithdrawalReview = reviewWithdrawal;
         const originalSubmit = window.submitWithdrawal;
         let submissionPending = false;
@@ -125,11 +145,71 @@
         return new Promise(resolve => {
             const dialog = document.createElement('dialog'); dialog.className = 'cv-dialog cv-withdraw-review';
             const method = data.method === 'momo' ? getSelectedCountryConfig()?.mobileMoneyLabel || 'Mobile Money' : data.method === 'bank' ? 'Bank transfer' : 'Crypto transfer';
-            const rows = [['Method',method],...(data.details.carrierName ? [['Provider',data.details.carrierName]] : []),['Country',data.countryName],['Recipient',data.details.number || data.details.account || data.details.address],['Account name',data.details.name || '--']];
+            const rows = [['Method',method],...(data.details.carrierName ? [['Provider',data.details.carrierName]] : []),...(data.details.bank && !['paypal','zelle'].includes(data.details.payoutRail) ? [['Bank',data.details.bank]] : []),['Country',data.countryName],['Recipient',data.details.number || data.details.account || data.details.address],['Account name',data.details.name || '--']];
             dialog.innerHTML = `<div class="cv-dialog-heading"><h2>Review withdrawal</h2><button class="cv-icon" type="button" title="Close review" aria-label="Close review">${CVAccount.icon('x')}</button></div><p class="cv-payout-value">${CVAccount.escape(data.currencyCode)} ${Number(data.amountLocal).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</p><dl>${rows.map(([name,value]) => `<dt>${CVAccount.escape(name)}</dt><dd>${CVAccount.escape(value)}</dd>`).join('')}</dl><p>Confirm with the verification code sent to your email.</p><div class="cv-review-actions"><button class="cv-button" data-back type="button">Back</button><button class="cv-button primary" data-confirm type="button">${CVAccount.icon('mail')}Send verification code</button></div>`;
+            const brand = CVPaymentLogos.withdrawalLogo(data);
+            const brandRow = document.createElement('div'); brandRow.className = 'cv-review-brand';
+            const mark = document.createElement('span'); mark.innerHTML = CVAccount.icon(brand.fallback);
+            if (brand.url) {
+                const image = document.createElement('img'); image.src = brand.url; image.alt = brand.label + ' logo';
+                image.onerror = () => { mark.innerHTML = CVAccount.icon(brand.fallback); CVAccount.icons(); };
+                mark.replaceChildren(image);
+            }
+            const label = document.createElement('span'); label.textContent = brand.label; brandRow.append(mark,label);
+            dialog.querySelector('dl').before(brandRow);
             document.body.append(dialog); dialog.querySelector('.cv-icon').onclick = () => dialog.close('cancel'); dialog.querySelector('[data-back]').onclick = () => dialog.close('cancel'); dialog.querySelector('[data-confirm]').onclick = () => dialog.close('confirm');
             dialog.addEventListener('close',() => { const confirmed = dialog.returnValue === 'confirm'; dialog.remove(); resolve(confirmed); },{once:true});
             dialog.showModal(); CVAccount.icons();
         });
+    }
+    function brandPicker(select,kind,logoFor) {
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'cv-brand-picker-button'; button.id = select.id + 'Picker';
+        button.setAttribute('aria-haspopup','dialog'); button.setAttribute('aria-expanded','false');
+        const value = document.createElement('span'); value.className = 'cv-choice-value';
+        const arrow = document.createElement('span'); arrow.innerHTML = CVAccount.icon('chevron-down'); button.append(value,arrow);
+        const labels = [...select.labels]; for (const label of labels) label.htmlFor = button.id;
+        select.before(button); select.classList.add('cv-native-brand-select'); select.tabIndex = -1; select.setAttribute('aria-hidden','true');
+        let dialog;
+        const sync = () => {
+            const selected = select.selectedOptions[0]; value.textContent = selected?.textContent || 'Select ' + kind;
+            button.disabled = select.disabled || select.options.length < 2;
+            button.setAttribute('aria-label','Choose ' + kind + ': ' + value.textContent);
+            if (dialog?.open) dialog.close();
+        };
+        const observer = new MutationObserver(sync); observer.observe(select,{childList:true,attributes:true,attributeFilter:['disabled']});
+        select.addEventListener('change',sync); document.addEventListener('cv:withdraw-selection',sync); sync();
+        button.onclick = () => {
+            if (dialog?.open) return;
+            const openedDialog = document.createElement('dialog'); dialog = openedDialog;
+            openedDialog.className = 'cv-dialog cv-brand-picker'; openedDialog.id = select.id + 'Choices';
+            openedDialog.setAttribute('aria-labelledby',openedDialog.id + 'Title');
+            openedDialog.innerHTML = `<div class="cv-dialog-heading"><h2 id="${openedDialog.id}Title">Choose ${kind}</h2><button class="cv-icon" type="button" aria-label="Close ${kind} choices" title="Close">${CVAccount.icon('x')}</button></div>`;
+            const list = document.createElement('div'); list.className = 'cv-brand-choices'; openedDialog.append(list);
+            for (const option of select.options) {
+                if (!option.value || option.disabled) continue;
+                const choice = document.createElement('button'); choice.type = 'button'; choice.className = 'cv-brand-choice'; choice.dataset.value = option.value;
+                choice.setAttribute('aria-pressed',String(option.selected));
+                const logo = document.createElement('span'); logo.className = 'cv-choice-logo'; logo.innerHTML = CVAccount.icon(kind === 'bank' ? 'home' : 'smartphone');
+                const url = logoFor(option.value);
+                if (url) {
+                    const image = document.createElement('img'); image.src = url; image.alt = ''; image.width = 32; image.height = 32;
+                    image.onerror = () => { logo.innerHTML = CVAccount.icon(kind === 'bank' ? 'home' : 'smartphone'); CVAccount.icons(); };
+                    logo.replaceChildren(image);
+                }
+                const label = document.createElement('span'); label.textContent = option.textContent; choice.append(logo,label);
+                if (option.selected) { const check = document.createElement('span'); check.className = 'cv-choice-check'; check.innerHTML = CVAccount.icon('check'); choice.append(check); }
+                choice.onclick = () => { openedDialog.close(); select.value = option.value; select.dispatchEvent(new Event('change',{bubbles:true})); };
+                list.append(choice);
+            }
+            openedDialog.querySelector('.cv-icon').onclick = () => openedDialog.close();
+            openedDialog.addEventListener('close',() => {
+                openedDialog.remove();
+                if (dialog !== openedDialog) return;
+                dialog = null; button.setAttribute('aria-expanded','false'); button.removeAttribute('aria-controls'); button.focus();
+            },{once:true});
+            button.setAttribute('aria-controls',openedDialog.id); button.setAttribute('aria-expanded','true');
+            document.body.append(openedDialog); openedDialog.showModal(); CVAccount.icons();
+            openedDialog.querySelector('[aria-pressed=true]')?.focus();
+        };
     }
 })();

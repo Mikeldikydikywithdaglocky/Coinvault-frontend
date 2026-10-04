@@ -1,0 +1,767 @@
+{
+  "purpose": "Visual brand identification only; not a payment integration or endorsement.",
+  "entries": [
+    {
+      "file": "absa.png",
+      "referenceWebsite": "https://www.absa.com.gh/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "abyssinia.png",
+      "referenceWebsite": "https://bankofabyssinia.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "access.png",
+      "referenceWebsite": "https://accessbankplc.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "afriland.png",
+      "referenceWebsite": "https://afrilandfirstbank.com",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://afrilandfirstbankci.com/",
+      "asset": "https://afrilandfirstbankci.com/wp-content/uploads/2024/08/cropped-afb-favicone-192x192.png",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "airtel.png",
+      "referenceWebsite": "https://airtel.in",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "airteltigo.png",
+      "referenceWebsite": "https://at.com.gh/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "alexbank.png",
+      "referenceWebsite": "https://alexbank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "atlantico.png",
+      "referenceWebsite": "https://atlantico.ao",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "atlantique.png",
+      "referenceWebsite": "https://banqueatlantique.net",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "atlasmara.png",
+      "referenceWebsite": "https://atlasmara.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "attijariwafa.png",
+      "referenceWebsite": "https://attijariwafabank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "awash.png",
+      "referenceWebsite": "https://awashbank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "badr.png",
+      "referenceWebsite": "https://badrbank.dz",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://www.irffi-dz.com/index.php/fr/",
+      "asset": "https://www.irffi-dz.com/images/logo/badr.jpg",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bancabc.png",
+      "referenceWebsite": "https://bancabc.com",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:BancABC_Logo.png",
+      "author": "BancABC",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bankofamerica.png",
+      "referenceWebsite": "https://bankofamerica.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bci.png",
+      "referenceWebsite": "https://bci.co.mz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bcp.png",
+      "referenceWebsite": "https://groupebcp.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bfa.png",
+      "referenceWebsite": "https://bfa.ao",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bic.png",
+      "referenceWebsite": "https://bancobic.ao",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bicici.png",
+      "referenceWebsite": "https://bicici.com",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://www.bicici.ci/",
+      "asset": "https://www.bicici.ci/documents/d/website-bicici/frame-54-png",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bicis.png",
+      "referenceWebsite": "https://bicis.sn",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://fr.wikipedia.org/wiki/Fichier:Bicis-bnp.svg",
+      "note": "Retained legacy configured bank identity; non-free corporate logo.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bim.png",
+      "referenceWebsite": "https://millenniumbim.co.mz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bk.png",
+      "referenceWebsite": "https://bk.rw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bmce.png",
+      "referenceWebsite": "https://bankofafrica.ma",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bna.png",
+      "referenceWebsite": "https://bna.dz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "bnp.png",
+      "referenceWebsite": "https://bnpparibas.dz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "boa.png",
+      "referenceWebsite": "https://bankofafrica.net",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "calbank.png",
+      "referenceWebsite": "https://calbank.net/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "capitalone.png",
+      "referenceWebsite": "https://capitalone.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "capitec.png",
+      "referenceWebsite": "https://capitecbank.co.za",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cashapp.png",
+      "referenceWebsite": "https://cash.app",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cbao.png",
+      "referenceWebsite": "https://cbaobank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cbe.png",
+      "referenceWebsite": "https://combanketh.et",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cdm.png",
+      "referenceWebsite": "https://creditdumaroc.ma",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "centenary.png",
+      "referenceWebsite": "https://centenarybank.co.ug",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "chase.png",
+      "referenceWebsite": "https://chase.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cib.png",
+      "referenceWebsite": "https://cibeg.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cih.png",
+      "referenceWebsite": "https://cihbank.ma",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "citi.png",
+      "referenceWebsite": "https://citi.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cogebanque.png",
+      "referenceWebsite": "https://cogebanque.co.rw",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://en.wikipedia.org/wiki/File:Cogebanque.png",
+      "note": "Retained legacy configured bank identity; non-free corporate logo.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "coop-et.png",
+      "referenceWebsite": "https://coopbankoromia.com.et",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "coop-ke.png",
+      "referenceWebsite": "https://co-opbank.co.ke",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "coris.png",
+      "referenceWebsite": "https://coris.bank",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "cpa.png",
+      "referenceWebsite": "https://cpa-bank.dz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "crdb.png",
+      "referenceWebsite": "https://crdbbank.co.tz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "dashen.png",
+      "referenceWebsite": "https://dashenbanksc.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "dfcu.png",
+      "referenceWebsite": "https://dfcugroup.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "discovery.png",
+      "referenceWebsite": "https://discovery.co.za",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "ecobank.png",
+      "referenceWebsite": "https://www.ecobank.com/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "emola.png",
+      "referenceWebsite": "https://movitel.co.mz",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://play.google.com/store/apps/details?id=com.movitel.mz.emola",
+      "asset": "https://play-lh.googleusercontent.com/Zs-xwLqYde2cHA17w_MdRurMHoGu4gWv3jBlJCLBMm9EhnwXdw4GZrzjo-aNbLtVceVDKLzNq4pHS3v3EGWLtbg=w240-h480-rw",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "equity.png",
+      "referenceWebsite": "https://equitygroupholdings.com",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Equity_Group_Logo.png",
+      "author": "Equity Bank",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "fdh.png",
+      "referenceWebsite": "https://fdh.co.mw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "fidelity-ng.png",
+      "referenceWebsite": "https://fidelitybank.ng",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "fidelity.png",
+      "referenceWebsite": "https://www.fidelitybank.com.gh/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "firstbank.png",
+      "referenceWebsite": "https://firstbanknigeria.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "fnb.png",
+      "referenceWebsite": "https://fnb.co.za",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "freemoney.png",
+      "referenceWebsite": "https://free.sn",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://www.boasenegal.com/particuliers/transfert-dargent/autres-partenaires/",
+      "asset": "https://www.boasenegal.com/wp-content/uploads/2020/04/fee-money-768x608.png",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "gaborone.png",
+      "referenceWebsite": "https://bankgaborone.co.bw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "gcb.png",
+      "referenceWebsite": "https://www.gcbbank.com.gh/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "gtbank.png",
+      "referenceWebsite": "https://gtbank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "halopesa.png",
+      "referenceWebsite": "https://halopesa.co.tz",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://www.halopesa.co.tz/",
+      "note": "Provider website icon, not the Halotel parent-company mark.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "im-bank.png",
+      "referenceWebsite": "https://imbankgroup.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "kcb.png",
+      "referenceWebsite": "https://kcbgroup.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "misr.png",
+      "referenceWebsite": "https://banquemisr.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "moniepoint.png",
+      "referenceWebsite": "https://moniepoint.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "moov.png",
+      "referenceWebsite": "https://moov-africa.ci",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "moza.png",
+      "referenceWebsite": "https://mozabanco.co.mz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "mpesa.png",
+      "referenceWebsite": "https://safaricom.co.ke",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:M-PESA_LOGO-01.svg",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "mtn.png",
+      "referenceWebsite": "https://www.mtn.com/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "myzaka.png",
+      "referenceWebsite": "https://mascom.bw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "navyfederal.png",
+      "referenceWebsite": "https://navyfederal.org",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Navy_Federal_Credit_Union_Logo.svg",
+      "author": "Mawillcockson",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "nbc.png",
+      "referenceWebsite": "https://nbc.co.tz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "nbe.png",
+      "referenceWebsite": "https://nbe.com.eg",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "nbm.png",
+      "referenceWebsite": "https://natbank.co.mw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "nbs.png",
+      "referenceWebsite": "https://nbs.mw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "ncba.png",
+      "referenceWebsite": "https://ncbagroup.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "nedbank.png",
+      "referenceWebsite": "https://nedbank.co.za",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "nmb.png",
+      "referenceWebsite": "https://nmbbank.co.tz",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "nsia.png",
+      "referenceWebsite": "https://nsiabanque.ci",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "opay.png",
+      "referenceWebsite": "https://opayweb.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "orabank.png",
+      "referenceWebsite": "https://orabank.net",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "orange.png",
+      "referenceWebsite": "https://orange.com",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://www.republicoftogo.com/toutes-les-rubriques/eco-finance/orange-money-en-pool-avec-tmoney",
+      "asset": "https://www.republicoftogo.com/var/site/storage/images/toutes-les-rubriques/eco-finance/orange-money-en-pool-avec-tmoney/2980600-1-fre-FR/orange-money-en-pool-avec-tmoney_i1920.jpg",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "paga.png",
+      "referenceWebsite": "https://mypaga.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "palmpay.png",
+      "referenceWebsite": "https://palmpay.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "paypal.png",
+      "referenceWebsite": "https://paypal.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "qnb.png",
+      "referenceWebsite": "https://qnb.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "rawbank.png",
+      "referenceWebsite": "https://rawbank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "skrill.png",
+      "referenceWebsite": "https://skrill.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "smega.png",
+      "referenceWebsite": "https://btc.bw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "socgen.png",
+      "referenceWebsite": "https://societegenerale.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "sol.png",
+      "referenceWebsite": "https://bancosol.ao",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "standardbank.png",
+      "referenceWebsite": "https://standardbank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "telecel.png",
+      "referenceWebsite": "https://telecel.com.gh/",
+      "sourceType": "Existing project asset",
+      "note": "Kept unchanged; reference website is not an asserted original download URL."
+    },
+    {
+      "file": "tigopesa.png",
+      "referenceWebsite": "https://tigo.co.tz",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://yas.co.tz/wp-content/uploads/2024/09/Tigo-Pesa-Rafiki_English-TC_2024.pdf",
+      "asset": "Embedded Image11.jpg, page 1",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "tkash.png",
+      "referenceWebsite": "https://telkom.co.ke",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "tmb.png",
+      "referenceWebsite": "https://tmb.cd",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "tmoney.png",
+      "referenceWebsite": "https://togocom.tg",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://www.republicoftogo.com/toutes-les-rubriques/medias/ib-bank-t-money-meme-combat",
+      "asset": "https://www.republicoftogo.com/var/site/storage/images/toutes-les-rubriques/medias/ib-bank-t-money-meme-combat/2830746-1-fre-FR/ib-bank-t-money-meme-combat_i1200.jpg",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "tnm.png",
+      "referenceWebsite": "https://tnm.co.mw",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "uba.png",
+      "referenceWebsite": "https://ubagroup.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "utb.png",
+      "referenceWebsite": "https://utb.tg",
+      "sourceType": "Published brand artwork",
+      "sourcePage": "https://www.dobiza.com/eng/Entreprises/profilsample/14078",
+      "asset": "https://www.dobiza.com/files/entreprise/logo/14078/thumb_utb.PNG",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "wave.png",
+      "referenceWebsite": "https://wave.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "wellsfargo.png",
+      "referenceWebsite": "https://wellsfargo.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "wise.png",
+      "referenceWebsite": "https://wise.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "zamtel.png",
+      "referenceWebsite": "https://zamtel.zm",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "zanaco.png",
+      "referenceWebsite": "https://zanaco.co.zm",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "zelle.png",
+      "referenceWebsite": "https://zellepay.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    },
+    {
+      "file": "zenith.png",
+      "referenceWebsite": "https://zenithbank.com",
+      "sourceType": "Website icon cached during development",
+      "note": "Website favicon obtained during development, including Google favicon cache where necessary; the application serves only this local file.",
+      "conversion": "Encoded or resized to local PNG for display; colors and logo design unchanged."
+    }
+  ]
+}

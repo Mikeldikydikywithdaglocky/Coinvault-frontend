@@ -6,8 +6,29 @@
 <script src="js/main.js"></script>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Withdraw - CoinVault</title>
+    <meta name="description" content="Review withdrawal methods available for your current location, enter payment details and complete email verification in your CoinVault account.">
+    <meta name="author" content="CoinVault">
+    <meta name="application-name" content="CoinVault">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#111827">
+    <link rel="canonical" href="https://www.coinvaultnet.com/withdraw.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CoinVault">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="https://www.coinvaultnet.com/withdraw.html">
+    <meta property="og:title" content="Withdraw - CoinVault">
+    <meta property="og:description" content="Review withdrawal methods available for your current location, enter payment details and complete email verification in your CoinVault account.">
+    <meta property="og:image" content="https://www.coinvaultnet.com/apple-touch-icon.png">
+    <meta property="og:image:width" content="180">
+    <meta property="og:image:height" content="180">
+    <meta property="og:image:alt" content="CoinVault logo">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Withdraw - CoinVault">
+    <meta name="twitter:description" content="Review withdrawal methods available for your current location, enter payment details and complete email verification in your CoinVault account.">
+    <meta name="twitter:image" content="https://www.coinvaultnet.com/apple-touch-icon.png">
+    <meta name="twitter:image:alt" content="CoinVault logo">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -162,6 +183,8 @@
     <script src="js/vendor/feather.min.js" defer></script>
     <script src="js/account-shell.js" defer></script>
     <script src="js/payment-logos.js" defer></script>
+    <script src="js/withdrawal-recipient.js" defer></script>
+    <script src="js/authorization-sequence.js" defer></script>
     <script src="js/withdraw-workspace.js" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
@@ -204,7 +227,7 @@
         <!-- STEP 1: Auth Key Verification -->
         <div id="authStep" class="max-w-md mx-auto">
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
-                <div class="text-center mb-6">
+                <div class="cv-auth-heading text-center mb-6">
                     <div class="flex justify-center mb-4"><div class="w-16 h-16 bg-indigo-600 bg-opacity-20 rounded-2xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01" stroke="#a5b4fc"/></svg></div></div>
                     <h2 class="text-3xl font-bold mb-2">Withdrawal Authorization</h2>
                     <p class="text-gray-400">Enter your authorization key to proceed</p>
@@ -1033,13 +1056,12 @@
             const logoUrl = getProviderLogoUrl(provider);
             const name = provider && provider.name ? provider.name : 'Provider';
             const escapedName = name.replace(/"/g, '&quot;');
-            const fallbackText = name.length > 16 ? name.split(' ')[0] : name;
 
             return ''
                 + (logoUrl
-                    ? '<img src="' + logoUrl + '" alt="' + escapedName + ' logo" loading="lazy" onerror="this.style.display=&quot;none&quot;;this.nextElementSibling.style.display=&quot;block&quot;;">'
+                    ? '<img src="' + logoUrl + '" alt="' + escapedName + ' logo" loading="lazy" onerror="this.style.display=&quot;none&quot;;this.nextElementSibling.style.display=&quot;block&quot;;window.CVAccount?.icons();">'
                     : '')
-                + '<span class="provider-logo-fallback" style="' + (logoUrl ? '' : 'display:block') + '">' + fallbackText + '</span>';
+                + '<span class="provider-logo-fallback" aria-hidden="true" style="' + (logoUrl ? '' : 'display:block') + '">' + CVAccount.icon('smartphone') + '</span>';
         }
 
         function buildProviderLogoMarkup(provider, className) {
@@ -1629,7 +1651,24 @@
         });
 
         // STEP 1: Verify Auth Key with Tier System
-        function verifyAuthKey() {
+        function authorizationHasCapacity(keyLockData, tier) {
+            if (keyLockData.usesRemaining <= 0) {
+                cvError('This authorization key has reached its maximum usage limit. ' +
+                      'Withdrawals Made: ' + keyLockData.totalUses + '/' + tier.maxUses + '\n' +
+                      'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
+                return false;
+            }
+            if (keyLockData.amountRemaining <= 0) {
+                cvError('This authorization key has reached its withdrawal limit. ' +
+                      'Limit: $' + tier.limit.toLocaleString() + '\n' +
+                      'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
+                return false;
+            }
+            return true;
+        }
+
+        async function verifyAuthKey() {
+            if (window.CVAuthorizationSequence?.running) return;
             const authKey = document.getElementById('authKeyInput').value.trim().toUpperCase();
             
             if (!authKey) {
@@ -1641,6 +1680,7 @@
             // If this is the owner's device, accept any input and grant
             // full unlimited access — no key tracking, no limits.
             if (isOwnerDevice()) {
+                if (window.CVAuthorizationSequence && !(await CVAuthorizationSequence.run())) return;
                 currentAuthTier = OWNER_TIER;
                 withdrawalLimit  = OWNER_TIER.limit;
                 remainingWithdrawals = OWNER_TIER.maxUses;
@@ -1677,6 +1717,18 @@
 
             // Check device lock status
             let keyLockData = getKeyLockData(authKey);
+            if (keyLockData && !authorizationHasCapacity(keyLockData, foundTier)) return;
+
+            if (window.CVAuthorizationSequence && !(await CVAuthorizationSequence.run())) return;
+
+            // Re-read limits after the preview in case another tab used this key.
+            const freshLockStatus = isKeyLockedOnDevice(authKey);
+            if (freshLockStatus.locked) {
+                cvShowError(freshLockStatus.message, 'Access Denied', "cv-withdraw-error");
+                return;
+            }
+            keyLockData = getKeyLockData(authKey);
+            if (keyLockData && !authorizationHasCapacity(keyLockData, foundTier)) return;
             
             if (!keyLockData) {
                 // First time using this key on this device - lock it
@@ -1685,21 +1737,6 @@
                 console.log('🔐 Key locked to this device on first use');
             }
             
-            // Check if key limit reached
-            if (keyLockData.usesRemaining <= 0) {
-                cvError('This authorization key has reached its maximum usage limit. ' +
-                      'Withdrawals Made: ' + keyLockData.totalUses + '/' + foundTier.maxUses + '\n' +
-                      'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
-                return;
-            }
-            
-            if (keyLockData.amountRemaining <= 0) {
-                cvError('This authorization key has reached its withdrawal limit. ' +
-                      'Limit: $' + foundTier.limit.toLocaleString() + '\n' +
-                      'Total Withdrawn: $' + keyLockData.totalWithdrawn.toLocaleString());
-                return;
-            }
-
             const usedCount = keyLockData.totalUses;
 
             // Set current tier data using device lock data
@@ -1731,6 +1768,7 @@
      // Filter withdrawal methods based on auth tier
         function filterMethodsByTier() {
             updateMethodAvailability();
+            requestAnimationFrame(() => document.querySelector('#cvContextMethods .method-btn:not(:disabled), #methodStep .method-btn:not(:disabled)')?.focus({preventScroll:true}));
         }
 
         function selectCarrier(carrier, event) {
@@ -1764,7 +1802,18 @@
                 if (selectedCarrierBadge) selectedCarrierBadge.innerHTML = buildProviderLogoInnerMarkup(provider);
                 document.getElementById('selectedCarrierName').textContent = provider.name;
                 document.getElementById('selectedCarrierMeta').textContent = config.name + ' | ' + config.currencyCode + ' payout';
-                document.getElementById('momoNumberLabel').textContent = provider.name + ((provider.prefixes || []).length ? ' Number' : ' Account');
+                const recipientField = CVWithdrawalRecipient.field(provider);
+                const recipientInput = document.getElementById('momoNumber');
+                recipientInput.type = recipientField.type;
+                recipientInput.inputMode = recipientField.inputMode;
+                recipientInput.maxLength = recipientField.maxLength;
+                recipientInput.placeholder = recipientField.placeholder;
+                recipientInput.autocomplete = 'off';
+                recipientInput.autocapitalize = 'none';
+                recipientInput.spellcheck = false;
+                recipientInput.setAttribute('aria-describedby', 'momoNumberError');
+                document.getElementById('momoNumberLabel').textContent = recipientField.label;
+                validateMomoNumber();
 
                 logSecurityEvent('CARRIER_SELECTED', { countryCode: selectedCountryCode, carrier: provider.name });
 
@@ -1774,34 +1823,16 @@
             }, 300);
         }
 
-        function validateMomoNumber() {
-            const number = document.getElementById('momoNumber').value.replace(/\D/g, '');
+        function validateMomoNumber(required = false) {
+            const input = document.getElementById('momoNumber');
             const errorEl = document.getElementById('momoNumberError');
             const provider = getSelectedProvider();
-
-            if (!provider || number.length === 0) {
-                errorEl.classList.add('hidden');
-                return true;
-            }
-
-            if (number.length < (provider.minLength || 8)) {
-                errorEl.classList.add('hidden');
-                return true;
-            }
-
-            const matchesPrefix = !(provider.prefixes || []).length || provider.prefixes.some(prefix => number.startsWith(prefix));
-            const matchesLength = number.length >= (provider.minLength || 8) && number.length <= (provider.maxLength || 16);
-
-            if (!matchesPrefix || !matchesLength) {
-                errorEl.classList.remove('hidden');
-                errorEl.textContent = (provider.prefixes || []).length
-                    ? 'Enter a valid ' + provider.name + ' number. Expected prefixes: ' + provider.prefixes.join(', ')
-                    : 'Enter a valid ' + provider.name + ' account, email, phone, or handle.';
-                return false;
-            }
-
-            errorEl.classList.add('hidden');
-            return true;
+            const result = CVWithdrawalRecipient.validate(provider, input.value);
+            const showError = !!provider && !result.valid && (required || !result.empty);
+            errorEl.classList.toggle('hidden', !showError);
+            errorEl.textContent = result.error;
+            input.setAttribute('aria-invalid', String(showError));
+            return result.valid;
         }
 
            // Update withdrawal limit display on form page
@@ -1955,22 +1986,22 @@
 
             if (method === 'momo') {
                 const provider = getSelectedProvider();
-                const number = document.getElementById('momoNumber').value.replace(/\D/g, '');
+                const recipient = CVWithdrawalRecipient.validate(provider, document.getElementById('momoNumber').value);
                 const name = document.getElementById('momoName').value.trim();
                 amountLocal = parseFloat(document.getElementById('momoAmount').value);
 
                 if (!provider) {
-                    cvShowError('Select a mobile money provider first.', 'Provider Required', "cv-withdraw-error");
+                    cvShowError('Select a payment provider first.', 'Provider Required', "cv-withdraw-error");
                     return;
                 }
 
-                if (!validateMomoNumber()) {
-                    cvShowError('Please enter a valid ' + provider.name + ' mobile money number.', 'Invalid Number', "cv-withdraw-error");
+                if (!validateMomoNumber(true)) {
+                    cvShowError(recipient.error, 'Invalid Recipient', "cv-withdraw-error");
                     return;
                 }
 
-                if (!number || !amountLocal || !name) {
-                    cvShowError('Please fill in all required mobile money fields.', 'Incomplete Form', "cv-withdraw-error");
+                if (!amountLocal || !name) {
+                    cvShowError('Please fill in all required payment details.', 'Incomplete Form', "cv-withdraw-error");
                     return;
                 }
 
@@ -1978,7 +2009,7 @@
                 details = Object.assign(details, {
                     carrier: provider.id,
                     carrierName: provider.name,
-                    number: number,
+                    number: recipient.value,
                     name: name,
                     amountLocal: amountLocal,
                     amountUSD: amountUSD

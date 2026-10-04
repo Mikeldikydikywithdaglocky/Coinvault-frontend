@@ -36,7 +36,8 @@
             const glyph = A.icon(brand ? brand.fallback : incoming ? 'arrow-down' : 'arrow-up');
             const logo = brand?.url ? `<img class="cv-transaction-logo" data-withdrawal-logo src="${A.escape(brand.url)}" alt="${A.escape(brand.label)} logo"><span hidden>${glyph}</span>` : glyph;
             const status = tx.status || 'Unavailable';
-            return `<div class="cv-transaction"><span class="cv-transaction-icon ${kind}">${logo}</span><div><strong>${A.escape(title)}</strong><p>${A.escape(formattedDate)}</p>${tx.displayName ? `<p>${A.escape(tx.displayName)}</p>` : ''}</div><div class="cv-transaction-amount cv-sensitive ${incoming ? 'cv-positive' : ''}">${A.escape(amount)}<small>${A.escape(status)}</small></div></div>`;
+            const amountClass = incoming ? 'cv-positive' : kind === 'withdrawal' ? 'cv-negative' : '';
+            return `<div class="cv-transaction"><span class="cv-transaction-icon ${kind}">${logo}</span><div><strong>${A.escape(title)}</strong><p>${A.escape(formattedDate)}</p>${tx.displayName ? `<p>${A.escape(tx.displayName)}</p>` : ''}</div><div class="cv-transaction-amount cv-sensitive ${amountClass}">${A.escape(amount)}<small>${A.escape(status)}</small></div></div>`;
         }).join('');
     }
     function render() {

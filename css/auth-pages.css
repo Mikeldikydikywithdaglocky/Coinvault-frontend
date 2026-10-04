@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@font-face {
+  font-family: Inter;
+  src: url('../assets/fonts/inter-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 
 :root {
   --cv-bg: #08111f;
@@ -20,6 +26,7 @@
 
 body.auth-page {
   min-height: 100vh;
+  min-height: 100svh;
   margin: 0;
   color: #eef5ff;
   background:
@@ -28,6 +35,9 @@ body.auth-page {
     linear-gradient(135deg, var(--cv-bg-strong), var(--cv-bg));
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 button, input { font: inherit; }
@@ -209,15 +219,16 @@ button, input { font: inherit; }
   margin-bottom: 7px;
   color: var(--cv-muted);
   font-size: 0.88rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .auth-input-wrap {
   display: flex;
   align-items: center;
-  min-height: 50px;
+  min-height: 48px;
   border: 1px solid var(--cv-line);
-  border-radius: 14px;
+  border-radius: 8px;
+  overflow: hidden;
   background: #ffffff;
   box-shadow: inset 0 1px 0 rgba(16, 24, 39, 0.02);
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
@@ -236,10 +247,13 @@ button, input { font: inherit; }
   padding: 0 14px;
   color: var(--cv-text);
   background: #ffffff;
+  min-height: 46px;
+  font-size: 16px;
+  line-height: 1.5;
   font-weight: 400;
 }
 
-.auth-input-wrap input::placeholder { color: #98a5b8; }
+.auth-input-wrap input::placeholder { color: #68778b; }
 
 .auth-input-wrap input:-webkit-autofill,
 .auth-input-wrap input:-webkit-autofill:hover,
@@ -256,7 +270,9 @@ button, input { font: inherit; }
   color: var(--cv-green-dark);
   background: transparent;
   cursor: pointer;
-  font-weight: 650;
+  min-height: 46px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .auth-row {
@@ -286,20 +302,20 @@ button, input { font: inherit; }
   background: transparent;
   text-decoration: none;
   cursor: pointer;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .auth-submit {
   display: grid;
   width: 100%;
-  min-height: 50px;
+  min-height: 48px;
   place-items: center;
   border: 0;
-  border-radius: 14px;
+  border-radius: 8px;
   color: #ffffff;
   background: linear-gradient(135deg, var(--cv-green-dark), var(--cv-blue));
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 550;
   text-decoration: none;
   transition: transform 0.15s, opacity 0.15s;
 }
@@ -615,7 +631,8 @@ button, input { font: inherit; }
 .switch-auth-shell {
   display: grid;
   min-height: 100vh;
-  width: min(100% - 28px, 1080px);
+  min-height: 100svh;
+  width: min(100% - 32px, 960px);
   place-items: center;
   margin: 0 auto;
   padding: 28px 0;
@@ -624,10 +641,10 @@ button, input { font: inherit; }
 .switch-auth-card {
   position: relative;
   overflow: hidden;
-  width: min(920px, 100%);
+  width: min(880px, 100%);
   min-height: 660px;
-  border: 8px solid rgba(255, 255, 255, 0.92);
-  border-radius: 28px;
+  border: 4px solid rgba(255, 255, 255, 0.92);
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 18px 90px rgba(3, 10, 24, 0.36);
 }
@@ -659,7 +676,7 @@ button, input { font: inherit; }
   bottom: 0;
   left: 0;
   width: 50%;
-  border-radius: 20px;
+  border-radius: 16px;
   transform: translateX(100%);
   transition: transform 0.65s ease-in-out;
   background:
@@ -698,17 +715,17 @@ button, input { font: inherit; }
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 16px;
-  padding: 72px 34px 38px;
+  gap: 14px;
+  padding: 60px 30px 32px;
   color: #f8fbff;
   text-align: center;
 }
 
 .combo-hero h2 {
   margin: 0;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  line-height: 1;
+  font-size: 34px;
+  font-weight: 550;
+  line-height: 1.2;
 }
 
 .combo-hero p {
@@ -761,14 +778,14 @@ button, input { font: inherit; }
   min-height: 46px;
   margin-top: 8px;
   border: 1px solid rgba(255, 255, 255, 0.26);
-  border-radius: 13px;
+  border-radius: 8px;
   padding: 0 36px;
   color: #ffffff;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(14px);
   cursor: pointer;
   font: inherit;
-  font-weight: 650;
+  font-weight: 500;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
@@ -782,10 +799,12 @@ button, input { font: inherit; }
 .combo-form {
   z-index: 4;
   display: flex;
-  justify-content: center;
+  justify-content: safe center;
   flex-direction: column;
-  gap: 12px;
-  padding: 60px 42px 30px;
+  gap: 10px;
+  padding: 48px 32px 24px;
+  overflow-y: auto;
+  scrollbar-width: thin;
   background: rgba(255, 255, 255, 0.96);
 }
 
@@ -825,15 +844,16 @@ button, input { font: inherit; }
 .combo-form-head h1 {
   margin: 0 0 4px;
   color: var(--cv-text);
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
+  font-size: 28px;
+  font-weight: 550;
+  line-height: 1.2;
 }
 
 .combo-form-head p {
   margin: 0;
   color: var(--cv-muted);
   line-height: 1.4;
+  font-size: 14px;
 }
 
 .combo-mini-logo {
@@ -887,16 +907,17 @@ button, input { font: inherit; }
   .auth-card { border-radius: 20px; }
 }
 
-@media (max-width: 780px) {
+@media (max-width: 780px), (pointer: coarse) and (max-height: 500px) {
   .switch-auth-shell {
     min-height: auto;
-    padding: 20px 0;
+    width: min(100% - 32px, 440px);
+    padding: max(24px, env(safe-area-inset-top)) 0 max(24px, env(safe-area-inset-bottom));
   }
 
   .switch-auth-card {
     min-height: auto;
     border-width: 4px;
-    border-radius: 24px;
+    border-radius: 16px;
   }
 
   .desktop-dots,
@@ -912,7 +933,7 @@ button, input { font: inherit; }
     width: 100%;
     height: auto;
     min-height: auto;
-    padding: 28px 22px;
+    padding: 24px 20px;
     opacity: 1;
     visibility: visible;
     transform: none;
@@ -933,11 +954,40 @@ button, input { font: inherit; }
 
 @media (max-width: 460px) {
   .social-auth {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .social-auth-btn {
-    justify-content: flex-start;
-    padding: 0 14px;
+    justify-content: center;
+    padding: 0 10px;
   }
+}
+
+.auth-page button,
+.auth-page a { touch-action: manipulation; }
+
+.auth-page :focus-visible {
+  outline: 2px solid var(--cv-green);
+  outline-offset: 3px;
+}
+
+.social-auth-btn { border-radius: 8px; font-weight: 500; }
+.auth-check { min-height: 32px; }
+
+@media (max-width: 780px), (pointer: coarse) and (max-height: 500px) {
+  .combo-form { gap: 16px; padding: 28px 20px; }
+  .combo-form-head { align-items: flex-start; gap: 14px; margin-bottom: 4px; }
+  .combo-form-head h1 { font-size: 26px; line-height: 1.25; }
+  .combo-form-head p { font-size: 15px; line-height: 1.55; margin-top: 6px; }
+  .combo-form .auth-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .combo-form .auth-row .auth-link { min-height: 44px; display: inline-flex; align-items: center; }
+  .combo-form .auth-check { min-height: 44px; }
+  .combo-form label, .combo-form .auth-link, .combo-form .auth-bottom, .combo-form .compact-copy { font-size: 14px; line-height: 1.6; }
+  .combo-form .social-auth { grid-template-columns: repeat(2, 56px); justify-content: center; gap: 16px; }
+  .combo-form .social-auth-btn { width: 56px; height: 52px; padding: 0; }
+  .combo-form .social-auth-label { display: none; }
+  .combo-form .social-mark { width: 24px; height: 24px; }
+  .combo-form .auth-submit { min-height: 50px; font-size: 16px; }
+  .combo-form-head > div:last-child { min-width: 0; }
+  .combo-form :is(h1,p,label,a,button) { overflow-wrap: break-word; }
 }
