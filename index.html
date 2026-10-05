@@ -32,11 +32,16 @@
     <meta name="apple-mobile-web-app-title" content="CoinVault">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="css/account-workspace.css">
+    <link rel="stylesheet" href="css/coinvault-learn.css">
+    <link rel="stylesheet" href="css/wallet-market.css">
     <script src="js/auth.js"></script>
     <script src="js/vendor/feather.min.js" defer></script>
     <script src="js/account-shell.js" defer></script>
     <script src="js/payment-logos.js" defer></script>
+    <script src="js/vendor/chart.umd.js" defer></script>
+    <script src="js/wallet-market.js" defer></script>
     <script src="js/account-dashboard.js" defer></script>
+    <script src="js/wallet-promotion.js" defer></script>
 </head>
 <body class="cv-account">
     <div class="cv-layout" id="cvDashboard">
@@ -59,7 +64,83 @@
                     <div class="cv-menu-wrap"><button class="cv-icon" data-cv-more title="More actions" aria-label="More actions" aria-expanded="false" style="border-color:var(--cv-line)"><i data-feather="more-horizontal"></i></button><div class="cv-dropdown" hidden><a href="send.html"><i data-feather="send"></i>Send</a><a href="buy.html"><i data-feather="plus-circle"></i>Buy</a><a href="sell.html"><i data-feather="minus-circle"></i>Sell</a></div></div>
                 </div>
             </div>
-            <section class="cv-total" aria-label="Wallet balance"><p>Total value</p><h2 class="cv-sensitive" id="cvTotalBalance">--</h2><small id="cvBtcPrice" aria-live="polite">BTC price loading...</small></section>
+            <section class="cv-total" aria-label="Wallet balance">
+                <p id="cvTotalLabel">Total value</p>
+                <h2 class="cv-sensitive" id="cvTotalBalance">--</h2>
+                <div class="cv-value-controls">
+                    <div class="cv-btc-movement" id="cvBtcMovement" aria-label="24-hour Bitcoin price change"><span class="cv-movement-period">BTC &middot; 24h</span><span id="cvBtcChangeAmount">--</span><span id="cvBtcChangePercent">(--)</span></div>
+                    <button class="cv-icon cv-history-toggle" id="cvToggleHistory" type="button" aria-expanded="false" aria-controls="cvBalanceHistory" title="Show balance chart" aria-label="Show balance chart"><i data-feather="chevron-down" aria-hidden="true"></i></button>
+                </div>
+                <div class="cv-market-meta"><small id="cvBtcPrice">BTC price loading...</small></div>
+                <section class="cv-balance-history" id="cvBalanceHistory" aria-labelledby="cvHistoryTitle" hidden>
+                    <div class="cv-history-heading"><h3 id="cvHistoryTitle">BTC-driven value &middot; 24h</h3><span id="cvHistoryTime">--</span><button class="cv-icon" id="cvHistoryLive" type="button" title="Return to current value" aria-label="Return to current value"><i data-feather="rotate-ccw" aria-hidden="true"></i></button></div>
+                    <div class="cv-history-plot"><canvas id="cvBalanceChart" role="slider" tabindex="0" aria-label="Inspect estimated wallet value" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="History loading"></canvas><div class="cv-history-message" id="cvHistoryMessage" role="status"><span id="cvHistoryMessageText">Loading price history...</span><button class="cv-icon" id="cvHistoryRetry" type="button" title="Retry chart" aria-label="Retry chart" hidden><i data-feather="refresh-cw" aria-hidden="true"></i></button></div></div>
+                    <div class="cv-history-range" aria-hidden="true"><span id="cvHistoryStart">24 hours ago</span><span>Now</span></div>
+                    <p class="cv-history-note"></p>
+                    <p class="cv-chart-announcement" id="cvChartAnnouncement" aria-live="polite"></p>
+                </section>
+            </section>
+            <aside class="cv-learn-promotion" id="cvLearnPromotion" aria-label="Learning and crypto news" aria-roledescription="carousel" data-theme="safety">
+                <article class="cv-promotion-slide" id="cvPromotionSafety" role="group" aria-roledescription="slide" aria-label="1 of 4" data-theme="safety">
+                <a class="cv-learn-promotion-link" href="learn.html" aria-labelledby="cvLearnPromoTitle cvLearnPromoCta" aria-describedby="cvLearnPromoDescription">
+                    <div class="cv-learn-promotion-copy">
+                        <p class="cv-learn-eyebrow">Account safety</p>
+                        <h2 id="cvLearnPromoTitle">CoinVault Learn</h2>
+                        <p id="cvLearnPromoDescription">Spot crypto scams.</p>
+                        <p class="cv-promotion-meta">CoinVault guide <span aria-hidden="true">&middot;</span> 4 min read</p>
+                        <span class="cv-learn-promotion-cta" id="cvLearnPromoCta">Explore guide<i data-feather="arrow-right" aria-hidden="true"></i></span>
+                    </div>
+                    <img class="cv-learn-promotion-art" src="assets/learn/scam-awareness.png" width="720" height="480" alt="" decoding="async">
+                </a>
+                </article>
+                <article class="cv-promotion-slide" id="cvPromotionBitcoin" role="group" aria-roledescription="slide" aria-label="2 of 4" data-theme="bitcoin" hidden>
+                    <a class="cv-learn-promotion-link" href="https://bitcoincore.org/en/2026/07/08/release-31.1/" target="_blank" rel="noopener noreferrer" aria-labelledby="cvBitcoinNewsTitle cvBitcoinNewsCta" aria-describedby="cvBitcoinNewsDescription cvBitcoinNewsMeta">
+                        <div class="cv-learn-promotion-copy">
+                            <p class="cv-learn-eyebrow">Bitcoin news</p>
+                            <h2 id="cvBitcoinNewsTitle">Bitcoin Core 31.1</h2>
+                            <p id="cvBitcoinNewsDescription">Bug fixes for Bitcoin's node software.</p>
+                            <p class="cv-promotion-meta" id="cvBitcoinNewsMeta">Bitcoin Core <span aria-hidden="true">&middot;</span> <time datetime="2026-07-08">8 Jul 2026</time></p>
+                            <span class="cv-learn-promotion-cta" id="cvBitcoinNewsCta">Read article<i data-feather="arrow-up-right" aria-hidden="true"></i><span class="cv-promotion-sr-only"> (opens in a new tab)</span></span>
+                        </div>
+                        <img class="cv-learn-promotion-art" src="assets/learn/bitcoin-news.png" width="720" height="480" alt="" loading="lazy" decoding="async">
+                    </a>
+                </article>
+                <article class="cv-promotion-slide" id="cvPromotionEthereum" role="group" aria-roledescription="slide" aria-label="3 of 4" data-theme="ethereum" hidden>
+                    <a class="cv-learn-promotion-link" href="https://blog.ethereum.org/2026/09/17/glamsterdam-testnet-announcement" target="_blank" rel="noopener noreferrer" aria-labelledby="cvEthereumNewsTitle cvEthereumNewsCta" aria-describedby="cvEthereumNewsDescription cvEthereumNewsMeta">
+                        <div class="cv-learn-promotion-copy">
+                            <p class="cv-learn-eyebrow">Ethereum news</p>
+                            <h2 id="cvEthereumNewsTitle">Glamsterdam testnet</h2>
+                            <p id="cvEthereumNewsDescription">Ethereum announces its Sepolia upgrade plans.</p>
+                            <p class="cv-promotion-meta" id="cvEthereumNewsMeta">Ethereum Foundation <span aria-hidden="true">&middot;</span> <time datetime="2026-09-28">28 Sep 2026</time></p>
+                            <span class="cv-learn-promotion-cta" id="cvEthereumNewsCta">Read article<i data-feather="arrow-up-right" aria-hidden="true"></i><span class="cv-promotion-sr-only"> (opens in a new tab)</span></span>
+                        </div>
+                        <img class="cv-learn-promotion-art" src="assets/learn/ethereum-news.png" width="720" height="480" alt="" loading="lazy" decoding="async">
+                    </a>
+                </article>
+                <article class="cv-promotion-slide" id="cvPromotionStablecoins" role="group" aria-roledescription="slide" aria-label="4 of 4" data-theme="stablecoins" hidden>
+                    <a class="cv-learn-promotion-link" href="https://www.circle.com/pressroom/volante-technologies-and-circle-to-advance-stablecoin-payment-and-settlement-capabilities-for-financial-institutions" target="_blank" rel="noopener noreferrer" aria-labelledby="cvStablecoinNewsTitle cvStablecoinNewsCta" aria-describedby="cvStablecoinNewsDescription cvStablecoinNewsMeta">
+                        <div class="cv-learn-promotion-copy">
+                            <p class="cv-learn-eyebrow">Stablecoin news</p>
+                            <h2 id="cvStablecoinNewsTitle">Stablecoin payment news</h2>
+                            <p id="cvStablecoinNewsDescription">Circle and Volante explore USDC bank payments.</p>
+                            <p class="cv-promotion-meta" id="cvStablecoinNewsMeta">Circle <span aria-hidden="true">&middot;</span> <time datetime="2026-09-28">28 Sep 2026</time></p>
+                            <span class="cv-learn-promotion-cta" id="cvStablecoinNewsCta">Read article<i data-feather="arrow-up-right" aria-hidden="true"></i><span class="cv-promotion-sr-only"> (opens in a new tab)</span></span>
+                        </div>
+                        <img class="cv-learn-promotion-art" src="assets/learn/stablecoin-news.png" width="720" height="480" alt="" loading="lazy" decoding="async">
+                    </a>
+                </article>
+                <div class="cv-promotion-controls" id="cvPromotionControls" aria-label="Choose a promotion" hidden>
+                    <button class="cv-icon" id="cvPreviousPromotion" type="button" title="Previous promotion" aria-label="Previous promotion"><i data-feather="chevron-left" aria-hidden="true"></i></button>
+                    <div class="cv-promotion-dots">
+                        <button class="cv-promotion-dot" type="button" title="Account safety" aria-label="Show account safety guide" aria-controls="cvPromotionSafety" aria-pressed="true"><span aria-hidden="true"></span></button>
+                        <button class="cv-promotion-dot" type="button" title="Bitcoin news" aria-label="Show Bitcoin news" aria-controls="cvPromotionBitcoin" aria-pressed="false"><span aria-hidden="true"></span></button>
+                        <button class="cv-promotion-dot" type="button" title="Ethereum news" aria-label="Show Ethereum news" aria-controls="cvPromotionEthereum" aria-pressed="false"><span aria-hidden="true"></span></button>
+                        <button class="cv-promotion-dot" type="button" title="Stablecoin news" aria-label="Show stablecoin news" aria-controls="cvPromotionStablecoins" aria-pressed="false"><span aria-hidden="true"></span></button>
+                    </div>
+                    <button class="cv-icon" id="cvNextPromotion" type="button" title="Next promotion" aria-label="Next promotion"><i data-feather="chevron-right" aria-hidden="true"></i></button>
+                </div>
+                <p class="cv-promotion-sr-only" id="cvPromotionStatus" aria-live="polite" aria-atomic="true"></p>
+            </aside>
             <div class="cv-tabs" role="tablist" aria-label="Wallet view"><button class="cv-tab" role="tab" id="cvBalancesTab" aria-selected="true" aria-controls="cvBalancesPanel">Balances</button><button class="cv-tab" role="tab" id="cvActivityTab" aria-selected="false" aria-controls="cvActivityPanel" tabindex="-1">Activity</button></div>
             <section id="cvBalancesPanel" role="tabpanel" aria-labelledby="cvBalancesTab">
                 <h2 class="cv-section-title" id="assetsHeading">Assets</h2>
@@ -74,6 +155,7 @@
             </section>
         </main>
         <footer class="cv-site-footer" aria-label="CoinVault site information">
+            <a class="cv-learn-footer-link" href="learn.html"><i data-feather="book-open" aria-hidden="true"></i>CoinVault Learn</a>
             <p>&copy; 2026 CoinVault. All rights reserved.</p>
         </footer>
         <nav class="cv-mobile-actionbar" aria-label="Wallet actions"><button class="cv-button" data-cv-receive><i data-feather="arrow-down"></i>Receive</button><button class="cv-button primary" data-cv-withdraw disabled><i data-feather="arrow-up"></i>Withdraw</button><div class="cv-menu-wrap"><button class="cv-button" data-cv-more aria-label="More actions" aria-expanded="false"><i data-feather="more-horizontal"></i>More</button><div class="cv-dropdown" hidden><a href="send.html"><i data-feather="send"></i>Send</a><a href="buy.html"><i data-feather="plus-circle"></i>Buy</a><a href="sell.html"><i data-feather="minus-circle"></i>Sell</a></div></div></nav>

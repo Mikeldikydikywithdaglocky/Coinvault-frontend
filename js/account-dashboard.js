@@ -4,14 +4,27 @@
     const $ = id => document.getElementById(id);
     let frameCompleted = false, privateMode = sessionStorage.getItem('cvPrivate') === 'true';
     function value(amount) { return A.money(amount); }
+    function assetReadout(asset) {
+        if (!Number.isFinite(Number(asset.price)) || Number(asset.price) <= 0) return 'Price unavailable';
+        const price = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: asset.symbol === 'USDT' ? 4 : 2 }).format(Number(asset.price));
+        return `${price} USD`;
+    }
     function assets() {
         if (!A.state.loaded || A.state.error || A.state.walletError) return [];
         const merged = new Map();
         for (const wallet of A.currentWallets()) for (const asset of wallet.assets || []) {
-            const previous = merged.get(asset.symbol) || { ...asset, balance: 0, usd: 0 };
+            const price = window.CVWalletMarket ? CVWalletMarket.priceFor(asset) : asset.price;
+            const previous = merged.get(asset.symbol) || { ...asset, price, balance: 0, usd: 0 };
             previous.balance += Number(asset.balance);
-            previous.usd = previous.usd !== null && Number.isFinite(Number(asset.price)) && asset.price !== null ? previous.usd + Number(asset.balance) * Number(asset.price) : null;
+            previous.usd = previous.usd !== null && Number.isFinite(Number(price)) && price !== null ? previous.usd + Number(asset.balance) * Number(price) : null;
             merged.set(asset.symbol, previous);
+        }
+        // Empty display rows do not become wallet holdings or overwrite recorded deposits.
+        for (const [symbol, name] of [['ETH', 'Ethereum'], ['USDT', 'Tether']]) {
+            if (!merged.has(symbol)) {
+                const price = window.CVWalletMarket ? CVWalletMarket.priceFor({ symbol, price: null }) : A.state.quotes[symbol] ?? null;
+                merged.set(symbol, { symbol, name, balance: 0, usd: 0, price });
+            }
         }
         return [...merged.values()];
     }
@@ -55,7 +68,7 @@
         $('cvAssets').innerHTML = list.length ? list.map(asset => {
             const symbol = /^[A-Z0-9]{1,10}$/.test(asset.symbol) ? asset.symbol : '';
             const image = ['BTC', 'ETH', 'USDT', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE'].includes(symbol) ? `<img src="assets/crypto/${symbol.toLowerCase()}.svg" alt="">` : A.icon('circle');
-            return `<article class="cv-asset"><div class="cv-asset-brand">${image}<div><strong>${A.escape(asset.name || symbol)}</strong><small>${A.escape(symbol)}</small></div></div><div class="cv-asset-amount cv-sensitive">${asset.balance.toLocaleString('en', { maximumFractionDigits: 8 })} ${A.escape(symbol)}</div><div class="cv-asset-value cv-sensitive">${value(asset.usd)}</div><button class="cv-link" data-asset="${A.escape(symbol)}">View asset ${A.icon('arrow-right')}</button></article>`;
+            return `<article class="cv-asset"><div class="cv-asset-brand">${image}<div><strong>${A.escape(asset.name || symbol)}</strong><small>${A.escape(symbol)}</small></div></div><div class="cv-asset-amount cv-sensitive">${asset.balance.toLocaleString('en', { maximumFractionDigits: 8 })} ${A.escape(symbol)}</div><div class="cv-asset-value cv-asset-market-price" data-asset-value="${A.escape(symbol)}" title="Market price">${assetReadout(asset)}</div><button class="cv-link" data-asset="${A.escape(symbol)}">View asset ${A.icon('arrow-right')}</button></article>`;
         }).join('') : `<div class="cv-empty"><p>${warning ? 'Assets are temporarily unavailable.' : wallets.length ? 'Balances are not available yet.' : 'No wallet connected.'}</p>${!warning && !wallets.length ? '<button class="cv-button" data-cv-connect>Connect wallet</button>' : ''}</div>`;
         $('cvAssets').querySelectorAll('[data-asset]').forEach(button => button.onclick = () => showAsset(button.dataset.asset));
         $('cvAssets').querySelectorAll('[data-cv-connect]').forEach(button => button.onclick = A.showConnect);
@@ -74,8 +87,9 @@
         }, { once: true }));
     }
     function renderBtcPrice() {
+        if (window.CVWalletMarket) return CVWalletMarket.render();
         const price = Number(A.state.quotes.BTC);
-        $('cvBtcPrice').textContent = Number.isFinite(price) && price > 0 ? `1 BTC = ${A.money(price)} USD` : 'BTC price unavailable';
+        $('cvBtcPrice').textContent = Number.isFinite(price) && price > 0 ? `${A.money(price)} USD` : 'BTC price unavailable';
     }
     function setTab(activity) {
         $('cvBalancesPanel').hidden = activity; $('cvActivityPanel').hidden = !activity;
@@ -84,7 +98,7 @@
     function showAsset(symbol) {
         const asset = assets().find(item => item.symbol === symbol); if (!asset) return;
         $('cvAssetTitle').textContent = `${asset.name || symbol} (${symbol})`;
-        $('cvAssetInfo').innerHTML = `<dl><dt>Balance</dt><dd class="cv-sensitive">${asset.balance.toLocaleString('en', { maximumFractionDigits: 8 })} ${A.escape(symbol)}</dd><dt>Value</dt><dd class="cv-sensitive">${value(asset.usd)}</dd><dt>Unit price</dt><dd>${A.money(asset.price)}</dd></dl><a href="receive.html" class="cv-button">${A.icon('arrow-down')}Receive</a>`;
+        $('cvAssetInfo').innerHTML = `<dl><dt>Balance</dt><dd class="cv-sensitive">${asset.balance.toLocaleString('en', { maximumFractionDigits: 8 })} ${A.escape(symbol)}</dd><dt>Value</dt><dd class="cv-sensitive">${value(asset.usd)}</dd><dt>Unit price</dt><dd>${assetReadout(asset)}</dd></dl>${symbol === 'BTC' ? `<a href="receive.html" class="cv-button">${A.icon('arrow-down')}Receive</a>` : ''}`;
         $('cvAssetDialog').showModal(); A.icons();
     }
     function openWithdrawal() {
@@ -96,6 +110,14 @@
     }
     document.addEventListener('cv:data', render); document.addEventListener('cv:walletchange', render);
     document.addEventListener('cv:quotes', renderBtcPrice);
+    function renderMarketValues() {
+        for (const asset of assets()) {
+            const field = [...document.querySelectorAll('[data-asset-value]')].find(node => node.dataset.assetValue === asset.symbol);
+            if (field) field.textContent = assetReadout(asset);
+        }
+    }
+    document.addEventListener('cv:quotes', renderMarketValues);
+    document.addEventListener('cv:market', renderMarketValues);
     document.addEventListener('DOMContentLoaded', () => {
         $('cvMobileWallet').onchange = event => A.select(event.target.value);
         document.querySelectorAll('[data-cv-connect]').forEach(button => button.onclick = A.showConnect);
@@ -131,5 +153,5 @@
         setInterval(() => { if (document.visibilityState === 'visible') A.loadQuotes(true); }, 60000);
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') A.loadQuotes(true); });
     });
-    function applyPrivacy() { document.body.classList.toggle('cv-private', privateMode); $('cvHideBalance').setAttribute('aria-pressed', String(privateMode)); $('cvHideBalance').setAttribute('aria-label', privateMode ? 'Show balances' : 'Hide balances'); $('cvHideBalance').title = privateMode ? 'Show balances' : 'Hide balances'; $('cvHideBalance').innerHTML = A.icon(privateMode ? 'eye-off' : 'eye'); A.icons(); }
+    function applyPrivacy() { document.body.classList.toggle('cv-private', privateMode); $('cvHideBalance').setAttribute('aria-pressed', String(privateMode)); $('cvHideBalance').setAttribute('aria-label', privateMode ? 'Show balances' : 'Hide balances'); $('cvHideBalance').title = privateMode ? 'Show balances' : 'Hide balances'; $('cvHideBalance').innerHTML = A.icon(privateMode ? 'eye-off' : 'eye'); A.icons(); document.dispatchEvent(new CustomEvent('cv:privacy')); }
 })();
