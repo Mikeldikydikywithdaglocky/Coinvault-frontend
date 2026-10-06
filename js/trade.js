@@ -146,7 +146,7 @@
         $('ctAvailableLabel').textContent = `Available ${currency}`;
         $('ctAvailable').textContent = s.account ? formatted(T.available(currency)) : '--';
         $('ctReserved').textContent = s.account ? formatted(s.account.reserved?.[currency] || '0') : '--';
-        $('ctAssetBalanceLabel').textContent = `Simulated ${symbol} holdings`;
+        $('ctAssetBalanceLabel').textContent = `Spot ${symbol} holdings`;
         $('ctAssetBalance').textContent = s.account ? `${new DecimalNumber(T.available(symbol)).toFixed()} ${symbol}` : '--';
         $('ctTradingAccount').textContent = s.account ? 'CoinVault' : s.waitingForBalance ? 'Awaiting balance' : s.error ? 'Unavailable' : 'Connecting...';
         const error = A.state.error || s.error;
