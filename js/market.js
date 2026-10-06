@@ -128,7 +128,7 @@ function displayCryptos(cryptos) {
                 <td class="px-6 py-4 text-right">$${formatLargeNumber(crypto.market_cap)}</td>
                 <td class="px-6 py-4 text-right">$${formatLargeNumber(crypto.total_volume)}</td>
                 <td class="px-6 py-4 text-center">
-                    <button onclick="alert('Trade ${crypto.symbol.toUpperCase()}')" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-1 rounded-lg text-sm">Trade</button>
+                    <a href="trade.html?asset=${encodeURIComponent(String(crypto.symbol || '').toUpperCase())}" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-1 rounded-lg text-sm">Trade</a>
                 </td>
             </tr>
         `;

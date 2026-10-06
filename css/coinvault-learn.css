@@ -6,7 +6,7 @@
 .cv-learn-promotion-copy{min-width:0}
 .cv-learn-eyebrow{margin:0 0 4px;color:#bef264;font-size:11px;font-weight:500;line-height:1.5;text-transform:uppercase}
 .cv-learn-promotion .cv-learn-eyebrow{color:var(--cv-promo-accent)}
-.cv-learn-promotion h2{margin:0 0 4px;font-size:18px;font-weight:500;line-height:1.25;overflow-wrap:anywhere}
+.cv-learn-promotion h2{margin:0 0 4px;font-size:18px;font-weight:500;line-height:1.25;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .cv-learn-promotion-copy>p:not(.cv-learn-eyebrow){max-width:430px;margin:0;color:#d0ddd8;font-size:13px;line-height:1.4}
 .cv-learn-promotion-copy>.cv-promotion-meta{display:flex;align-items:center;flex-wrap:wrap;gap:3px 6px;margin-top:5px!important;color:#b6c2c9!important;font-size:11px!important;line-height:1.4}
 .cv-promotion-meta time{white-space:nowrap}
@@ -14,11 +14,11 @@
 .cv-learn-promotion-cta svg{width:17px;height:17px}
 .cv-learn-promotion-link:hover .cv-learn-promotion-cta{filter:brightness(1.08)}
 .cv-learn-promotion-art{display:block;width:138px;height:92px;max-width:100%;object-fit:contain}
-.cv-promotion-controls{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:4px;height:46px;padding:0 8px;border-top:1px solid var(--cv-promo-line)}
+.cv-promotion-controls{display:flex;justify-content:center;align-items:center;height:28px;padding:0 8px;border:0}
 .cv-promotion-controls>.cv-icon{flex:0 0 44px;color:#c7d6d0}
 .cv-promotion-controls>.cv-icon:hover{background:#ffffff0d;color:white}
 .cv-promotion-dots{display:flex;align-items:center;justify-content:center;min-width:0}
-.cv-promotion-dot{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;padding:0;border:0;border-radius:5px;background:transparent;cursor:pointer}
+.cv-promotion-dot{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;flex:none;padding:0;border:0;border-radius:5px;background:transparent;cursor:pointer}
 .cv-promotion-dot>span{width:6px;height:6px;border-radius:4px;background:#829192;transition:width .15s ease,background .15s ease}
 .cv-promotion-dot[aria-pressed="true"]>span{width:20px;background:var(--cv-promo-accent)}
 .cv-promotion-dot:hover{background:#ffffff0d}

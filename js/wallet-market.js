@@ -170,6 +170,30 @@
 
     const glow = {
         id: 'coinvault-glow',
+        beforeDatasetsDraw(instance) {
+            const { ctx, chartArea: area } = instance;
+            const line = instance.getDatasetMeta(1).dataset;
+            if (!line) return;
+            const marker = state.selected ? instance.getDatasetMeta(1).data[nearest(state.selected.time)] : null;
+            const color = instance.data.datasets[1].borderColor;
+            const depth = Math.min(72, (area.bottom - area.top) * .32);
+            if (depth <= 0) return;
+            ctx.save();
+            ctx.beginPath(); ctx.rect(area.left, area.top, area.right - area.left, area.bottom - area.top); ctx.clip();
+            // Sample the rendered curve so the short vertical fade follows its contour.
+            for (let x = Math.ceil(area.left); x < area.right; x++) {
+                const point = line.interpolate({ x }, 'x');
+                if (!point || !Number.isFinite(point.y)) continue;
+                const dim = marker && x > marker.x;
+                const gradient = ctx.createLinearGradient(0, point.y, 0, point.y + depth);
+                gradient.addColorStop(0, color + (dim ? '12' : '50'));
+                gradient.addColorStop(.35, color + (dim ? '08' : '24'));
+                gradient.addColorStop(1, color + '00');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, point.y, 1, depth);
+            }
+            ctx.restore();
+        },
         beforeDatasetDraw(instance, args) {
             const ctx = instance.ctx;
             ctx.save(); ctx.shadowBlur = 0;

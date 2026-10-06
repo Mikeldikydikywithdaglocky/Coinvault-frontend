@@ -95,11 +95,38 @@
         $('cvBalancesPanel').hidden = activity; $('cvActivityPanel').hidden = !activity;
         for (const [id, selected] of [['cvBalancesTab', !activity], ['cvActivityTab', activity]]) { $(id).setAttribute('aria-selected', String(selected)); $(id).tabIndex = selected ? 0 : -1; }
     }
+    function setupActivityFilter() {
+        const select = $('cvActivityFilter'), wrapper = document.createElement('div');
+        wrapper.className = 'cv-activity-filter';
+        wrapper.innerHTML = `<button type="button" class="cv-filter-trigger" id="cvFilterTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="cvFilterMenu">${A.icon('filter')}<span>All activity</span>${A.icon('chevron-down')}</button><div class="cv-filter-menu" id="cvFilterMenu" role="menu" aria-label="Filter transactions" hidden>${[...select.options].map(option => `<button type="button" role="menuitemradio" tabindex="-1" aria-checked="${option.value === select.value}" data-filter="${A.escape(option.value)}"><span>${A.escape(option.text)}</span>${A.icon('check')}</button>`).join('')}</div>`;
+        select.after(wrapper); select.hidden = true;
+        const trigger = wrapper.querySelector('.cv-filter-trigger'), menu = wrapper.querySelector('.cv-filter-menu'), items = [...menu.querySelectorAll('button')];
+        function close(restore = false) { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); if (restore) trigger.focus(); }
+        function open() { menu.hidden = false; trigger.setAttribute('aria-expanded', 'true'); (items.find(item => item.dataset.filter === select.value) || items[0]).focus(); }
+        trigger.onclick = () => menu.hidden ? open() : close();
+        trigger.onkeydown = event => { if (['ArrowDown', 'ArrowUp'].includes(event.key)) { event.preventDefault(); open(); } };
+        menu.onclick = event => {
+            const item = event.target.closest('[data-filter]'); if (!item) return;
+            select.value = item.dataset.filter;
+            trigger.querySelector('span').textContent = item.querySelector('span').textContent;
+            items.forEach(button => button.setAttribute('aria-checked', String(button === item)));
+            select.dispatchEvent(new Event('change')); close(true);
+        };
+        menu.onkeydown = event => {
+            const current = items.indexOf(document.activeElement);
+            if (event.key === 'Escape') { event.preventDefault(); close(true); }
+            if (event.key === 'Tab') close();
+            if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+                event.preventDefault(); const index = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (current + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+                items[index].focus();
+            }
+        };
+        document.addEventListener('click', event => { if (!wrapper.contains(event.target)) close(); });
+        wrapper.addEventListener('focusout', event => { if (!wrapper.contains(event.relatedTarget)) close(); });
+    }
     function showAsset(symbol) {
         const asset = assets().find(item => item.symbol === symbol); if (!asset) return;
-        $('cvAssetTitle').textContent = `${asset.name || symbol} (${symbol})`;
-        $('cvAssetInfo').innerHTML = `<dl><dt>Balance</dt><dd class="cv-sensitive">${asset.balance.toLocaleString('en', { maximumFractionDigits: 8 })} ${A.escape(symbol)}</dd><dt>Value</dt><dd class="cv-sensitive">${value(asset.usd)}</dd><dt>Unit price</dt><dd>${assetReadout(asset)}</dd></dl>${symbol === 'BTC' ? `<a href="receive.html" class="cv-button">${A.icon('arrow-down')}Receive</a>` : ''}`;
-        $('cvAssetDialog').showModal(); A.icons();
+        location.href = `trade.html?asset=${encodeURIComponent(symbol)}&from=dashboard`;
     }
     function openWithdrawal() {
         const wallet = A.state.wallets.find(item => item.type === 'bluewallet');
@@ -133,6 +160,7 @@
         $('cvBalancesTab').onclick = () => setTab(false); $('cvActivityTab').onclick = () => setTab(true); $('cvViewActivity').onclick = () => { setTab(true); $('cvActivityTab').focus(); };
         document.querySelector('.cv-tabs').onkeydown = event => { if (['ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); const activity = $('cvActivityTab').getAttribute('aria-selected') !== 'true'; setTab(activity); $(activity ? 'cvActivityTab' : 'cvBalancesTab').focus(); } };
         $('cvActivityFilter').onchange = renderActivity; $('cvRetry').onclick = () => { A.loadQuotes(true); A.load(true); };
+        setupActivityFilter();
         $('cvHideBalance').onclick = () => { privateMode = !privateMode; sessionStorage.setItem('cvPrivate', String(privateMode)); applyPrivacy(); };
         $('cvAssetClose').onclick = () => $('cvAssetDialog').close();
         $('cvCloseWithdraw').onclick = () => $('cvWithdrawDrawer').close();

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Trading - CoinVault</title>
+    <meta name="description" content="Follow cryptocurrency candlesticks, market depth and recent trades in your CoinVault trading workspace.">
+    <meta name="author" content="CoinVault">
+    <meta name="application-name" content="CoinVault">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#111827">
+    <link rel="canonical" href="https://www.coinvaultnet.com/trade.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CoinVault">
+    <meta property="og:url" content="https://www.coinvaultnet.com/trade.html">
+    <meta property="og:title" content="Trading - CoinVault">
+    <meta property="og:description" content="Cryptocurrency charts, market depth and an order workspace.">
+    <meta property="og:image" content="https://www.coinvaultnet.com/apple-touch-icon.png">
+    <meta property="og:image:alt" content="CoinVault logo">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Trading - CoinVault">
+    <meta name="twitter:description" content="Cryptocurrency charts and market data on CoinVault.">
+    <meta name="twitter:image" content="https://www.coinvaultnet.com/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="css/account-workspace.css">
+    <link rel="stylesheet" href="css/trade.css?v=asset-copy-1">
+    <script src="js/auth.js"></script>
+    <script src="js/vendor/feather.min.js" defer></script>
+    <script src="js/vendor/lightweight-charts.standalone.production.js" defer></script>
+    <script src="js/vendor/decimal.js" defer></script>
+    <script src="js/account-shell.js" defer></script>
+    <script src="js/trade-data.js" defer></script>
+    <script src="js/trade-account.js?v=asset-copy-1" defer></script>
+    <script src="js/trade.js?v=asset-copy-1" defer></script>
+</head>
+<body class="cv-account cv-trade">
+<main id="cvDashboard" class="cv-layout ct-layout" data-mobile-view="chart">
+    <header class="cv-topbar">
+        <a class="cv-mobile-brand" href="index.html"><img src="favicon-96x96.png" class="cv-logo" alt="">CoinVault</a>
+        <div class="cv-breadcrumb"><a href="market.html">Market</a><span>/ Trading</span></div>
+        <div class="ct-top-actions">
+            <a class="cv-link ct-back" href="market.html"><i data-feather="arrow-left"></i>Markets</a>
+            <button class="cv-icon cv-mobile-menu" type="button" data-cv-menu aria-label="Open navigation" title="Open navigation"><i data-feather="menu"></i></button>
+        </div>
+    </header>
+    <div class="ct-workspace">
+        <header class="ct-heading"><h1>Trading</h1><span class="ct-execution-state"><i data-feather="activity"></i>Spot trading</span></header>
+        <div id="ctAccountError" class="ct-notice" role="alert" hidden></div>
+        <section class="ct-market-summary" aria-label="Selected market">
+            <button id="ctPairButton" class="ct-pair-button" type="button" aria-haspopup="dialog" aria-controls="ctPairDialog">
+                <span id="ctPairIcon" class="ct-pair-icon"><img src="assets/crypto/btc.svg" alt=""></span>
+                <span><strong id="ctPairName">BTC / USD</strong><small id="ctAssetName">Bitcoin</small></span>
+                <i data-feather="chevron-down"></i>
+            </button>
+            <div class="ct-last-price"><strong id="ctPrice">--</strong><small id="ctChange">--</small></div>
+            <dl class="ct-stats">
+                <div><dt>24h high</dt><dd id="ctHigh">--</dd></div>
+                <div><dt>24h low</dt><dd id="ctLow">--</dd></div>
+                <div><dt>24h volume <span id="ctVolumeSymbol">BTC</span></dt><dd id="ctVolume">--</dd></div>
+            </dl>
+        </section>
+        <nav class="ct-mobile-tabs" aria-label="Trading views">
+            <button type="button" data-mobile-view="chart" aria-pressed="true">Chart</button>
+            <button type="button" data-mobile-view="order" aria-pressed="false">Order</button>
+            <button type="button" data-mobile-view="orders" aria-pressed="false">Orders</button>
+        </nav>
+        <div class="ct-trading-grid">
+            <section class="ct-chart-section" aria-label="Price chart">
+                <div class="ct-chart-toolbar">
+                    <div class="ct-timeframes" role="group" aria-label="Candle interval">
+                        <button type="button" data-interval="60" aria-pressed="false">1m</button>
+                        <button type="button" data-interval="300" aria-pressed="false">5m</button>
+                        <button type="button" data-interval="900" aria-pressed="true">15m</button>
+                        <button type="button" data-interval="3600" aria-pressed="false">1h</button>
+                        <button type="button" data-interval="21600" aria-pressed="false">6h</button>
+                        <button type="button" data-interval="86400" aria-pressed="false">1D</button>
+                    </div>
+                    <div class="ct-chart-tools">
+                        <label class="ct-volume-toggle"><input id="ctShowVolume" type="checkbox" checked>Volume</label>
+                        <button id="ctResetChart" type="button" class="cv-icon" aria-label="Fit chart" title="Fit chart"><i data-feather="maximize"></i></button>
+                        <button id="ctExpandChart" type="button" class="cv-icon" aria-label="Expand chart" title="Expand chart"><i data-feather="maximize-2"></i></button>
+                    </div>
+                </div>
+                <div class="ct-ohlc" id="ctOhlc" aria-label="Candle values"><span>O <b id="ctOpen">--</b></span><span>H <b id="ctCandleHigh">--</b></span><span>L <b id="ctCandleLow">--</b></span><span>C <b id="ctClose">--</b></span><span>V <b id="ctCandleVolume">--</b></span></div>
+                <div class="ct-chart-frame">
+                    <div id="ctChart" role="img" aria-label="Bitcoin candlestick chart with volume"></div>
+                    <div id="ctChartMessage" class="ct-chart-message" role="status"><span id="ctChartMessageText">Loading candles...</span><button id="ctRetryChart" type="button" class="cv-button" hidden><i data-feather="refresh-cw"></i>Retry</button></div>
+                </div>
+                <div class="ct-chart-caption"><span>Coinbase market data <span aria-hidden="true">/</span> UTC</span><span id="ctFeedStatus" role="status">Connecting...</span><button id="ctRefreshMarket" class="cv-icon" type="button" aria-label="Refresh market data" title="Refresh market data"><i data-feather="refresh-cw"></i></button></div>
+            </section>
+            <section class="ct-book-section" aria-label="Market depth and recent trades">
+                <div class="ct-section-tabs" role="tablist" aria-label="Market activity">
+                    <button type="button" role="tab" id="ctBookTab" data-book-view="book" aria-selected="true" aria-controls="ctBookPanel">Order book</button>
+                    <button type="button" role="tab" id="ctTradesTab" data-book-view="trades" aria-selected="false" aria-controls="ctTradesPanel" tabindex="-1">Trades</button>
+                </div>
+                <div id="ctBookPanel" role="tabpanel" aria-labelledby="ctBookTab">
+                    <div class="ct-book-head"><span>Price (USD)</span><span>Amount</span><span>Total</span></div>
+                    <div id="ctAsks" class="ct-book-rows"></div>
+                    <div class="ct-spread"><strong id="ctBookPrice">--</strong><small>Spread <span id="ctSpread">--</span></small></div>
+                    <div id="ctBids" class="ct-book-rows"></div>
+                    <p id="ctBookMessage" class="ct-panel-message">Loading market depth...</p>
+                </div>
+                <div id="ctTradesPanel" role="tabpanel" aria-labelledby="ctTradesTab" hidden>
+                    <div class="ct-book-head"><span>Price (USD)</span><span>Amount</span><span>Time</span></div>
+                    <div id="ctRecentTrades" class="ct-trade-rows"></div>
+                    <p id="ctTradesMessage" class="ct-panel-message">Loading recent trades...</p>
+                </div>
+            </section>
+            <section class="ct-ticket" aria-labelledby="ctOrderHeading">
+                <header><h2 id="ctOrderHeading">Place order</h2><span>Spot</span></header>
+                <div class="ct-side-switch" role="group" aria-label="Order side"><button type="button" data-side="buy" aria-pressed="true"><i data-feather="arrow-down-left"></i>Buy</button><button type="button" data-side="sell" aria-pressed="false"><i data-feather="arrow-up-right"></i>Sell</button></div>
+                <div class="ct-order-types" role="group" aria-label="Order type"><button type="button" data-order-type="market" aria-pressed="true">Market</button><button type="button" data-order-type="limit" aria-pressed="false">Limit</button></div>
+                <form id="ctOrderForm" novalidate>
+                    <label for="ctLimitPrice">Price</label><div class="ct-input-wrap"><input id="ctLimitPrice" name="price" type="text" inputmode="decimal" autocomplete="off" placeholder="Market price" disabled><span>USD</span></div>
+                    <label for="ctQuantity">Amount</label><div class="ct-input-wrap"><input id="ctQuantity" name="quantity" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" maxlength="24" aria-describedby="ctOrderError"><span id="ctQuantitySymbol">BTC</span></div>
+                    <p id="ctOrderError" class="ct-order-error" role="alert"></p>
+                    <label for="ctNotional">Estimated order value</label><div class="ct-input-wrap"><input id="ctNotional" name="notional" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" maxlength="24"><span>USD</span></div>
+                    <dl class="ct-order-summary"><div><dt id="ctAssetBalanceLabel">Spot asset holdings</dt><dd id="ctAssetBalance">--</dd></div></dl>
+                    <dl class="ct-order-summary"><div><dt id="ctAvailableLabel">Available USD</dt><dd id="ctAvailable">--</dd></div><div><dt>In open orders</dt><dd id="ctReserved">--</dd></div><div><dt>Fee (0.10%)</dt><dd id="ctEstimatedFee">--</dd></div><div><dt id="ctEstimatedTotalLabel">Estimated total</dt><dd id="ctEstimatedTotal">--</dd></div><div><dt>Trading account</dt><dd id="ctTradingAccount">Connecting...</dd></div></dl>
+                    <button id="ctReviewOrder" type="submit" class="ct-review-button" disabled><i data-feather="eye"></i><span>Review buy order</span></button>
+                    <p class="ct-execution-notice" id="ctSimulationNotice">Trading starts with your CoinVault spot balance.</p>
+                </form>
+            </section>
+            <section class="ct-orders" aria-label="Your orders">
+                <div class="ct-section-tabs" role="tablist" aria-label="Order records"><button role="tab" id="ctOpenOrdersTab" type="button" data-orders-view="open" aria-selected="true" aria-controls="ctOrdersContent">Open orders</button><button role="tab" id="ctOrderHistoryTab" type="button" data-orders-view="history" aria-selected="false" aria-controls="ctOrdersContent" tabindex="-1">Order history</button></div>
+                <div id="ctOrdersContent" role="tabpanel" aria-labelledby="ctOpenOrdersTab"><div class="ct-orders-empty"><i data-feather="clipboard"></i><strong>Loading spot orders</strong></div></div>
+            </section>
+        </div>
+        <footer class="ct-footer"><span>&copy; <span id="ctYear">2026</span> CoinVault</span><a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer">Charts by TradingView Lightweight Charts&trade;</a><a href="learn.html">CoinVault Learn</a></footer>
+    </div>
+</main>
+<dialog id="ctPairDialog" class="cv-dialog ct-pair-dialog" aria-labelledby="ctPairDialogTitle">
+    <div class="cv-dialog-heading"><h2 id="ctPairDialogTitle">Select market</h2><button type="button" class="cv-icon" data-close="ctPairDialog" aria-label="Close market selector" title="Close"><i data-feather="x"></i></button></div>
+    <label class="ct-search"><i data-feather="search"></i><input id="ctPairSearch" type="search" autocomplete="off" placeholder="Search markets" aria-label="Search markets"></label>
+    <div id="ctPairs" class="ct-pairs"></div>
+    <p id="ctPairsMessage" class="ct-panel-message" hidden></p>
+</dialog>
+<dialog id="ctReviewDialog" class="cv-dialog ct-review-dialog ct-receipt" aria-labelledby="ctReviewTitle">
+    <div class="ct-receipt-brand"><span>CoinVault</span><small>Receipt</small></div>
+    <div class="cv-dialog-heading"><h2 id="ctReviewTitle">Review order</h2><button type="button" class="cv-icon" data-close="ctReviewDialog" aria-label="Close order review" title="Close"><i data-feather="x"></i></button></div>
+    <p class="ct-receipt-amount" id="ctReviewAmount"></p>
+    <dl id="ctReviewDetails"></dl>
+    <p class="ct-review-disclosure" id="ctReviewDisclosure">This order executes cryptocurrency purchase or sale at the current market price and updates your balance accordingly.</p>
+    <p class="ct-order-error" id="ctReviewError" role="alert"></p>
+    <button class="cv-button" id="ctConfirmOrder" type="button"><i data-feather="check"></i><span>Confirm order</span></button>
+    <button class="ct-receipt-dismiss" data-close="ctReviewDialog" type="button">Cancel</button>
+    <p class="ct-receipt-foot">Virtual funds only. No real assets are purchased or sold.</p>
+</dialog>
+<dialog id="ctReceiptDialog" class="cv-dialog ct-review-dialog ct-receipt" aria-labelledby="ctReceiptTitle">
+    <div class="ct-receipt-brand"><span>CoinVault</span><small>Receipt</small></div>
+    <div class="ct-receipt-result"><span class="ct-receipt-check" id="ctReceiptIcon"><i data-feather="check"></i></span><h2 id="ctReceiptTitle" tabindex="-1" autofocus>Order filled</h2><p class="ct-receipt-amount" id="ctReceiptAmount"></p><p id="ctReceiptMarket"></p></div>
+    <dl id="ctReceiptDetails"></dl>
+    <p class="ct-review-disclosure" id="ctReceiptNote"></p>
+    <button class="cv-button" id="ctReceiptViewOrders" type="button">View order history</button>
+    <button class="ct-receipt-dismiss" data-close="ctReceiptDialog" type="button">Done</button>
+    <p class="ct-receipt-foot">Transaction receipt. Proof of a completed trade.</p>
+</dialog>
+<noscript><p>JavaScript is required to load the trading workspace.</p></noscript>
+</body>
+</html>
