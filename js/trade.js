@@ -17,7 +17,7 @@
     const receiptRows = entries => entries.map(([label, value], index) => `<div${index === entries.length - 1 ? ' class="ct-receipt-total"' : ''}><dt>${A.escape(label)}</dt><dd>${A.escape(value)}</dd></div>`).join('');
     function showReceipt(order) {
         const filled = order.status === 'filled', open = order.status === 'open', symbol = order.productId.slice(0, -4);
-        $('ctReceiptTitle').textContent = filled ? 'Spot order filled' : open ? 'Simulated order placed' : 'Simulated order cancelled';
+        $('ctReceiptTitle').textContent = filled ? 'Spot order filled' : open ? 'Order placed' : 'Order cancelled';
         $('ctReceiptIcon').innerHTML = A.icon(filled ? 'check' : open ? 'clock' : 'x');
         $('ctReceiptAmount').textContent = `${order.side === 'buy' ? 'Buy' : 'Sell'} ${order.quantity} ${symbol}`;
         $('ctReceiptMarket').textContent = `${symbol} / USD`;
@@ -161,11 +161,11 @@
         $('ctOrderHistoryTab').textContent = `Order history${account ? ` (${account.orders.filter(order => order.status !== 'open').length})` : ''}`;
         const list = account ? (ordersView === 'open' ? [...account.openOrders].reverse() : account.orders.filter(order => order.status !== 'open')) : [];
         if (!list.length) {
-            $('ctOrdersContent').innerHTML = `<div class="ct-orders-empty">${A.icon('clipboard')}<strong>${account ? ordersView === 'open' ? 'No open simulated orders' : 'No simulated trades yet' : T.state.error ? 'Orders are temporarily unavailable' : 'Your simulated portfolio'}</strong><p>${account ? ordersView === 'open' ? 'Limit orders appear here until filled or cancelled.' : 'Completed and cancelled simulated orders appear here.' : 'Your starting funds are copied from your CoinVault balance.'}</p></div>`;
+            $('ctOrdersContent').innerHTML = `<div class="ct-orders-empty">${A.icon('clipboard')}<strong>${account ? ordersView === 'open' ? 'No open orders' : 'No trades yet' : T.state.error ? 'Orders are temporarily unavailable' : 'Your  portfolio'}</strong><p>${account ? ordersView === 'open' ? 'Limit orders appear here until filled or cancelled.' : 'Completed and cancelled orders appear here.' : 'Your starting funds are copied from your CoinVault balance.'}</p></div>`;
         } else {
             $('ctOrdersContent').innerHTML = `<div class="ct-record-head"><span>Market</span><span>Order</span><span>Amount</span><span>Price (USD)</span><span>Status</span><span></span></div>` + list.map(order => {
                 const symbol = order.productId.slice(0, -4), label = order.status === 'filled' ? 'Order fill' : order.status === 'cancelled' ? 'Cancelled' : 'Open';
-                return `<div class="ct-record" data-order-id="${A.escape(order.id)}"><div class="ct-record-market"><strong>${A.escape(symbol)} / USD</strong><small>${A.escape(new Date(order.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }))}</small></div><span class="ct-record-kind ${order.side === 'buy' ? 'is-up' : 'is-down'}">${order.side === 'buy' ? 'Buy' : 'Sell'} / ${order.type === 'market' ? 'Market' : 'Limit'}</span><span class="ct-record-amount">${A.escape(order.quantity)}</span><span class="ct-record-price">${A.escape(order.fillPrice || order.limitPrice || '--')}</span><span class="ct-record-status">${label}</span><span class="ct-record-action"><button class="cv-icon" type="button" data-receipt-order="${A.escape(order.id)}" aria-label="View ${A.escape(symbol)} order receipt" title="View receipt">${A.icon('file-text')}</button>${order.status === 'open' ? `<button class="cv-icon" type="button" data-cancel-order="${A.escape(order.id)}" aria-label="Cancel simulated ${A.escape(symbol)} order" title="Cancel order" ${T.state.saving ? 'disabled' : ''}>${A.icon('x')}</button>` : ''}</span></div>`;
+                return `<div class="ct-record" data-order-id="${A.escape(order.id)}"><div class="ct-record-market"><strong>${A.escape(symbol)} / USD</strong><small>${A.escape(new Date(order.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }))}</small></div><span class="ct-record-kind ${order.side === 'buy' ? 'is-up' : 'is-down'}">${order.side === 'buy' ? 'Buy' : 'Sell'} / ${order.type === 'market' ? 'Market' : 'Limit'}</span><span class="ct-record-amount">${A.escape(order.quantity)}</span><span class="ct-record-price">${A.escape(order.fillPrice || order.limitPrice || '--')}</span><span class="ct-record-status">${label}</span><span class="ct-record-action"><button class="cv-icon" type="button" data-receipt-order="${A.escape(order.id)}" aria-label="View ${A.escape(symbol)} order receipt" title="View receipt">${A.icon('file-text')}</button>${order.status === 'open' ? `<button class="cv-icon" type="button" data-cancel-order="${A.escape(order.id)}" aria-label="Cancel ${A.escape(symbol)} order" title="Cancel order" ${T.state.saving ? 'disabled' : ''}>${A.icon('x')}</button>` : ''}</span></div>`;
             }).join('');
         }
         if (ordersView === 'open' && account?.openOrders.length) $('ctOrdersContent').insertAdjacentHTML('beforeend', `<p class="ct-limit-note">${T.state.unavailable.length ? 'Some orders are waiting for current market prices. ' : ''}Simulated limit orders are checked while this page is open.</p>`);
@@ -196,10 +196,10 @@
         $('ctQuantity').setAttribute('aria-invalid', String(insufficient || wrongStep));
         $('ctReviewOrder').disabled = !valid;
         $('ctReviewOrder').querySelector('span').textContent = `Review ${side} order`;
-        if (insufficient || wrongStep || showError) $('ctOrderError').textContent = insufficient ? `Insufficient simulated ${currency} balance.` : wrongStep ? `Use an amount in increments of ${M.state.product.baseIncrement}.` : !M.fresh() ? 'A current market quote is required.' : !current ? 'Enter a valid positive price.' : !size ? 'Enter a valid positive amount.' : A.state.error ? 'Your account is temporarily unavailable.' : '';
+        if (insufficient || wrongStep || showError) $('ctOrderError').textContent = insufficient ? `Insufficient ${currency} balance.` : wrongStep ? `Use an amount in increments of ${M.state.product.baseIncrement}.` : !M.fresh() ? 'A current market quote is required.' : !current ? 'Enter a valid positive price.' : !size ? 'Enter a valid positive amount.' : A.state.error ? 'Your account is temporarily unavailable.' : '';
         else $('ctOrderError').textContent = '';
         if (needsConversion) {
-            $('ctOrderError').textContent = 'Sell or convert some simulated BTC to USD before buying this asset. ';
+            $('ctOrderError').textContent = 'Sell or convert some BTC to USD before buying this asset. ';
             const link = document.createElement('a');
             link.href = 'trade.html?asset=BTC&side=sell'; link.textContent = 'Go to BTC/USD';
             $('ctOrderError').append(link);
@@ -306,12 +306,12 @@
             event.preventDefault(); const estimate = calculate(true);
             if (!estimate) return;
             pendingOrder = { clientOrderId: crypto.randomUUID(), productId: M.state.product.id, side: estimate.side, type: estimate.type, quantity: estimate.amount.toFixed(), ...(estimate.type === 'limit' ? { limitPrice: estimate.price.toFixed() } : {}) };
-            const entries = [['Market', `${estimate.symbol} / USD`], ['Order type', estimate.type === 'market' ? 'Market' : 'Limit'], ['Estimated price', usd(estimate.price)], ['Order value', usd(estimate.total)], ['Simulated fee (0.10%)', usd(estimate.fee)], [estimate.side === 'buy' ? 'Estimated total' : 'Estimated proceeds', usd(estimate.net)]];
+            const entries = [['Market', `${estimate.symbol} / USD`], ['Order type', estimate.type === 'market' ? 'Market' : 'Limit'], ['Estimated price', usd(estimate.price)], ['Order value', usd(estimate.total)], ['Fee (0.10%)', usd(estimate.fee)], [estimate.side === 'buy' ? 'Estimated total' : 'Estimated proceeds', usd(estimate.net)]];
             $('ctReviewAmount').textContent = `${estimate.side === 'buy' ? 'Buy' : 'Sell'} ${estimate.amount.toFixed()} ${estimate.symbol}`;
             $('ctReviewDetails').innerHTML = receiptRows(entries);
             $('ctReviewError').textContent = '';
-            $('ctConfirmOrder').querySelector('span').textContent = `Confirm simulated ${estimate.side}`;
-            $('ctReviewDisclosure').textContent = 'Only your simulated portfolio is updated. No real assets are purchased or sold.' + (estimate.type === 'limit' ? ' Funds are reserved until filled or cancelled. Limit orders are checked while this page is open.' : ' The fill uses a current market quote and may differ from this estimate.');
+            $('ctConfirmOrder').querySelector('span').textContent = `Confirm ${estimate.side}`;
+            $('ctReviewDisclosure').textContent = 'Only your portfolio is updated. No real assets are purchased or sold.' + (estimate.type === 'limit' ? ' Funds are reserved until filled or cancelled. Limit orders are checked while this page is open.' : ' The fill uses a current market quote and may differ from this estimate.');
             $('ctReviewDialog').showModal(); $('ctReviewDialog').scrollTop = 0;
         };
         $('ctConfirmOrder').onclick = async () => {
