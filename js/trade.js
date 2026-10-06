@@ -151,8 +151,8 @@
         $('ctTradingAccount').textContent = s.account ? 'CoinVault' : s.waitingForBalance ? 'Awaiting balance' : s.error ? 'Unavailable' : 'Connecting...';
         const error = A.state.error || s.error;
         $('ctAccountError').hidden = !error; $('ctAccountError').textContent = error || '';
-        $('ctSimulationNotice').textContent = s.account ? s.account.initializationMode === 'asset-copy' ? 'Started with a one-time copy of your CoinVault asset quantities. Trades update only this simulated portfolio; these funds and gains cannot be withdrawn.' : `` :
-            s.waitingForBalance ? 'Connect a funded CoinVault wallet to initialize your simulated holdings.' : 'Simulated trading starts with a one-time copy of your CoinVault assets. No real funds are exchanged.';
+        $('ctSimulationNotice').textContent = s.account ? s.account.initializationMode === 'asset-copy' ? '' : `` :
+            s.waitingForBalance ? 'Connect a funded CoinVault wallet to initialize your holdings.' : '';
         $('ctConfirmOrder').disabled = s.saving;
     }
     function renderOrders() {
