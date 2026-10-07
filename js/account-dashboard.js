@@ -70,7 +70,14 @@
             const image = ['BTC', 'ETH', 'USDT', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE'].includes(symbol) ? `<img src="assets/crypto/${symbol.toLowerCase()}.svg" alt="">` : A.icon('circle');
             return `<article class="cv-asset"><div class="cv-asset-brand">${image}<div><strong>${A.escape(asset.name || symbol)}</strong><small>${A.escape(symbol)}</small></div></div><div class="cv-asset-amount cv-sensitive">${asset.balance.toLocaleString('en', { maximumFractionDigits: 8 })} ${A.escape(symbol)}</div><div class="cv-asset-value cv-asset-market-price" data-asset-value="${A.escape(symbol)}" title="Market price">${assetReadout(asset)}</div><button class="cv-link" data-asset="${A.escape(symbol)}">View asset ${A.icon('arrow-right')}</button></article>`;
         }).join('') : `<div class="cv-empty"><p>${warning ? 'Assets are temporarily unavailable.' : wallets.length ? 'Balances are not available yet.' : 'No wallet connected.'}</p>${!warning && !wallets.length ? '<button class="cv-button" data-cv-connect>Connect wallet</button>' : ''}</div>`;
-        $('cvAssets').querySelectorAll('[data-asset]').forEach(button => button.onclick = () => showAsset(button.dataset.asset));
+        $('cvAssets').querySelectorAll('[data-asset]').forEach(button => {
+            button.onclick = () => showAsset(button.dataset.asset);
+            const link = document.createElement('a');
+            link.className = 'cv-asset-mobile-link';
+            link.href = `trade.html?asset=${encodeURIComponent(button.dataset.asset)}&from=dashboard`;
+            link.setAttribute('aria-label', `View ${button.dataset.asset} trading`);
+            button.closest('.cv-asset').appendChild(link);
+        });
         $('cvAssets').querySelectorAll('[data-cv-connect]').forEach(button => button.onclick = A.showConnect);
         $('cvDetailsAddresses').innerHTML = wallets.map(wallet => `<div class="cv-detail-row"><small>${A.escape(wallet.label)}</small><div class="cv-address"><span title="${A.escape(wallet.address)}">${A.escape(A.short(wallet.address))}</span><button class="cv-icon" data-copy="${A.escape(wallet.address)}" aria-label="Copy Bitcoin address" title="Copy Bitcoin address">${A.icon('copy')}</button></div>${wallet.unavailable ? '<small>Balance unavailable</small>' : ''}</div>`).join('');
         $('cvDetailsAddresses').querySelectorAll('[data-copy]').forEach(button => button.onclick = () => A.copy(button.dataset.copy));
